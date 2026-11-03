@@ -22,7 +22,7 @@ const App = {
   },
 
   /**
-   * Registrasi Service Worker PWA
+   * Registrasi Service Worker PWA & Auto-Update
    */
   registerServiceWorker() {
     if ('serviceWorker' in navigator) {
@@ -31,6 +31,8 @@ const App = {
           .register('./sw.js')
           .then(reg => {
             console.log('[SW] Service Worker terdaftar. Scope:', reg.scope);
+            // Paksa pengecekan versi baru dari server
+            reg.update();
           })
           .catch(err => {
             console.warn('[SW] Pendaftaran Service Worker gagal:', err);
@@ -95,16 +97,9 @@ const App = {
    * Memeriksa Apakah Pengguna Perlu Mengonfigurasi URL Endpoint GAS
    */
   checkApiEndpointConfig() {
-    const currentUrl = CONFIG.getApiUrl();
     const configBtn = document.getElementById('btn-open-endpoint-config');
     if (configBtn) {
       configBtn.addEventListener('click', () => this.openEndpointModal());
-    }
-
-    // Jika masih default placeholder, tampilkan notifikasi lembut
-    if (currentUrl.includes('YOUR_SCRIPT_ID')) {
-      const banner = document.getElementById('demo-mode-banner');
-      if (banner) banner.style.display = 'block';
     }
   },
 
@@ -127,17 +122,12 @@ const App = {
     CONFIG.setApiUrl(val);
     document.getElementById('modal-endpoint-config').style.display = 'none';
     this.showToast('URL Google Apps Script berhasil disimpan.', 'success');
-
-    const banner = document.getElementById('demo-mode-banner');
-    if (banner) banner.style.display = val ? 'none' : 'block';
   },
 
   resetCustomEndpoint() {
     CONFIG.setApiUrl('');
     document.getElementById('modal-endpoint-config').style.display = 'none';
     this.showToast('URL dikembalikan ke setelan awal.', 'info');
-    const banner = document.getElementById('demo-mode-banner');
-    if (banner) banner.style.display = 'block';
   },
 
   /**

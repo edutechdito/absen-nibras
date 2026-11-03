@@ -51,24 +51,19 @@
        ======================================================================== -->
   <main class="main-container">
 
-    <!-- PWA Install Banner -->
+    <!-- PWA Install Banner (Hanya muncul jika browser mendukung instalasi PWA) -->
     <div id="pwa-install-banner" class="install-banner">
-      <div>
-        <b>Pasang Aplikasi di Layar HP</b>
-        <div style="font-size:0.8rem;color:#78350F;">Akses presensi lebih cepat & mudah dari Homescreen HP.</div>
-      </div>
-      <button class="btn btn-sm btn-primary" onclick="App.triggerInstall()">Pasang Sekarang</button>
-    </div>
-
-    <!-- Demo Mode Notice Banner -->
-    <div id="demo-mode-banner" class="install-banner" style="background:#EFF6FF;border-color:#BFDBFE;display:none;">
-      <div>
-        <b style="color:#1E40AF;">Mode Demo / Simulasi Aktif</b>
-        <div style="font-size:0.8rem;color:#1E3A8A;">
-          URL Google Apps Script belum dikonfigurasi. Klik tombol di kanan untuk menghubungkan database resmi.
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:1.5rem;">📲</span>
+        <div>
+          <b>Pasang Aplikasi di Layar HP</b>
+          <div style="font-size:0.8rem;color:#78350F;">Akses presensi lebih cepat dari layar utama HP.</div>
         </div>
       </div>
-      <button class="btn btn-sm btn-primary" onclick="App.openEndpointModal()">Atur URL Web App</button>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="btn btn-sm btn-primary" onclick="App.triggerInstall()">Pasang</button>
+        <button class="btn btn-sm btn-secondary" onclick="document.getElementById('pwa-install-banner').style.display='none'" title="Tutup">✕</button>
+      </div>
     </div>
 
     <!-- ======================================================================
