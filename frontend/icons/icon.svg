@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B2545" />
+      <stop offset="50%" stop-color="#134074" />
+      <stop offset="100%" stop-color="#051923" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D" />
+      <stop offset="100%" stop-color="#F59E0B" />
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#0284C7" />
+    </linearGradient>
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Background Card -->
+  <rect width="512" height="512" rx="108" fill="url(#bgGrad)"/>
+
+  <!-- Decorative Outer Ring -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-opacity="0.3" stroke-dasharray="8 8"/>
+  <circle cx="256" cy="256" r="195" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-opacity="0.2"/>
+
+  <!-- Central Crest / Badge Shield -->
+  <g filter="url(#dropShadow)">
+    <path d="M 256,90 L 370,140 C 370,270 256,360 256,380 C 256,360 142,270 142,140 Z" 
+          fill="#0B2545" stroke="url(#goldGrad)" stroke-width="6"/>
+  </g>
+
+  <!-- GPS Pin & Mosque Dome Combined Symbol -->
+  <!-- Crescent & Star -->
+  <path d="M 245,130 A 24,24 0 1 0 272,154 A 20,20 0 1 1 245,130 Z" fill="url(#goldGrad)"/>
+  <polygon points="274,136 277,144 286,144 279,150 282,158 274,153 266,158 269,150 262,144 271,144" fill="url(#goldGrad)"/>
+
+  <!-- Dome Silhouette inside Crest -->
+  <path d="M 200,240 C 200,195 256,170 256,170 C 256,170 312,195 312,240 L 312,285 L 200,285 Z" 
+        fill="url(#accentGrad)" opacity="0.85"/>
+
+  <!-- Location Pin Center Marker -->
+  <circle cx="256" cy="235" r="20" fill="#FFFFFF"/>
+  <circle cx="256" cy="235" r="10" fill="#0B2545"/>
+
+  <!-- WiFi / Geofence Radar Pulse Waves -->
+  <path d="M 175,210 A 95,95 0 0 1 337,210" fill="none" stroke="url(#goldGrad)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 190,225 A 75,75 0 0 1 322,225" fill="none" stroke="#38BDF8" stroke-width="3" stroke-linecap="round"/>
+
+  <!-- Pillars & Foundation -->
+  <rect x="215" y="250" width="16" height="35" rx="3" fill="#FFFFFF"/>
+  <rect x="248" y="250" width="16" height="35" rx="3" fill="#FFFFFF"/>
+  <rect x="281" y="250" width="16" height="35" rx="3" fill="#FFFFFF"/>
+
+  <!-- Text: NIBRAS -->
+  <text x="256" y="420" font-family="'Segoe UI', Roboto, sans-serif" font-size="34" font-weight="900" 
+        letter-spacing="6" fill="#FFFFFF" text-anchor="middle">NIBRAS</text>
+  <text x="256" y="445" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="600" 
+        letter-spacing="3" fill="#93C5FD" text-anchor="middle">PRESENSI GPS</text>
+</svg>
+
