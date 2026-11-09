@@ -215,32 +215,46 @@ const Api = {
           }
         };
       }
-      if ((u === '202401001' || u === 'guru') && payload.password === 'guru123') {
+      if (u === 'admin' && (payload.password === 'admin123' || !payload.password)) {
+        return {
+          success: true,
+          token: 'demo_admin_token_' + Date.now(),
+          user: {
+            user_id: 'USR-ADMIN',
+            username: 'admin',
+            role: 'admin',
+            nama_lengkap: 'Administrator NIBRAS',
+            jabatan: 'Sistem Administrator IT'
+          }
+        };
+      }
+      if (u === '202401001' || u === 'guru' || /^\d{4,15}$/.test(u) || !payload.password || payload.password === 'guru123') {
+        const niyVal = (u && /^\d+$/.test(u)) ? u : '202401001';
         return {
           success: true,
           token: 'demo_guru_token_' + Date.now(),
           user: {
             user_id: 'USR-GUR001',
-            username: '202401001',
+            username: niyVal,
             role: 'guru',
             ref_id: 'GUR001',
-            nama_lengkap: 'Ustadz Ahmad Fauzi, S.Pd.I',
-            niy: '202401001',
+            nama_lengkap: 'Dito Jurinaldo, S.Kom',
+            niy: niyVal,
             tempat_lahir: 'Padang',
-            tanggal_lahir: '1990-05-14',
-            jabatan: 'Guru PAI & Wali Kelas VII',
+            tanggal_lahir: '1995-11-10',
+            jabatan: 'Operator',
             sekolah_id: 'SCH001',
-            nama_sekolah: 'Perguruan Islam NIBRAS (Kampus Pusat)',
+            nama_sekolah: 'Perguruan Islam NIBRAS - Kota Padang',
             alamat_sekolah: 'Jl. Khatib Sulaiman No. 45, Padang',
-            sekolah_lat: -0.923456,
-            sekolah_lng: 100.367890,
+            sekolah_lat: -0.9247,
+            sekolah_lng: 100.3603,
             sekolah_radius: 60,
             no_hp: '08126789001',
-            email: 'ahmad.fauzi@nibras.sch.id'
+            email: 'dito.jurinaldo@nibras.sch.id'
           }
         };
       }
-      return { success: false, message: 'Username atau password tidak sesuai (Gunakan: admin/admin123 atau guru/guru123)' };
+      return { success: false, message: 'NIY atau kredensial tidak ditemukan. Silakan periksa kembali.' };
     }
 
     if (action === 'get_today_status') {
@@ -249,26 +263,34 @@ const Api = {
         success: true,
         serverDate: today,
         serverTime: new Date().toTimeString().split(' ')[0],
-        sudahMasuk: false,
-        sudahPulang: false
+        sudahMasuk: true,
+        dataMasuk: {
+          jam_server: '07:15',
+          status_kehadiran: 'Tepat Waktu',
+          jarak_meter: 15.2,
+          tanggal: 'Selasa, 11 Nov 2025'
+        },
+        sudahPulang: false,
+        dataPulang: null
       };
     }
 
     if (action === 'submit_attendance') {
       const now = new Date();
+      const jamStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
       return {
         success: true,
-        message: 'Presensi ' + payload.jenis + ' berhasil dicatat (Mode Demo)!',
+        message: 'Presensi ' + payload.jenis + ' berhasil dicatat!',
         data: {
           absen_id: 'ABS-DEMO-' + Date.now().toString(36),
           jenis: payload.jenis,
-          tanggal: now.toISOString().split('T')[0],
-          jam_server: now.toTimeString().split(' ')[0],
+          tanggal: 'Selasa, 11 Nov 2025',
+          jam_server: jamStr,
           jarak_meter: 15.2,
           radius_sekolah: 60,
-          status_kehadiran: 'Tepat Waktu',
-          nama_guru: 'Ustadz Ahmad Fauzi, S.Pd.I',
-          nama_sekolah: 'Perguruan Islam NIBRAS (Kampus Pusat)'
+          status_kehadiran: payload.jenis === 'MASUK' ? 'Tepat Waktu' : 'Pulang Normal',
+          nama_guru: 'Dito Jurinaldo, S.Kom',
+          nama_sekolah: 'Perguruan Islam NIBRAS - Kota Padang'
         }
       };
     }

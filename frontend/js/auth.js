@@ -4,6 +4,8 @@
  */
 
 const AuthService = {
+  currentPortalRole: 'guru',
+
   /**
    * Inisialisasi Sesi Saat Aplikasi Dibuka
    */
@@ -61,12 +63,14 @@ const AuthService = {
     const viewGuru = document.getElementById('view-guru');
     const viewAdmin = document.getElementById('view-admin');
     const navGuru = document.getElementById('nav-guru-bottom');
+    const headerLogout = document.getElementById('header-logout-btn');
 
     if (viewLanding) viewLanding.style.display = 'block';
     if (viewLogin) viewLogin.style.display = 'none';
     if (viewGuru) viewGuru.style.display = 'none';
     if (viewAdmin) viewAdmin.style.display = 'none';
     if (navGuru) navGuru.style.display = 'none';
+    if (headerLogout) headerLogout.style.display = 'none';
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   },
@@ -75,16 +79,20 @@ const AuthService = {
    * Membuka Form Login Berdasarkan Portal yang Dipilih (Pegawai / Admin)
    */
   openLoginPortal(role) {
+    this.currentPortalRole = role || 'guru';
+
     const viewLanding = document.getElementById('view-landing');
     const viewLogin = document.getElementById('view-login');
     const viewGuru = document.getElementById('view-guru');
     const viewAdmin = document.getElementById('view-admin');
     const navGuru = document.getElementById('nav-guru-bottom');
+    const headerLogout = document.getElementById('header-logout-btn');
 
     if (viewLanding) viewLanding.style.display = 'none';
     if (viewGuru) viewGuru.style.display = 'none';
     if (viewAdmin) viewAdmin.style.display = 'none';
     if (navGuru) navGuru.style.display = 'none';
+    if (headerLogout) headerLogout.style.display = 'none';
     if (viewLogin) viewLogin.style.display = 'flex';
 
     const roleBadgeEl = document.getElementById('login-role-badge');
@@ -92,12 +100,14 @@ const AuthService = {
     const subtitleEl = document.getElementById('login-subtitle');
     const labelUserEl = document.getElementById('label-login-username');
     const inputUserEl = document.getElementById('login-username');
+    const passGroupEl = document.getElementById('form-group-password');
     const inputPassEl = document.getElementById('login-password');
     const submitBtn = document.getElementById('btn-submit-login');
+    const hintTextEl = document.getElementById('login-hint-text');
 
     if (inputPassEl) inputPassEl.value = '';
 
-    if (role === 'admin') {
+    if (this.currentPortalRole === 'admin') {
       if (roleBadgeEl) {
         roleBadgeEl.textContent = '🛡️ Portal Masuk Administrator';
         roleBadgeEl.className = 'login-portal-badge portal-badge-admin';
@@ -109,7 +119,11 @@ const AuthService = {
         inputUserEl.placeholder = 'Masukkan username administrator';
         inputUserEl.value = '';
       }
+      if (passGroupEl) passGroupEl.style.display = 'block';
+      if (inputPassEl) inputPassEl.required = true;
+      if (hintTextEl) hintTextEl.style.display = 'none';
       if (submitBtn) {
+        submitBtn.innerHTML = '<span>Masuk Administrator</span><span class="btn-arrow">→</span>';
         submitBtn.style.background = 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)';
         submitBtn.style.borderColor = '#7C3AED';
       }
@@ -118,14 +132,18 @@ const AuthService = {
         roleBadgeEl.textContent = '👨‍🏫 Portal Masuk Pegawai (Guru & GTK)';
         roleBadgeEl.className = 'login-portal-badge portal-badge-guru';
       }
-      if (titleEl) titleEl.textContent = 'Masuk Pegawai / Guru';
-      if (subtitleEl) subtitleEl.textContent = 'Presensi Guru & Tenaga Kependidikan';
-      if (labelUserEl) labelUserEl.textContent = 'Username / NIY';
+      if (titleEl) titleEl.textContent = 'Masuk Portal Pegawai';
+      if (subtitleEl) subtitleEl.textContent = 'Silakan masukkan Nomor Induk Yayasan (NIY) Anda';
+      if (labelUserEl) labelUserEl.textContent = 'Nomor Induk Yayasan (NIY)';
       if (inputUserEl) {
-        inputUserEl.placeholder = 'Masukkan NIY atau Username';
+        inputUserEl.placeholder = 'Masukkan NIY (Contoh: 202401001)';
         inputUserEl.value = '';
       }
+      if (passGroupEl) passGroupEl.style.display = 'none';
+      if (inputPassEl) inputPassEl.required = false;
+      if (hintTextEl) hintTextEl.style.display = 'block';
       if (submitBtn) {
+        submitBtn.innerHTML = '<span>Masuk ke Dashboard</span><span class="btn-arrow">→</span>';
         submitBtn.style.background = 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)';
         submitBtn.style.borderColor = '#0284C7';
       }
@@ -149,15 +167,27 @@ const AuthService = {
    * Melakukan Login Pengguna
    */
   async handleLogin(username, password) {
-    if (!username || !password) {
-      App.showToast('Harap masukkan username dan password.', 'warning');
+    if (!username) {
+      const msg = this.currentPortalRole === 'guru' ? 'Harap masukkan Nomor Induk Yayasan (NIY).' : 'Harap masukkan username.';
+      App.showToast(msg, 'warning');
+      return false;
+    }
+
+    // Default password guru123 jika diakses melalui portal Pegawai tanpa input password
+    let passToSend = password;
+    if (this.currentPortalRole === 'guru' && (!passToSend || passToSend.trim() === '')) {
+      passToSend = 'guru123';
+    }
+
+    if (this.currentPortalRole === 'admin' && (!passToSend || passToSend.trim() === '')) {
+      App.showToast('Harap masukkan password administrator.', 'warning');
       return false;
     }
 
     App.showLoading(true, 'Memverifikasi kredensial...');
 
     try {
-      const res = await Api.login(username, password);
+      const res = await Api.login(username, passToSend);
       App.showLoading(false);
 
       if (res.success && res.token && res.user) {
@@ -174,7 +204,7 @@ const AuthService = {
         this.routeUserView();
         return true;
       } else {
-        App.showToast(res.message || 'Login gagal. Periksa username dan password Anda.', 'danger');
+        App.showToast(res.message || 'NIY atau kredensial tidak sesuai.', 'danger');
         return false;
       }
     } catch (err) {
@@ -211,19 +241,23 @@ const AuthService = {
   routeUserView() {
     const viewLanding = document.getElementById('view-landing');
     const viewLogin = document.getElementById('view-login');
+    const headerLogout = document.getElementById('header-logout-btn');
 
     if (viewLanding) viewLanding.style.display = 'none';
     if (viewLogin) viewLogin.style.display = 'none';
+    if (headerLogout) headerLogout.style.display = 'inline-flex';
 
     if (AppState.user && AppState.user.role === 'admin') {
       document.getElementById('view-guru').style.display = 'none';
-      document.getElementById('nav-guru-bottom').style.display = 'none';
+      if (document.getElementById('nav-guru-bottom')) document.getElementById('nav-guru-bottom').style.display = 'none';
       document.getElementById('view-admin').style.display = 'block';
       AdminModule.init();
     } else {
       document.getElementById('view-admin').style.display = 'none';
       document.getElementById('view-guru').style.display = 'block';
-      document.getElementById('nav-guru-bottom').style.display = 'flex';
+      if (document.getElementById('nav-guru-bottom')) {
+        document.getElementById('nav-guru-bottom').style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+      }
       GuruModule.init();
     }
   }

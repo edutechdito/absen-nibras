@@ -433,11 +433,9 @@
           <span class="meta-icon">⏰</span>
           <span id="header-live-clock">--:--:-- WIB</span>
         </span>
-      </div>
-
-      <div class="header-actions">
-        <button id="btn-open-endpoint-config" class="btn btn-sm btn-outline" style="color:#FFF;border-color:rgba(255,255,255,0.4);" title="Pengaturan URL API Server">
-          ⚙️ API
+        <button id="header-logout-btn" type="button" class="btn-logout-header" style="display:none;" onclick="AuthService.handleLogout()" title="Keluar dari akun">
+          <span>🚪</span>
+          <span>Logout</span>
         </button>
       </div>
     </div>
@@ -774,23 +772,26 @@
         </div>
 
         <form id="form-login">
-          <div class="form-group">
-            <label class="form-label" for="login-username" id="label-login-username">Username / NIY</label>
+          <div class="form-group" id="form-group-username">
+            <label class="form-label" for="login-username" id="label-login-username">Nomor Induk Yayasan (NIY)</label>
             <div class="form-input-wrap">
-              <input type="text" id="login-username" class="form-input" placeholder="Masukkan NIY atau Username" required autocomplete="username">
+              <input type="text" id="login-username" class="form-input" placeholder="Masukkan NIY (Contoh: 202401001)" required autocomplete="username">
             </div>
+            <p id="login-hint-text" style="font-size:0.8rem;color:#64748B;margin-top:6px;margin-bottom:0;">
+              💡 Masukkan NIY Anda yang terdaftar pada sistem NIBRAS untuk melanjutkan.
+            </p>
           </div>
 
-          <div class="form-group">
+          <div class="form-group" id="form-group-password" style="display:none;">
             <label class="form-label" for="login-password">Password</label>
             <div class="form-input-wrap">
-              <input type="password" id="login-password" class="form-input" placeholder="Masukkan Kata Sandi" required autocomplete="current-password">
+              <input type="password" id="login-password" class="form-input" placeholder="Masukkan Kata Sandi" autocomplete="current-password">
               <button type="button" id="toggle-password" class="toggle-eye-btn" title="Lihat password">👁️</button>
             </div>
           </div>
 
           <button type="submit" class="btn btn-primary btn-block btn-login" id="btn-submit-login">
-            <span>Masuk ke Akun</span>
+            <span>Masuk ke Dashboard</span>
             <span class="btn-arrow">→</span>
           </button>
         </form>
@@ -808,286 +809,441 @@
     <!-- ======================================================================
          VIEW 2: GURU / GTK DASHBOARD & SECTIONS
          ====================================================================== -->
-    <section id="view-guru" style="display:none;">
+        <section id="view-guru" style="display:none;">
 
-      <!-- SECTION: BERANDA GURU -->
-      <div id="guru-section-beranda" class="guru-view-section">
-        <!-- Hero Card Profil & Live Clock -->
-        <div class="guru-hero-card">
-          <div class="guru-hero-top">
-            <div>
-              <div class="guru-greeting">Assalamu'alaikum,</div>
-              <div id="guru-profile-nama" class="guru-name">Nama Guru</div>
-              <div id="guru-profile-niy" class="guru-niy">NIY: 202401001</div>
-              <div id="guru-profile-jabatan" style="font-size:0.8rem;color:#BFDBFE;margin-top:2px;">Guru PAI</div>
+      <!-- CONTAINER PORTAL PEGAWAI (MATCHING REFERENSI DESAIN) -->
+      <div class="guru-portal-wrapper">
+        
+        <!-- SIDEBAR KIRI -->
+        <aside class="guru-sidebar">
+          <nav class="guru-sidebar-nav">
+            <button type="button" class="guru-nav-item active" data-tab="beranda">
+              <span class="nav-icon">🏠</span>
+              <span>Beranda</span>
+            </button>
+            <button type="button" class="guru-nav-item" data-tab="riwayat">
+              <span class="nav-icon">📊</span>
+              <span>Riwayat Absensi</span>
+            </button>
+            <button type="button" class="guru-nav-item" data-tab="profil">
+              <span class="nav-icon">ℹ️</span>
+              <span>Profil</span>
+            </button>
+            <button type="button" class="guru-nav-item" data-tab="pengaturan">
+              <span class="nav-icon">⚙️</span>
+              <span>Pengaturan</span>
+            </button>
+          </nav>
+
+          <!-- Motto & Dekorasi Sudut Bawah Kiri -->
+          <div class="guru-sidebar-bottom">
+            <div class="guru-sidebar-motto">
+              <em>Disiplin Hadir,<br>Untuk Pendidikan<br>yang Lebih Baik</em>
             </div>
-            <div class="guru-clock-box">
-              <div id="guru-live-clock" class="guru-live-clock">--:--:-- WIB</div>
-              <div id="guru-live-date" class="guru-live-date">-- -- ----</div>
+            <div class="guru-sidebar-waves">
+              <svg viewBox="0 0 160 80" preserveAspectRatio="none" class="sidebar-wave-svg">
+                <path d="M 0 80 Q 40 20, 110 50 T 160 30 L 160 80 Z" fill="#F59E0B" opacity="0.95"/>
+                <path d="M 0 80 Q 50 45, 120 70 T 160 55 L 160 80 Z" fill="#0284C7"/>
+              </svg>
             </div>
           </div>
-          <div class="guru-school-badge">
-            <span>🏫</span>
-            <span id="guru-profile-sekolah">Perguruan Islam NIBRAS</span>
+        </aside>
+
+        <!-- KONTEN UTAMA KANAN -->
+        <div class="guru-main-content">
+
+          <!-- 1. SECTION: BERANDA -->
+          <div id="guru-section-beranda" class="guru-view-section active">
+            
+            <!-- Welcome Banner Card -->
+            <div class="guru-welcome-card">
+              <div class="welcome-user-col">
+                <div class="welcome-avatar-wrap">
+                  <svg viewBox="0 0 100 100" class="teacher-avatar-svg">
+                    <circle cx="50" cy="50" r="46" fill="#DBEAFE"/>
+                    <!-- Male teacher face & hair matching reference -->
+                    <path d="M 28 42 C 28 26, 40 18, 50 18 C 60 18, 72 26, 72 42 C 72 56, 62 66, 50 66 C 38 66, 28 56, 28 42 Z" fill="#FDBA74"/>
+                    <path d="M 26 36 C 28 22, 42 14, 52 14 C 64 14, 73 20, 74 32 C 74 32, 68 24, 55 25 C 40 26, 32 34, 26 36 Z" fill="#1E293B"/>
+                    <ellipse cx="43" cy="42" rx="3" ry="3.5" fill="#1E293B"/>
+                    <ellipse cx="57" cy="42" rx="3" ry="3.5" fill="#1E293B"/>
+                    <path d="M 45 53 Q 50 57, 55 53" stroke="#9A3412" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <!-- Safari uniform shirt -->
+                    <path d="M 20 88 C 22 72, 34 68, 50 68 C 66 68, 78 72, 80 88 Z" fill="#D97706"/>
+                    <path d="M 38 68 L 50 82 L 62 68 Z" fill="#FDE68A"/>
+                    <path d="M 47 70 L 50 82 L 53 70 Z" fill="#B45309"/>
+                  </svg>
+                </div>
+                <div class="welcome-info">
+                  <div class="welcome-label">Selamat Datang,</div>
+                  <h2 id="guru-profile-nama" class="welcome-name">Dito Jurinaldo, S.Kom</h2>
+                  <div id="guru-profile-jabatan" class="welcome-role">Operator</div>
+                </div>
+              </div>
+
+              <div class="welcome-meta-divider"></div>
+
+              <div class="welcome-datetime-col">
+                <div class="welcome-date-row">
+                  <span class="meta-icon-blue">📅</span>
+                  <span id="guru-live-date" class="welcome-date-text">Selasa, 11 November 2025</span>
+                </div>
+                <div class="welcome-time-row">
+                  <span class="meta-icon-blue">🕒</span>
+                  <span id="guru-live-clock" class="welcome-clock-text">14:35:27</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Middle 2-Column Grid -->
+            <div class="guru-dashboard-grid">
+              
+              <!-- Kolom Kiri: Absensi Hari Ini -->
+              <div class="card-absensi-hari-ini">
+                <div class="card-blue-header">
+                  <span class="header-icon">📅</span>
+                  <h3>Absensi Hari Ini</h3>
+                </div>
+
+                <div class="card-absensi-body">
+                  <!-- 2 Status Boxes Side by Side -->
+                  <div class="absensi-status-row">
+                    
+                    <!-- Box Absen Masuk -->
+                    <div id="box-absen-masuk" class="status-box box-masuk">
+                      <div class="status-box-header header-green">
+                        <span class="icon-sun">☀️</span>
+                        <span>Absen Masuk</span>
+                      </div>
+                      <div class="status-box-center">
+                        <div id="icon-indicator-masuk" class="circle-indicator indicator-green">
+                          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                          </svg>
+                        </div>
+                        <div id="time-masuk-display" class="time-large time-green">07:15 WIB</div>
+                        <div id="sub-masuk-display" class="sub-text sub-green">Selasa, 11 Nov 2025</div>
+                      </div>
+                    </div>
+
+                    <!-- Box Absen Pulang -->
+                    <div id="box-absen-pulang" class="status-box box-pulang">
+                      <div class="status-box-header header-blue">
+                        <span class="icon-moon">🌙</span>
+                        <span>Absen Pulang</span>
+                      </div>
+                      <div class="status-box-center">
+                        <div id="icon-indicator-pulang" class="circle-indicator indicator-blue-outline">
+                          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#0284C7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                          </svg>
+                        </div>
+                        <div id="time-pulang-display" class="time-large time-blue">-</div>
+                        <div id="sub-pulang-display" class="sub-text sub-muted">Menunggu absen pulang...</div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- Tombol Aksi Utama: Lakukan Absen -->
+                  <button type="button" class="btn-lakukan-absen" onclick="GuruModule.openAttendanceModal()">
+                    <div class="lakukan-absen-main">
+                      <span class="pin-icon">📍</span>
+                      <span class="pin-title">Lakukan Absen</span>
+                    </div>
+                    <div class="lakukan-absen-sub">Pastikan berada di lokasi sekolah</div>
+                  </button>
+
+                  <!-- GPS Footer Status Bar -->
+                  <div class="guru-gps-footer">
+                    <div class="gps-coords-wrap">
+                      <span class="gps-radar-icon">🎯</span>
+                      <span>Lokasi Anda: <strong id="guru-live-coords">-0.9247, 100.3603</strong></span>
+                    </div>
+                    <div class="gps-strip-divider">|</div>
+                    <div id="guru-gps-status-badge" class="gps-status-badge status-active">
+                      <span class="badge-icon">✔</span>
+                      <span class="badge-text">GPS Aktif</span>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Kolom Kanan: Status Kehadiran + Riwayat Absensi -->
+              <div class="guru-stacked-col">
+                
+                <!-- Card 1: Status Kehadiran -->
+                <div class="card-status-kehadiran">
+                  <div class="kehadiran-header">
+                    <span class="shield-icon">🛡️</span>
+                    <h3>Status Kehadiran</h3>
+                  </div>
+                  <p id="kehadiran-body-text" class="kehadiran-desc">
+                    Anda sudah melakukan absen masuk hari ini.
+                  </p>
+                  <div class="kehadiran-action-wrap">
+                    <span id="kehadiran-btn-pill" class="kehadiran-pill">
+                      ✔ Terima kasih!
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Card 2: Riwayat Absensi Timeline -->
+                <div class="card-riwayat-widget">
+                  <div class="riwayat-widget-header">
+                    <span class="clock-icon">🕒</span>
+                    <h3>Riwayat Absensi</h3>
+                  </div>
+
+                  <div class="widget-timeline">
+                    <!-- Item 1: Masuk -->
+                    <div class="timeline-row">
+                      <div class="timeline-marker dot-green"></div>
+                      <div class="timeline-content">
+                        <div class="timeline-head">
+                          <span class="timeline-title">Masuk</span>
+                          <span id="widget-masuk-time" class="timeline-time">07:15 WIB</span>
+                        </div>
+                        <div id="widget-masuk-date" class="timeline-sub">Selasa, 11 Nov 2025</div>
+                      </div>
+                    </div>
+
+                    <!-- Item 2: Pulang -->
+                    <div class="timeline-row">
+                      <div class="timeline-marker dot-blue"></div>
+                      <div class="timeline-content">
+                        <div class="timeline-head">
+                          <span class="timeline-title">Pulang</span>
+                          <span id="widget-pulang-time" class="timeline-time">-</span>
+                        </div>
+                        <div id="widget-pulang-date" class="timeline-sub italic">Belum absen pulang</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Footer Portal Beranda -->
+            <footer class="guru-bottom-footer">
+              <div class="footer-left-info">
+                © 2026 Perguruan Islam NIBRAS - Kota Padang
+              </div>
+              <div class="footer-right-info">
+                📊 Absensi Online | Transparan, Akurat, dan Real-Time
+              </div>
+            </footer>
+
           </div>
+
+          <!-- 2. SECTION: RIWAYAT ABSENSI LENGKAP -->
+          <div id="guru-section-riwayat" class="guru-view-section" style="display:none;">
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-title">Rekap Kehadiran Bulan Ini</div>
+              <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:10px;text-align:center;">
+                <div style="background:#F1F5F9;padding:12px 6px;border-radius:12px;">
+                  <div id="recap-total-hadir" style="font-size:1.4rem;font-weight:800;color:#0B2545;">24</div>
+                  <div style="font-size:0.7rem;font-weight:700;color:#64748B;">TOTAL</div>
+                </div>
+                <div style="background:#ECFDF5;padding:12px 6px;border-radius:12px;">
+                  <div id="recap-tepat-waktu" style="font-size:1.4rem;font-weight:800;color:#059669;">22</div>
+                  <div style="font-size:0.7rem;font-weight:700;color:#059669;">TEPAT</div>
+                </div>
+                <div style="background:#FFFBEB;padding:12px 6px;border-radius:12px;">
+                  <div id="recap-terlambat" style="font-size:1.4rem;font-weight:800;color:#D97706;">2</div>
+                  <div style="font-size:0.7rem;font-weight:700;color:#D97706;">TELAT</div>
+                </div>
+                <div style="background:#FEF2F2;padding:12px 6px;border-radius:12px;">
+                  <div id="recap-pulang-cepat" style="font-size:1.4rem;font-weight:800;color:#DC2626;">0</div>
+                  <div style="font-size:0.7rem;font-weight:700;color:#DC2626;">P.CEPAT</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Filter Riwayat -->
+            <div style="display:flex;gap:10px;margin-bottom:16px;">
+              <select id="filter-history-month" class="form-input" style="padding:10px 14px;" onchange="GuruModule.loadAttendanceHistory()">
+                <option value="">Semua Bulan</option>
+                <option value="01">Januari</option>
+                <option value="02">Februari</option>
+                <option value="03">Maret</option>
+                <option value="04">April</option>
+                <option value="05">Mei</option>
+                <option value="06">Juni</option>
+                <option value="07">Juli</option>
+                <option value="08">Agustus</option>
+                <option value="09">September</option>
+                <option value="10">Oktober</option>
+                <option value="11" selected>November</option>
+                <option value="12">Desember</option>
+              </select>
+              <select id="filter-history-year" class="form-input" style="padding:10px 14px;" onchange="GuruModule.loadAttendanceHistory()">
+                <option value="2026" selected>2026</option>
+                <option value="2025">2025</option>
+              </select>
+            </div>
+
+            <div id="history-list-container"></div>
+          </div>
+
+          <!-- 3. SECTION: PROFIL PENGGUNA -->
+          <div id="guru-section-profil" class="guru-view-section" style="display:none;">
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-title">Biodata Identitas Pegawai</div>
+              <table style="width:100%;font-size:0.88rem;line-height:2.2;">
+                <tr><td style="color:#64748B;width:35%;">Nama Lengkap</td><td id="profile-detail-nama" style="font-weight:700;color:#0B2545;">Dito Jurinaldo, S.Kom</td></tr>
+                <tr><td style="color:#64748B;">NIY</td><td id="profile-detail-niy" style="font-weight:700;color:#0B2545;">202401001</td></tr>
+                <tr><td style="color:#64748B;">TTL</td><td id="profile-detail-ttl">Padang, 10 November 1995</td></tr>
+                <tr><td style="color:#64748B;">Jabatan</td><td id="profile-detail-jabatan">Operator</td></tr>
+                <tr><td style="color:#64748B;">Unit Sekolah</td><td id="profile-detail-sekolah">Perguruan Islam NIBRAS - Kota Padang</td></tr>
+                <tr><td style="color:#64748B;">No. WhatsApp</td><td id="profile-detail-hp">08126789001</td></tr>
+              </table>
+            </div>
+
+            <!-- Ubah Password -->
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-title">Ganti Kata Sandi</div>
+              <form id="form-change-password" onsubmit="GuruModule.handleChangePassword(event)">
+                <div class="form-group">
+                  <label class="form-label">Password Lama</label>
+                  <input type="password" id="input-old-pass" class="form-input" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Password Baru (min 6 karakter)</label>
+                  <input type="password" id="input-new-pass" class="form-input" minlength="6" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Ulangi Password Baru</label>
+                  <input type="password" id="input-confirm-pass" class="form-input" minlength="6" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Simpan Password Baru</button>
+              </form>
+            </div>
+
+            <button type="button" class="btn btn-danger btn-block" onclick="AuthService.handleLogout()" style="padding:13px;">
+              Keluar dari Aplikasi (Logout)
+            </button>
+          </div>
+
+          <!-- 4. SECTION: PENGATURAN -->
+          <div id="guru-section-pengaturan" class="guru-view-section" style="display:none;">
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-title">Pengaturan & Validasi Sistem Presensi</div>
+              <div style="font-size:0.88rem;color:#475569;display:flex;flex-direction:column;gap:12px;line-height:1.6;">
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid #E2E8F0;padding-bottom:8px;">
+                  <span>Radius Presensi Sekolah:</span>
+                  <strong style="color:#0B2545;">Maksimal 60 Meter</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid #E2E8F0;padding-bottom:8px;">
+                  <span>Metode Validasi:</span>
+                  <strong style="color:#0B2545;">GPS Geofence + Foto Selfie</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;border-bottom:1px solid #E2E8F0;padding-bottom:8px;">
+                  <span>Versi Aplikasi:</span>
+                  <strong style="color:#0284C7;">v2.1.0 Enterprise PWA</strong>
+                </div>
+                <div style="display:flex;justify-content:space-between;">
+                  <span>Sinkronisasi Data:</span>
+                  <strong style="color:#059669;">Real-Time Spreadsheet Cloud</strong>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" class="btn btn-outline btn-block" onclick="location.reload(true)" style="padding:12px;">
+              🔄 Perbarui & Bersihkan Cache Lokal
+            </button>
+          </div>
+
         </div>
 
-        <!-- Status Presensi Hari Ini -->
-        <h3 style="font-size:0.95rem;font-weight:700;color:var(--primary);margin-bottom:10px;">Status Kehadiran Hari Ini</h3>
-        <div class="today-status-grid">
-          <div class="status-card">
-            <div class="status-card-header">
-              <span>Absen Masuk</span>
-              <span>🌅</span>
-            </div>
-            <div id="card-status-masuk">
-              <div class="status-badge badge-secondary">Memuat...</div>
-            </div>
-          </div>
-
-          <div class="status-card">
-            <div class="status-card-header">
-              <span>Absen Pulang</span>
-              <span>🌇</span>
-            </div>
-            <div id="card-status-pulang">
-              <div class="status-badge badge-secondary">Memuat...</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Action Buttons -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
-          <button class="btn btn-primary" onclick="GuruModule.switchTab('absen-masuk')" style="padding:16px 12px;border-radius:14px;flex-direction:column;gap:6px;">
-            <span style="font-size:1.6rem;">📲</span>
-            <span>Absen Masuk</span>
-          </button>
-          <button class="btn btn-secondary" onclick="GuruModule.switchTab('absen-pulang')" style="padding:16px 12px;border-radius:14px;flex-direction:column;gap:6px;background:#E0E7FF;color:#3730A3;">
-            <span style="font-size:1.6rem;">🚪</span>
-            <span>Absen Pulang</span>
-          </button>
-        </div>
-
-        <!-- Info Jam Operasional -->
-        <div class="card">
-          <div class="card-title">Aturan Jam Kerja Sekolah</div>
-          <div style="font-size:0.85rem;color:var(--text-muted);display:flex;flex-direction:column;gap:8px;">
-            <div style="display:flex;justify-content:space-between;">
-              <span>Batas Absen Tepat Waktu:</span>
-              <b>07:15 WIB</b>
-            </div>
-            <div style="display:flex;justify-content:space-between;">
-              <span>Toleransi Keterlambatan:</span>
-              <b>15 Menit</b>
-            </div>
-            <div style="display:flex;justify-content:space-between;">
-              <span>Waktu Absen Pulang:</span>
-              <b>Mulai 15:30 WIB</b>
-            </div>
-          </div>
-        </div>
       </div>
 
-      <!-- SECTION: FORM ABSEN MASUK -->
-      <div id="guru-section-absen-masuk" class="guru-view-section" style="display:none;">
-        <div class="attendance-card">
-          <h2 style="font-size:1.2rem;font-weight:800;color:var(--primary);margin-bottom:12px;">Presensi Masuk</h2>
-
-          <div id="gps-alert-masuk" class="radius-badge outside" style="display:none;"></div>
-          <div id="distance-badge-masuk" class="radius-badge inside">Mendeteksi Posisi GPS...</div>
-
-          <div class="gps-info-strip">
-            <div>Jarak ke Sekolah: <b id="distance-value-masuk">-- meter</b></div>
-            <div id="gps-accuracy-masuk" class="accuracy-indicator acc-med">Akurasi: ±-- m</div>
+      <!-- MODAL LAKUKAN ABSEN (GEOFENCE MAP & KAMERA SELFIE) -->
+      <div id="modal-lakukan-absen" class="modal-backdrop" style="display:none;">
+        <div class="modal-dialog-attendance">
+          
+          <div class="modal-att-header">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span style="font-size:1.3rem;">📍</span>
+              <h3 id="modal-absen-title" style="font-size:1.15rem;font-weight:800;color:#0B2545;margin:0;">Form Presensi Kehadiran</h3>
+            </div>
+            <button type="button" class="btn-close-modal" onclick="GuruModule.closeAttendanceModal()" title="Tutup">✕</button>
           </div>
 
-          <!-- Peta Leaflet Realtime -->
-          <div id="map-container-masuk" class="leaflet-map-box"></div>
+          <div class="modal-att-body">
+            
+            <!-- Tab Pilihan: Masuk / Pulang -->
+            <div class="modal-type-tabs">
+              <button type="button" id="modal-tab-masuk" class="tab-type-btn active" onclick="GuruModule.switchModalTab('MASUK')">
+                ☀️ Absen Masuk
+              </button>
+              <button type="button" id="modal-tab-pulang" class="tab-type-btn" onclick="GuruModule.switchModalTab('PULANG')">
+                🌙 Absen Pulang
+              </button>
+            </div>
 
-          <!-- Viewfinder Kamera Selfie -->
-          <div class="camera-box">
-            <video id="video-stream-masuk" autoplay playsinline muted></video>
-            <img id="photo-preview-masuk" alt="Foto Selfie Masuk" style="display:none;">
-            <canvas id="canvas-snapshot-masuk" style="display:none;"></canvas>
-          </div>
+            <!-- Status Geofence GPS -->
+            <div class="modal-gps-info-strip">
+              <span id="modal-gps-distance-badge" class="radius-badge inside">Mendeteksi Posisi GPS...</span>
+              <span id="modal-gps-accuracy-badge" class="accuracy-indicator acc-good">Akurasi: ±12 m</span>
+            </div>
 
-          <div class="camera-controls">
-            <button id="btn-capture-masuk" class="btn btn-primary" style="background:#1E3A8A;">
-              📸 Ambil Foto Selfie
+            <!-- Leaflet Map Container -->
+            <div id="map-modal-presensi" class="leaflet-map-modal"></div>
+
+            <!-- Viewfinder Kamera Selfie -->
+            <div class="camera-modal-view">
+              <video id="modal-video-stream" autoplay playsinline muted></video>
+              <img id="modal-photo-preview" alt="Foto Selfie Presensi" style="display:none;">
+              <canvas id="modal-canvas-snapshot" style="display:none;"></canvas>
+            </div>
+
+            <!-- Kontrol Kamera -->
+            <div class="camera-modal-controls">
+              <button type="button" id="btn-modal-capture" class="btn btn-primary" onclick="GuruModule.captureModalSelfie()" style="background:#0284C7;">
+                📸 Ambil Foto Selfie
+              </button>
+              <button type="button" id="btn-modal-retake" class="btn btn-secondary" onclick="GuruModule.retakeModalSelfie()" style="display:none;">
+                🔄 Foto Ulang
+              </button>
+              <label class="btn btn-outline" style="cursor:pointer;" title="Alternatif bila kamera tidak terbuka">
+                📁 Unggah Foto
+                <input type="file" id="modal-file-fallback" accept="image/*" capture="user" style="display:none;" onchange="GuruModule.handleModalFileFallback(this)">
+              </label>
+            </div>
+
+            <!-- Tombol Kirim Presensi -->
+            <button type="button" id="btn-submit-modal-absen" class="btn btn-success btn-block" onclick="GuruModule.submitAttendanceFromModal()" style="padding:15px;font-size:1rem;margin-top:10px;" disabled>
+              <span>📸 Silakan Ambil Foto Selfie Dulu</span>
             </button>
-            <button id="btn-retake-masuk" class="btn btn-secondary" style="display:none;">
-              🔄 Foto Ulang
-            </button>
-            <label class="btn btn-outline" style="cursor:pointer;" title="Alternatif bila kamera tidak terbuka">
-              📁 Unggah
-              <input type="file" id="file-fallback-masuk" accept="image/*" capture="user" style="display:none;">
-            </label>
+
           </div>
 
-          <button id="btn-submit-masuk" class="btn btn-success btn-block" style="padding:14px;font-size:1rem;" disabled>
-            Kirim Presensi Masuk
-          </button>
         </div>
-      </div>
-
-      <!-- SECTION: FORM ABSEN PULANG -->
-      <div id="guru-section-absen-pulang" class="guru-view-section" style="display:none;">
-        <div class="attendance-card">
-          <h2 style="font-size:1.2rem;font-weight:800;color:var(--primary);margin-bottom:12px;">Presensi Pulang</h2>
-
-          <div id="gps-alert-pulang" class="radius-badge outside" style="display:none;"></div>
-          <div id="distance-badge-pulang" class="radius-badge inside">Mendeteksi Posisi GPS...</div>
-
-          <div class="gps-info-strip">
-            <div>Jarak ke Sekolah: <b id="distance-value-pulang">-- meter</b></div>
-            <div id="gps-accuracy-pulang" class="accuracy-indicator acc-med">Akurasi: ±-- m</div>
-          </div>
-
-          <!-- Peta Leaflet Realtime -->
-          <div id="map-container-pulang" class="leaflet-map-box"></div>
-
-          <!-- Viewfinder Kamera Selfie -->
-          <div class="camera-box">
-            <video id="video-stream-pulang" autoplay playsinline muted></video>
-            <img id="photo-preview-pulang" alt="Foto Selfie Pulang" style="display:none;">
-            <canvas id="canvas-snapshot-pulang" style="display:none;"></canvas>
-          </div>
-
-          <div class="camera-controls">
-            <button id="btn-capture-pulang" class="btn btn-primary" style="background:#1E3A8A;">
-              📸 Ambil Foto Selfie
-            </button>
-            <button id="btn-retake-pulang" class="btn btn-secondary" style="display:none;">
-              🔄 Foto Ulang
-            </button>
-            <label class="btn btn-outline" style="cursor:pointer;" title="Alternatif bila kamera tidak terbuka">
-              📁 Unggah
-              <input type="file" id="file-fallback-pulang" accept="image/*" capture="user" style="display:none;">
-            </label>
-          </div>
-
-          <button id="btn-submit-pulang" class="btn btn-success btn-block" style="padding:14px;font-size:1rem;" disabled>
-            Kirim Presensi Pulang
-          </button>
-        </div>
-      </div>
-
-      <!-- SECTION: RIWAYAT ABSENSI & REKAP BULANAN -->
-      <div id="guru-section-riwayat" class="guru-view-section" style="display:none;">
-        <!-- Recap Box -->
-        <div class="card">
-          <div class="card-title">Rekap Kehadiran Bulan Ini</div>
-          <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:8px;text-align:center;">
-            <div style="background:#EEF4F8;padding:10px 4px;border-radius:10px;">
-              <div id="recap-total-hadir" style="font-size:1.3rem;font-weight:800;color:var(--primary);">0</div>
-              <div style="font-size:0.65rem;font-weight:700;color:var(--text-muted);">TOTAL</div>
-            </div>
-            <div style="background:#ECFDF5;padding:10px 4px;border-radius:10px;">
-              <div id="recap-tepat-waktu" style="font-size:1.3rem;font-weight:800;color:var(--success);">0</div>
-              <div style="font-size:0.65rem;font-weight:700;color:var(--success);">TEPAT</div>
-            </div>
-            <div style="background:#FFFBEB;padding:10px 4px;border-radius:10px;">
-              <div id="recap-terlambat" style="font-size:1.3rem;font-weight:800;color:var(--warning);">0</div>
-              <div style="font-size:0.65rem;font-weight:700;color:var(--warning);">TELAT</div>
-            </div>
-            <div style="background:#FEF2F2;padding:10px 4px;border-radius:10px;">
-              <div id="recap-pulang-cepat" style="font-size:1.3rem;font-weight:800;color:var(--danger);">0</div>
-              <div style="font-size:0.65rem;font-weight:700;color:var(--danger);">P.CEPAT</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Filter Riwayat -->
-        <div style="display:flex;gap:10px;margin-bottom:14px;">
-          <select id="filter-history-month" class="form-input" style="padding:8px 12px;">
-            <option value="">Semua Bulan</option>
-            <option value="01">Januari</option>
-            <option value="02">Februari</option>
-            <option value="03">Maret</option>
-            <option value="04">April</option>
-            <option value="05">Mei</option>
-            <option value="06">Juni</option>
-            <option value="07">Juli</option>
-            <option value="08">Agustus</option>
-            <option value="09">September</option>
-            <option value="10">Oktober</option>
-            <option value="11" selected>November</option>
-            <option value="12">Desember</option>
-          </select>
-          <select id="filter-history-year" class="form-input" style="padding:8px 12px;">
-            <option value="2026" selected>2026</option>
-            <option value="2025">2025</option>
-          </select>
-        </div>
-
-        <div id="history-list-container">
-          <div style="text-align:center;padding:24px;color:var(--text-muted);">Memuat riwayat...</div>
-        </div>
-      </div>
-
-      <!-- SECTION: PROFIL PENGGUNA -->
-      <div id="guru-section-profil" class="guru-view-section" style="display:none;">
-        <div class="card">
-          <div class="card-title">Biodata Identitas Pegawai</div>
-          <table style="width:100%;font-size:0.85rem;line-height:2;">
-            <tr><td style="color:var(--text-muted);width:35%;">Nama Lengkap</td><td id="profile-detail-nama" style="font-weight:700;">-</td></tr>
-            <tr><td style="color:var(--text-muted);">NIY</td><td id="profile-detail-niy" style="font-weight:700;">-</td></tr>
-            <tr><td style="color:var(--text-muted);">TTL</td><td id="profile-detail-ttl">-</td></tr>
-            <tr><td style="color:var(--text-muted);">Jabatan</td><td id="profile-detail-jabatan">-</td></tr>
-            <tr><td style="color:var(--text-muted);">Unit Sekolah</td><td id="profile-detail-sekolah">-</td></tr>
-            <tr><td style="color:var(--text-muted);">No. WhatsApp</td><td id="profile-detail-hp">-</td></tr>
-          </table>
-        </div>
-
-        <!-- Ubah Password -->
-        <div class="card">
-          <div class="card-title">Ganti Kata Sandi</div>
-          <form id="form-change-password">
-            <div class="form-group">
-              <label class="form-label">Password Lama</label>
-              <input type="password" id="input-old-pass" class="form-input" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Password Baru (min 6 karakter)</label>
-              <input type="password" id="input-new-pass" class="form-input" minlength="6" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Ulangi Password Baru</label>
-              <input type="password" id="input-confirm-pass" class="form-input" minlength="6" required>
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">Simpan Password Baru</button>
-          </form>
-        </div>
-
-        <!-- Tombol Logout -->
-        <button id="btn-logout-guru" class="btn btn-danger btn-block" style="padding:13px;margin-top:10px;">
-          Keluar dari Aplikasi (Logout)
-        </button>
       </div>
 
     </section>
 
-    <!-- Bottom Nav Guru -->
+    <!-- Bottom Nav Mobile untuk Layar Kecil -->
     <nav id="nav-guru-bottom" class="guru-bottom-nav" style="display:none;">
       <button class="guru-tab-btn active" data-tab="beranda">
         <span class="tab-icon">🏠</span>
         <span>Beranda</span>
       </button>
-      <button class="guru-tab-btn" data-tab="absen-masuk">
-        <span class="tab-icon">🌅</span>
-        <span>Masuk</span>
-      </button>
-      <button class="guru-tab-btn" data-tab="absen-pulang">
-        <span class="tab-icon">🌇</span>
-        <span>Pulang</span>
-      </button>
       <button class="guru-tab-btn" data-tab="riwayat">
-        <span class="tab-icon">📋</span>
+        <span class="tab-icon">📊</span>
         <span>Riwayat</span>
       </button>
       <button class="guru-tab-btn" data-tab="profil">
-        <span class="tab-icon">👤</span>
+        <span class="tab-icon">ℹ️</span>
         <span>Profil</span>
+      </button>
+      <button class="guru-tab-btn" data-tab="pengaturan">
+        <span class="tab-icon">⚙️</span>
+        <span>Pengaturan</span>
       </button>
     </nav>
 
