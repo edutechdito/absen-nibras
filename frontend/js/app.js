@@ -377,8 +377,10 @@ const App = {
   }
 };
 
-// Bootstrap saat DOM siap
-document.addEventListener('DOMContentLoaded', () => {
+// Bootstrap aman saat DOM siap
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => App.init());
+} else {
   App.init();
-});
+}
 

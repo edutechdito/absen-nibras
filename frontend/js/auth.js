@@ -85,8 +85,9 @@ const AuthService = {
     if (viewGuru) viewGuru.style.display = 'none';
     if (viewAdmin) viewAdmin.style.display = 'none';
     if (navGuru) navGuru.style.display = 'none';
-    if (viewLogin) viewLogin.style.display = 'block';
+    if (viewLogin) viewLogin.style.display = 'flex';
 
+    const roleBadgeEl = document.getElementById('login-role-badge');
     const titleEl = document.getElementById('login-title');
     const subtitleEl = document.getElementById('login-subtitle');
     const labelUserEl = document.getElementById('label-login-username');
@@ -97,6 +98,10 @@ const AuthService = {
     if (inputPassEl) inputPassEl.value = '';
 
     if (role === 'admin') {
+      if (roleBadgeEl) {
+        roleBadgeEl.textContent = '🛡️ Portal Masuk Administrator';
+        roleBadgeEl.className = 'login-portal-badge portal-badge-admin';
+      }
       if (titleEl) titleEl.textContent = 'Masuk Administrator';
       if (subtitleEl) subtitleEl.textContent = 'Pengelolaan Data & Laporan Absensi';
       if (labelUserEl) labelUserEl.textContent = 'Username Admin';
@@ -105,10 +110,14 @@ const AuthService = {
         inputUserEl.value = '';
       }
       if (submitBtn) {
-        submitBtn.style.backgroundColor = '#7C3AED';
+        submitBtn.style.background = 'linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%)';
         submitBtn.style.borderColor = '#7C3AED';
       }
     } else {
+      if (roleBadgeEl) {
+        roleBadgeEl.textContent = '👨‍🏫 Portal Masuk Pegawai (Guru & GTK)';
+        roleBadgeEl.className = 'login-portal-badge portal-badge-guru';
+      }
       if (titleEl) titleEl.textContent = 'Masuk Pegawai / Guru';
       if (subtitleEl) subtitleEl.textContent = 'Presensi Guru & Tenaga Kependidikan';
       if (labelUserEl) labelUserEl.textContent = 'Username / NIY';
@@ -117,7 +126,7 @@ const AuthService = {
         inputUserEl.value = '';
       }
       if (submitBtn) {
-        submitBtn.style.backgroundColor = '#0284C7';
+        submitBtn.style.background = 'linear-gradient(135deg, #0284C7 0%, #0369A1 100%)';
         submitBtn.style.borderColor = '#0284C7';
       }
     }

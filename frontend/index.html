@@ -19,8 +19,388 @@
   <!-- Leaflet Map CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
-  <!-- Main Stylesheet -->
-  <link rel="stylesheet" href="css/style.css">
+  <!-- Main Stylesheet (with cache-buster) -->
+  <link rel="stylesheet" href="css/style.css?v=2.0.0">
+
+  <!-- Critical Layout & Landing Styles (Guarantees Perfect Render Always) -->
+  <style>
+    .landing-page-wrap {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 10px 0 20px;
+    }
+    .landing-hero {
+      background: linear-gradient(180deg, #F0F7FF 0%, #E0F2FE 40%, #BAE6FD 80%, #93C5FD 100%);
+      border-radius: 24px;
+      padding: 40px 32px 32px;
+      box-shadow: 0 12px 36px rgba(11, 37, 69, 0.08);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 24px;
+      border: 1px solid #BAE6FD;
+    }
+    .hero-backdrop-scenery {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .scenery-svg {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.42;
+    }
+    .landing-hero-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 36px;
+      align-items: center;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-brand-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .hero-emblem-wrap {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .hero-calendar-badge {
+      width: 82px;
+      height: 82px;
+      background: #FFFFFF;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(2, 132, 199, 0.2);
+      flex-shrink: 0;
+    }
+    .hero-brand-titles h1 {
+      font-size: 2.3rem;
+      font-weight: 900;
+      color: #0B2545;
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+    }
+    .hero-brand-titles h2 {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #134074;
+      margin-top: 4px;
+    }
+    .hero-motto-wrap {
+      margin-top: 10px;
+    }
+    .hero-motto-text {
+      font-family: 'Georgia', 'Palatino', serif;
+      font-style: italic;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #1E293B;
+      line-height: 1.35;
+    }
+    .motto-wave-svg {
+      display: block;
+      margin-top: 6px;
+    }
+    .hero-portals-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .portal-choice-card {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 22px;
+      padding: 26px 18px 22px;
+      box-shadow: 0 10px 30px rgba(11, 37, 69, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      z-index: 3;
+    }
+    .portal-choice-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(11, 37, 69, 0.16);
+    }
+    .portal-avatar-circle {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+    .portal-avatar-circle.avatar-pegawai {
+      background: linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%);
+    }
+    .portal-avatar-circle.avatar-admin {
+      background: linear-gradient(135deg, #EDE9FE 0%, #DDD6FE 100%);
+    }
+    .portal-pill-badge {
+      color: #FFFFFF;
+      font-size: 1.05rem;
+      font-weight: 800;
+      padding: 8px 24px;
+      border-radius: 25px;
+      margin-bottom: 12px;
+      width: 88%;
+      letter-spacing: 0.3px;
+    }
+    .portal-pill-badge.pill-blue {
+      background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+    }
+    .portal-pill-badge.pill-purple {
+      background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+      box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+    }
+    .portal-desc {
+      font-size: 0.82rem;
+      color: #64748B;
+      min-height: 40px;
+      margin-bottom: 18px;
+      line-height: 1.4;
+      padding: 0 4px;
+    }
+    .btn-portal {
+      width: 100%;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #FFFFFF;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn-portal-blue {
+      background-color: #0284C7;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+    }
+    .btn-portal-blue:hover {
+      background-color: #0369A1;
+      box-shadow: 0 6px 18px rgba(2, 132, 199, 0.45);
+    }
+    .btn-portal-purple {
+      background-color: #7C3AED;
+      box-shadow: 0 4px 14px rgba(124, 58, 237, 0.3);
+    }
+    .btn-portal-purple:hover {
+      background-color: #6D28D9;
+      box-shadow: 0 6px 18px rgba(124, 58, 237, 0.45);
+    }
+    .landing-features-strip {
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 16px 20px;
+      border: 1px solid #E2E8F0;
+      box-shadow: 0 6px 20px rgba(11, 37, 69, 0.05);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .feature-strip-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 12px;
+      border-right: 1px solid #E2E8F0;
+    }
+    .feature-strip-item:last-child {
+      border-right: none;
+    }
+    .feature-strip-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #E0F2FE;
+      color: #0284C7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .feature-strip-content {
+      display: flex;
+      flex-direction: column;
+    }
+    .feature-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #1E293B;
+      line-height: 1.25;
+    }
+    .feature-subtitle {
+      font-size: 0.78rem;
+      color: #64748B;
+      font-weight: 500;
+    }
+    .landing-footer {
+      background-color: #0B2545;
+      color: #FFFFFF;
+      border-radius: 16px;
+      padding: 18px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .landing-footer-text {
+      font-size: 0.86rem;
+      font-weight: 500;
+      color: #E2E8F0;
+      position: relative;
+      z-index: 2;
+    }
+    .landing-footer-accent {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 220px;
+      height: 55px;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .landing-footer-accent svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .login-wrapper {
+      min-height: calc(100vh - 120px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      animation: fadeInLogin 0.3s ease-out;
+    }
+    @keyframes fadeInLogin {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      background: #FFFFFF;
+      border-radius: 24px;
+      padding: 36px 32px 30px;
+      box-shadow: 0 18px 45px rgba(11, 37, 69, 0.12);
+      border: 1px solid #E2E8F0;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: linear-gradient(90deg, #0B2545 0%, #0284C7 50%, #F59E0B 100%);
+    }
+    .login-portal-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .portal-badge-guru {
+      background: #E0F2FE;
+      color: #0284C7;
+      border: 1px solid #BAE6FD;
+    }
+    .portal-badge-admin {
+      background: #EDE9FE;
+      color: #7C3AED;
+      border: 1px solid #DDD6FE;
+    }
+    @media (max-width: 900px) {
+      .landing-hero-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 32px;
+      }
+      .hero-emblem-wrap {
+        justify-content: center;
+      }
+      .hero-motto-wrap {
+        text-align: center;
+      }
+      .motto-wave-svg {
+        margin: 8px auto 0;
+      }
+      .landing-features-strip {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .feature-strip-item:nth-child(2) {
+        border-right: none;
+      }
+      .feature-strip-item:nth-child(3),
+      .feature-strip-item:nth-child(4) {
+        border-top: 1px solid #E2E8F0;
+        padding-top: 12px;
+      }
+    }
+    @media (max-width: 600px) {
+      .hero-portals-col {
+        grid-template-columns: 1fr;
+      }
+      .landing-features-strip {
+        grid-template-columns: 1fr;
+      }
+      .feature-strip-item {
+        border-right: none !important;
+        border-bottom: 1px solid #E2E8F0;
+        padding: 10px 4px;
+      }
+      .feature-strip-item:last-child {
+        border-bottom: none;
+      }
+      .hero-brand-titles h1 {
+        font-size: 1.85rem;
+      }
+      .hero-brand-titles h2 {
+        font-size: 1.15rem;
+      }
+      .landing-hero {
+        padding: 26px 16px 20px;
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -73,30 +453,113 @@
          ====================================================================== -->
     <section id="view-landing" class="landing-page-wrap">
       
-      <!-- HERO MAIN SECTION -->
+      <!-- HERO MAIN SECTION WITH SCENIC SCHOOL BACKDROP -->
       <div class="landing-hero">
+        
+        <!-- Vector Scenic Backdrop (School Building, Flagpole with Indonesian Flag, Green Garden) -->
+        <div class="hero-backdrop-scenery">
+          <svg viewBox="0 0 1000 380" preserveAspectRatio="xMidYMax slice" class="scenery-svg" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="roofGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#DC2626"/>
+                <stop offset="100%" stop-color="#991B1B"/>
+              </linearGradient>
+              <linearGradient id="wallGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="#FFFFFF"/>
+                <stop offset="100%" stop-color="#F1F5F9"/>
+              </linearGradient>
+            </defs>
+
+            <!-- Distant Hills & Trees -->
+            <path d="M0 270 Q140 240 300 260 Q450 235 620 260 Q800 230 1000 255 L1000 380 L0 380 Z" fill="#BBF7D0" opacity="0.55"/>
+
+            <!-- School Building Base & Foundation -->
+            <rect x="20" y="235" width="600" height="90" fill="#E2E8F0" rx="3"/>
+            <rect x="15" y="318" width="610" height="15" fill="#CBD5E1"/>
+
+            <!-- Terracotta Tile Roof -->
+            <polygon points="10,235 50,175 600,175 635,235" fill="url(#roofGrad)"/>
+            <rect x="48" y="173" width="554" height="4" fill="#7F1D1D"/>
+            <!-- Roof Pavilion Center Ridge -->
+            <polygon points="250,175 305,135 385,135 440,175" fill="url(#roofGrad)"/>
+
+            <!-- School Front Colonnade Walkway -->
+            <rect x="25" y="235" width="590" height="85" fill="url(#wallGrad)"/>
+            
+            <!-- Walkway Pillars -->
+            <rect x="45" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+            <rect x="110" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+            <rect x="175" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+            <rect x="240" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+            <rect x="305" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+            <rect x="370" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+            <rect x="435" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+            <rect x="500" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+            <rect x="565" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
+
+            <!-- Classroom Windows (Glass with blue tint) -->
+            <rect x="65" y="248" width="32" height="42" rx="2" fill="#1E293B"/>
+            <rect x="68" y="251" width="26" height="36" fill="#0284C7" opacity="0.6"/>
+            <rect x="130" y="248" width="32" height="42" rx="2" fill="#1E293B"/>
+            <rect x="133" y="251" width="26" height="36" fill="#0284C7" opacity="0.6"/>
+            <rect x="195" y="248" width="32" height="42" rx="2" fill="#1E293B"/>
+            <rect x="198" y="251" width="26" height="36" fill="#0284C7" opacity="0.6"/>
+            
+            <!-- Center Main Hallway Door -->
+            <rect x="260" y="245" width="35" height="73" rx="2" fill="#334155"/>
+            
+            <rect x="325" y="248" width="32" height="42" rx="2" fill="#1E293B"/>
+            <rect x="328" y="251" width="26" height="36" fill="#0284C7" opacity="0.6"/>
+            <rect x="390" y="248" width="32" height="42" rx="2" fill="#1E293B"/>
+            <rect x="393" y="251" width="26" height="36" fill="#0284C7" opacity="0.6"/>
+            <rect x="455" y="248" width="32" height="42" rx="2" fill="#1E293B"/>
+            <rect x="458" y="251" width="26" height="36" fill="#0284C7" opacity="0.6"/>
+
+            <!-- Flagpole & Indonesian Merah Putih Flag -->
+            <rect x="330" y="315" width="20" height="15" rx="2" fill="#94A3B8"/>
+            <line x1="340" y1="318" x2="340" y2="90" stroke="#CBD5E1" stroke-width="3.5" stroke-linecap="round"/>
+            <circle cx="340" cy="88" r="3.5" fill="#F59E0B"/>
+            <!-- Waving Red & White Flag -->
+            <path d="M342 92 C362 95 372 88 392 93 L392 108 C372 103 362 110 342 107 Z" fill="#DC2626"/>
+            <path d="M342 107 C362 110 372 103 392 108 L392 123 C372 118 362 125 342 122 Z" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="0.5"/>
+
+            <!-- Campus Garden / Green Shrubbery & Trees -->
+            <ellipse cx="25" cy="320" rx="35" ry="30" fill="#15803D"/>
+            <ellipse cx="32" cy="305" rx="26" ry="25" fill="#16A34A"/>
+            <ellipse cx="295" cy="325" rx="25" ry="22" fill="#15803D"/>
+            <ellipse cx="300" cy="315" rx="18" ry="18" fill="#22C55E"/>
+            <ellipse cx="385" cy="325" rx="26" ry="22" fill="#15803D"/>
+            <ellipse cx="390" cy="315" rx="20" ry="18" fill="#16A34A"/>
+            <ellipse cx="610" cy="320" rx="40" ry="30" fill="#15803D"/>
+            <ellipse cx="615" cy="305" rx="30" ry="25" fill="#22C55E"/>
+
+            <!-- Lawn Base Strip -->
+            <path d="M0 340 Q50 325 120 338 Q200 325 300 338 Q400 322 520 338 Q650 324 800 338 L1000 338 L1000 380 L0 380 Z" fill="#16A34A" opacity="0.65"/>
+            <rect x="0" y="355" width="1000" height="25" fill="#15803D" opacity="0.8"/>
+          </svg>
+        </div>
+
         <div class="landing-hero-grid">
           
           <!-- LEFT COLUMN: BRANDING & MOTTO -->
           <div class="hero-brand-col">
             <div class="hero-emblem-wrap">
-              <!-- Branded Calendar & Clock Icon (Reference Design) -->
+              <!-- Calendar & Clock Vector Badge (Exact Matching Reference) -->
               <div class="hero-calendar-badge">
-                <div class="hero-calendar-rings">
-                  <span class="calendar-ring"></span>
-                  <span class="calendar-ring"></span>
-                </div>
-                <!-- Calendar & Clock SVG Illustration -->
-                <svg viewBox="0 0 64 64" width="56" height="56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg viewBox="0 0 84 84" width="70" height="70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Top Hanging Rings -->
+                  <rect x="22" y="6" width="6" height="12" rx="3" fill="#0284C7"/>
+                  <rect x="42" y="6" width="6" height="12" rx="3" fill="#0284C7"/>
                   <!-- Calendar Body -->
-                  <rect x="8" y="14" width="48" height="42" rx="8" fill="#FFFFFF" stroke="#0284C7" stroke-width="4"/>
-                  <rect x="8" y="14" width="48" height="12" rx="8" fill="#0284C7"/>
-                  <!-- Checkmark Badge -->
-                  <circle cx="24" cy="38" r="9" fill="#FEF3C7"/>
-                  <path d="M19 38 L23 42 L29 34" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                  <!-- Clock -->
-                  <circle cx="44" cy="42" r="12" fill="#FFFFFF" stroke="#0B2545" stroke-width="3"/>
-                  <path d="M44 35 V42 L48 45" stroke="#0B2545" stroke-width="2.5" stroke-linecap="round"/>
+                  <rect x="10" y="12" width="50" height="48" rx="10" fill="#FFFFFF" stroke="#0284C7" stroke-width="4.5"/>
+                  <path d="M10 22 C10 16.5 14.5 12 20 12 L50 12 C55.5 12 60 16.5 60 22 L60 26 L10 26 Z" fill="#0284C7"/>
+                  <!-- Checkmark Circle Badge -->
+                  <circle cx="28" cy="42" r="10" fill="#FEF3C7"/>
+                  <path d="M23 42 L27 46 L34 38" stroke="#F59E0B" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <!-- Analog Clock attached at lower right -->
+                  <circle cx="56" cy="54" r="16" fill="#FFFFFF" stroke="#0B2545" stroke-width="4"/>
+                  <circle cx="56" cy="54" r="2.5" fill="#0B2545"/>
+                  <path d="M56 44 V54 L64 54" stroke="#0B2545" stroke-width="3" stroke-linecap="round"/>
                 </svg>
               </div>
 
@@ -110,7 +573,9 @@
               <div class="hero-motto-text">
                 "Disiplin Hadir,<br>Untuk Pendidikan yang Lebih Baik"
               </div>
-              <div class="hero-motto-wave"></div>
+              <svg class="motto-wave-svg" viewBox="0 0 200 20" width="180" height="16" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 12 Q 50 3, 100 10 T 195 8" stroke="#F59E0B" stroke-width="4" fill="none" stroke-linecap="round"/>
+              </svg>
             </div>
           </div>
 
@@ -120,63 +585,96 @@
             <!-- PORTAL 1: PEGAWAI (GURU & GTK) -->
             <div class="portal-choice-card">
               <div class="portal-avatar-circle avatar-pegawai">
-                <!-- Educator Male Vector Illustration SVG -->
-                <svg viewBox="0 0 100 100" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="50" cy="50" r="46" fill="#DBEAFE"/>
-                  <!-- Hair / Peci -->
-                  <ellipse cx="50" cy="34" rx="20" ry="16" fill="#0F172A"/>
-                  <rect x="32" y="30" width="36" height="10" rx="3" fill="#1E293B"/>
+                <!-- Male Teacher Vector in Khaki ASN / PNS Uniform -->
+                <svg viewBox="0 0 120 120" width="92" height="92" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Circular Backdrop -->
+                  <circle cx="60" cy="60" r="56" fill="#DBEAFE"/>
+                  <!-- Khaki Safari Uniform -->
+                  <path d="M22 114 C22 86 38 80 60 80 C82 80 98 86 98 114 Z" fill="#C28E58"/>
+                  <path d="M38 90 L46 114" stroke="#A77440" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M82 90 L74 114" stroke="#A77440" stroke-width="2" stroke-linecap="round"/>
+                  <!-- White Inner Collar & Neck Tie / Placket -->
+                  <polygon points="52,80 60,94 68,80" fill="#FFFFFF"/>
+                  <polygon points="56,80 60,90 64,80" fill="#E2E8F0"/>
+                  <line x1="60" y1="94" x2="60" y2="114" stroke="#A77440" stroke-width="2"/>
+                  <circle cx="60" cy="100" r="1.5" fill="#5A3A1A"/>
+                  <circle cx="60" cy="108" r="1.5" fill="#5A3A1A"/>
+                  <!-- Name Tag / Badge on Chest -->
+                  <rect x="70" y="92" width="14" height="6" rx="1.5" fill="#FFFFFF" stroke="#A77440" stroke-width="0.8"/>
+                  <line x1="73" y1="95" x2="81" y2="95" stroke="#0284C7" stroke-width="1.5"/>
+                  <!-- Neck -->
+                  <rect x="53" y="68" width="14" height="15" rx="4" fill="#F5CBA7"/>
+                  <!-- Ears -->
+                  <circle cx="41" cy="54" r="6" fill="#F5CBA7"/>
+                  <circle cx="79" cy="54" r="6" fill="#F5CBA7"/>
                   <!-- Face -->
-                  <ellipse cx="50" cy="44" rx="15" ry="16" fill="#FCD34D"/>
-                  <ellipse cx="36" cy="45" rx="3" ry="5" fill="#FCD34D"/>
-                  <ellipse cx="64" cy="45" rx="3" ry="5" fill="#FCD34D"/>
-                  <!-- Eyes & Smile -->
-                  <circle cx="45" cy="42" r="2" fill="#0F172A"/>
-                  <circle cx="55" cy="42" r="2" fill="#0F172A"/>
-                  <path d="M46 50 Q50 54 54 50" stroke="#B45309" stroke-width="2" fill="none" stroke-linecap="round"/>
-                  <!-- Khaki Uniform Shirt -->
-                  <path d="M28 88 C28 66 38 62 50 62 C62 62 72 66 72 88 Z" fill="#D97706"/>
-                  <!-- Collar & Badge -->
-                  <path d="M44 62 L50 72 L56 62 Z" fill="#FFFFFF"/>
-                  <rect x="56" y="70" width="10" height="4" rx="1" fill="#FEF3C7"/>
+                  <ellipse cx="60" cy="54" rx="19" ry="21" fill="#F5CBA7"/>
+                  <!-- Eyes & Eyebrows -->
+                  <ellipse cx="53" cy="52" rx="3.5" ry="4" fill="#1E293B"/>
+                  <ellipse cx="67" cy="52" rx="3.5" ry="4" fill="#1E293B"/>
+                  <circle cx="54" cy="51" r="1" fill="#FFFFFF"/>
+                  <circle cx="68" cy="51" r="1" fill="#FFFFFF"/>
+                  <path d="M48 46 Q53 44 57 46" stroke="#1E293B" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <path d="M63 46 Q67 44 72 46" stroke="#1E293B" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <!-- Nose & Friendly Smile -->
+                  <path d="M59 54 Q60 58 62 58" stroke="#D35400" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                  <path d="M53 63 Q60 69 67 63" stroke="#A04000" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <path d="M54 63 Q60 68 66 63" fill="#FFFFFF"/>
+                  <!-- Neat Haircut -->
+                  <path d="M40 47 C38 34 46 26 60 26 C74 26 82 34 80 47 C78 40 72 34 60 34 C48 34 42 40 40 47 Z" fill="#1E293B"/>
+                  <path d="M41 44 Q50 32 68 36" stroke="#334155" stroke-width="2" fill="none"/>
                 </svg>
               </div>
               <div class="portal-pill-badge pill-blue">Pegawai</div>
               <div class="portal-desc">Absensi untuk Guru dan Tenaga Kependidikan</div>
               <button type="button" class="btn-portal btn-portal-blue" onclick="AuthService.openLoginPortal('guru')">
-                <span>→ Masuk</span>
+                <span>→ Masuk Portal</span>
               </button>
             </div>
 
             <!-- PORTAL 2: ADMIN (ADMINISTRATOR) -->
             <div class="portal-choice-card">
               <div class="portal-avatar-circle avatar-admin">
-                <!-- Administrator Female with Hijab & Laptop Vector SVG -->
-                <svg viewBox="0 0 100 100" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="50" cy="50" r="46" fill="#EDE9FE"/>
-                  <!-- Hijab Outer -->
-                  <path d="M30 40 C30 22 70 22 70 40 C70 65 66 78 50 78 C34 78 30 65 30 40 Z" fill="#D97706"/>
+                <!-- Female Educator with Hijab, Glasses & Laptop -->
+                <svg viewBox="0 0 120 120" width="92" height="92" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Circular Backdrop -->
+                  <circle cx="60" cy="60" r="56" fill="#EDE9FE"/>
+                  <!-- Hijab Outer Shape -->
+                  <path d="M34 52 C34 28 86 28 86 52 C86 80 80 96 60 96 C40 96 34 80 34 52 Z" fill="#C28E58"/>
+                  <path d="M34 52 C34 28 86 28 86 52 C86 67 82 87 60 87 C38 87 34 67 34 52 Z" fill="#B77E44"/>
                   <!-- Face inside Hijab -->
-                  <ellipse cx="50" cy="44" rx="13" ry="14" fill="#FCD34D"/>
-                  <!-- Eyes with Glasses & Smile -->
-                  <circle cx="45" cy="42" r="2" fill="#0F172A"/>
-                  <circle cx="55" cy="42" r="2" fill="#0F172A"/>
-                  <rect x="41" y="39" width="8" height="6" rx="2" fill="none" stroke="#0F172A" stroke-width="1.2"/>
-                  <rect x="51" y="39" width="8" height="6" rx="2" fill="none" stroke="#0F172A" stroke-width="1.2"/>
-                  <line x1="49" y1="42" x2="51" y2="42" stroke="#0F172A" stroke-width="1.2"/>
-                  <path d="M46 51 Q50 54 54 51" stroke="#B45309" stroke-width="2" fill="none" stroke-linecap="round"/>
-                  <!-- Body & Laptop -->
-                  <path d="M26 90 C26 72 36 68 50 68 C64 68 74 72 74 90 Z" fill="#7C3AED"/>
-                  <!-- Silver Laptop -->
-                  <rect x="36" y="74" width="28" height="16" rx="2" fill="#94A3B8"/>
-                  <polygon points="32,90 68,90 64,86 36,86" fill="#64748B"/>
-                  <circle cx="50" cy="81" r="2" fill="#FFFFFF"/>
+                  <ellipse cx="60" cy="52" rx="16" ry="18" fill="#F5CBA7"/>
+                  <path d="M45 44 C48 36 72 36 75 44 C72 42 48 42 45 44 Z" fill="#B77E44"/>
+                  <!-- Eyes & Eyebrows with Glasses -->
+                  <ellipse cx="53" cy="51" rx="2.5" ry="3" fill="#1E293B"/>
+                  <ellipse cx="67" cy="51" rx="2.5" ry="3" fill="#1E293B"/>
+                  <circle cx="54" cy="50" r="0.8" fill="#FFFFFF"/>
+                  <circle cx="68" cy="50" r="0.8" fill="#FFFFFF"/>
+                  <rect x="47" y="46" width="12" height="10" rx="3" fill="none" stroke="#1E293B" stroke-width="1.8"/>
+                  <rect x="61" y="46" width="12" height="10" rx="3" fill="none" stroke="#1E293B" stroke-width="1.8"/>
+                  <line x1="59" y1="50" x2="61" y2="50" stroke="#1E293B" stroke-width="1.8"/>
+                  <line x1="47" y1="49" x2="43" y2="47" stroke="#1E293B" stroke-width="1.5"/>
+                  <line x1="73" y1="49" x2="77" y2="47" stroke="#1E293B" stroke-width="1.5"/>
+                  <path d="M49 43 Q53 41 57 43" stroke="#4A2E10" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                  <path d="M63 43 Q67 41 71 43" stroke="#4A2E10" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+                  <!-- Smile -->
+                  <path d="M55 60 Q60 64 65 60" stroke="#A04000" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                  <!-- Hijab Drape over Chest -->
+                  <path d="M40 66 C44 78 54 86 60 86 C66 86 76 78 80 66 C76 82 66 96 60 96 C54 96 44 82 40 66 Z" fill="#9C6632"/>
+                  <!-- Shoulders -->
+                  <path d="M26 116 C26 96 40 90 60 90 C80 90 94 96 94 116 Z" fill="#7C3AED"/>
+                  <!-- Laptop in Front -->
+                  <polygon points="42,94 78,94 84,108 36,108" fill="#94A3B8"/>
+                  <polygon points="43,95 77,95 82,107 38,107" fill="#CBD5E1"/>
+                  <circle cx="60" cy="101" r="2.5" fill="#FFFFFF"/>
+                  <polygon points="32,108 88,108 84,114 36,114" fill="#64748B"/>
+                  <rect x="52" y="108" width="16" height="2" rx="1" fill="#475569"/>
                 </svg>
               </div>
               <div class="portal-pill-badge pill-purple">Admin</div>
               <div class="portal-desc">Pengelolaan Data dan Laporan Absensi</div>
               <button type="button" class="btn-portal btn-portal-purple" onclick="AuthService.openLoginPortal('admin')">
-                <span>→ Masuk</span>
+                <span>→ Masuk Portal</span>
               </button>
             </div>
 
@@ -188,29 +686,66 @@
       <!-- BOTTOM FEATURES STRIP (MATCHING REFERENCE IMAGE) -->
       <div class="landing-features-strip">
         <div class="feature-strip-item">
-          <div class="feature-strip-icon">📍</div>
-          <div class="feature-strip-text">Berbasis Lokasi<br><span style="font-size:0.78rem;color:#64748B;font-weight:500;">(GPS Geofence)</span></div>
+          <div class="feature-strip-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="#0284C7">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+          </div>
+          <div class="feature-strip-content">
+            <div class="feature-title">Berbasis Lokasi</div>
+            <div class="feature-subtitle">(GPS Geofence)</div>
+          </div>
         </div>
+
         <div class="feature-strip-item">
-          <div class="feature-strip-icon">🛡️</div>
-          <div class="feature-strip-text">Aman & Terpercaya<br><span style="font-size:0.78rem;color:#64748B;font-weight:500;">(Foto & Waktu Server)</span></div>
+          <div class="feature-strip-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="#0284C7">
+              <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
+            </svg>
+          </div>
+          <div class="feature-strip-content">
+            <div class="feature-title">Aman & Terpercaya</div>
+            <div class="feature-subtitle">(Foto & Server Time)</div>
+          </div>
         </div>
+
         <div class="feature-strip-item">
-          <div class="feature-strip-icon">📊</div>
-          <div class="feature-strip-text">Laporan Real-Time<br><span style="font-size:0.78rem;color:#64748B;font-weight:500;">(Excel & Rekap PDF)</span></div>
+          <div class="feature-strip-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="#0284C7">
+              <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+            </svg>
+          </div>
+          <div class="feature-strip-content">
+            <div class="feature-title">Laporan Real-Time</div>
+            <div class="feature-subtitle">(Excel & Rekap PDF)</div>
+          </div>
         </div>
+
         <div class="feature-strip-item">
-          <div class="feature-strip-icon">🤝</div>
-          <div class="feature-strip-text">Mendukung Kinerja<br><span style="font-size:0.78rem;color:#64748B;font-weight:500;">Pendidikan Berkualitas</span></div>
+          <div class="feature-strip-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="#0284C7">
+              <path d="M17.5 12c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm-11 0c.83 0 1.5-.67 1.5-1.5S7.33 9 6.5 9 5 9.67 5 10.5 5.67 12 6.5 12zm5.5-2c.83 0 1.5-.67 1.5-1.5S12.83 7 12 7s-1.5.67-1.5 1.5.67 1.5 1.5 1.5zm8 6h-2.17c-.41 0-.78-.25-.93-.63l-1.07-2.67c-.22-.55-.75-.9-1.33-.9h-5c-.58 0-1.11.35-1.33.9l-1.07 2.67c-.15.38-.52.63-.93.63H3c-.55 0-1 .45-1 1v2c0 .55.45 1 1 1h18c.55 0 1-.45 1-1v-2c0-.55-.45-1-1-1z"/>
+            </svg>
+          </div>
+          <div class="feature-strip-content">
+            <div class="feature-title">Mendukung Kinerja</div>
+            <div class="feature-subtitle">Pendidikan Berkualitas</div>
+          </div>
         </div>
       </div>
 
-      <!-- FOOTER STRIP -->
+      <!-- FOOTER STRIP WITH GOLD & BLUE WAVE ACCENT -->
       <footer class="landing-footer">
         <div class="landing-footer-text">
-          © 2026 Perguruan Islam NIBRAS - Kota Padang • Sistem Presensi Online Berbasis GPS
+          © 2026 Perguruan Islam NIBRAS - Kota Padang
         </div>
-        <div class="landing-footer-waves"></div>
+        <div class="landing-footer-accent">
+          <svg viewBox="0 0 260 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 0 60 C 80 50, 160 20, 260 0 L 260 60 Z" fill="#0284C7"/>
+            <path d="M 40 60 C 110 52, 180 30, 260 16 L 260 60 Z" fill="#F59E0B"/>
+            <path d="M 80 60 C 140 55, 200 42, 260 32 L 260 60 Z" fill="#0284C7"/>
+          </svg>
+        </div>
       </footer>
 
     </section>
@@ -222,15 +757,19 @@
       <div class="login-card">
         
         <!-- Back to Homepage Button -->
-        <button type="button" class="btn btn-sm btn-outline" onclick="AuthService.showLandingView()" style="margin-bottom:18px;">
-          ← Kembali ke Halaman Utama
+        <button type="button" class="btn btn-sm btn-outline" onclick="AuthService.showLandingView()" style="margin-bottom:16px;">
+          ← Kembali ke Pilihan Portal
         </button>
 
         <div class="login-header">
+          <!-- Role Indicator Badge -->
+          <div id="login-role-badge" class="login-portal-badge portal-badge-guru">
+            👨‍🏫 Portal Masuk Pegawai (Guru & GTK)
+          </div>
           <div class="logo-badge" id="login-header-badge">
             <img src="icons/icon.svg" alt="Nibras Logo">
           </div>
-          <h2 id="login-title">Masuk ke Sistem</h2>
+          <h2 id="login-title">Masuk Pegawai / Guru</h2>
           <p id="login-subtitle">Sistem Presensi Guru & Tenaga Kependidikan</p>
         </div>
 
@@ -261,7 +800,7 @@
             <span class="secure-icon">🛡️</span>
             <span>Autentikasi Terenkripsi & Validasi GPS Resmi</span>
           </div>
-          <p class="login-copyright">© Perguruan Islam NIBRAS • Hak Cipta Dilindungi</p>
+          <p class="login-copyright">© Perguruan Islam NIBRAS - Kota Padang</p>
         </div>
       </div>
     </section>
@@ -1368,16 +1907,16 @@
   <!-- Leaflet Map JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-  <!-- Application Modules -->
-  <script src="js/config.js"></script>
-  <script src="js/state.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/gps.js"></script>
-  <script src="js/camera.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/guru.js"></script>
-  <script src="js/admin.js"></script>
-  <script src="js/app.js"></script>
+  <!-- Application Modules (with cache-buster) -->
+  <script src="js/config.js?v=2.0.0"></script>
+  <script src="js/state.js?v=2.0.0"></script>
+  <script src="js/api.js?v=2.0.0"></script>
+  <script src="js/gps.js?v=2.0.0"></script>
+  <script src="js/camera.js?v=2.0.0"></script>
+  <script src="js/auth.js?v=2.0.0"></script>
+  <script src="js/guru.js?v=2.0.0"></script>
+  <script src="js/admin.js?v=2.0.0"></script>
+  <script src="js/app.js?v=2.0.0"></script>
 
 </body>
 </html>
