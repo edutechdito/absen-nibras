@@ -1,6 +1,6 @@
 /**
  * AUTHENTICATION & SESSION CONTROLLER
- * Menangani login, logout, penyimpanan token, dan pergantian tampilan antarmuka
+ * Menangani login, logout, penyimpanan token, pemilihan portal, dan pergantian tampilan antarmuka
  */
 
 const AuthService = {
@@ -31,7 +31,8 @@ const AuthService = {
       }
     }
 
-    this.showLoginView();
+    // Default ke Halaman Awal / Landing Page (Sesuai Referensi Desain)
+    this.showLandingView();
   },
 
   /**
@@ -43,12 +44,96 @@ const AuthService = {
       if (!res.success) {
         console.warn('Sesi server kadaluarsa.');
         AppState.clearSession();
-        this.showLoginView();
-        App.showToast('Sesi Anda telah kedaluwarsa. Silakan login kembali.', 'warning');
+        this.showLandingView();
+        App.showToast('Sesi Anda telah kedaluwarsa. Silakan masuk kembali.', 'warning');
       }
     } catch (e) {
       // Abaikan jika offline, biarkan user tetap di tampilan lokal
     }
+  },
+
+  /**
+   * Menampilkan Halaman Awal / Landing Portal (Pilihan Pegawai vs Admin)
+   */
+  showLandingView() {
+    const viewLanding = document.getElementById('view-landing');
+    const viewLogin = document.getElementById('view-login');
+    const viewGuru = document.getElementById('view-guru');
+    const viewAdmin = document.getElementById('view-admin');
+    const navGuru = document.getElementById('nav-guru-bottom');
+
+    if (viewLanding) viewLanding.style.display = 'block';
+    if (viewLogin) viewLogin.style.display = 'none';
+    if (viewGuru) viewGuru.style.display = 'none';
+    if (viewAdmin) viewAdmin.style.display = 'none';
+    if (navGuru) navGuru.style.display = 'none';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  /**
+   * Membuka Form Login Berdasarkan Portal yang Dipilih (Pegawai / Admin)
+   */
+  openLoginPortal(role) {
+    const viewLanding = document.getElementById('view-landing');
+    const viewLogin = document.getElementById('view-login');
+    const viewGuru = document.getElementById('view-guru');
+    const viewAdmin = document.getElementById('view-admin');
+    const navGuru = document.getElementById('nav-guru-bottom');
+
+    if (viewLanding) viewLanding.style.display = 'none';
+    if (viewGuru) viewGuru.style.display = 'none';
+    if (viewAdmin) viewAdmin.style.display = 'none';
+    if (navGuru) navGuru.style.display = 'none';
+    if (viewLogin) viewLogin.style.display = 'block';
+
+    const titleEl = document.getElementById('login-title');
+    const subtitleEl = document.getElementById('login-subtitle');
+    const labelUserEl = document.getElementById('label-login-username');
+    const inputUserEl = document.getElementById('login-username');
+    const inputPassEl = document.getElementById('login-password');
+    const submitBtn = document.getElementById('btn-submit-login');
+
+    if (inputPassEl) inputPassEl.value = '';
+
+    if (role === 'admin') {
+      if (titleEl) titleEl.textContent = 'Masuk Administrator';
+      if (subtitleEl) subtitleEl.textContent = 'Pengelolaan Data & Laporan Absensi';
+      if (labelUserEl) labelUserEl.textContent = 'Username Admin';
+      if (inputUserEl) {
+        inputUserEl.placeholder = 'Masukkan username administrator';
+        inputUserEl.value = '';
+      }
+      if (submitBtn) {
+        submitBtn.style.backgroundColor = '#7C3AED';
+        submitBtn.style.borderColor = '#7C3AED';
+      }
+    } else {
+      if (titleEl) titleEl.textContent = 'Masuk Pegawai / Guru';
+      if (subtitleEl) subtitleEl.textContent = 'Presensi Guru & Tenaga Kependidikan';
+      if (labelUserEl) labelUserEl.textContent = 'Username / NIY';
+      if (inputUserEl) {
+        inputUserEl.placeholder = 'Masukkan NIY atau Username';
+        inputUserEl.value = '';
+      }
+      if (submitBtn) {
+        submitBtn.style.backgroundColor = '#0284C7';
+        submitBtn.style.borderColor = '#0284C7';
+      }
+    }
+
+    setTimeout(() => {
+      if (inputUserEl) inputUserEl.focus();
+    }, 120);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  /**
+   * Menampilkan Tampilan Login Default
+   */
+  showLoginView() {
+    this.openLoginPortal('guru');
   },
 
   /**
@@ -106,32 +191,22 @@ const AuthService = {
       CameraService.stopCamera();
       AppState.clearSession();
       App.showLoading(false);
-      this.showLoginView();
+      this.showLandingView();
       App.showToast('Anda telah keluar dari aplikasi.', 'info');
     }
-  },
-
-  /**
-   * Menampilkan Tampilan Login
-   */
-  showLoginView() {
-    document.getElementById('view-login').style.display = 'block';
-    document.getElementById('view-guru').style.display = 'none';
-    document.getElementById('view-admin').style.display = 'none';
-    document.getElementById('nav-guru-bottom').style.display = 'none';
-
-    // Reset Form Login
-    const form = document.getElementById('form-login');
-    if (form) form.reset();
   },
 
   /**
    * Mengarahkan Tampilan Berdasarkan Peran Pengguna (Guru / Admin)
    */
   routeUserView() {
-    document.getElementById('view-login').style.display = 'none';
+    const viewLanding = document.getElementById('view-landing');
+    const viewLogin = document.getElementById('view-login');
 
-    if (AppState.user.role === 'admin') {
+    if (viewLanding) viewLanding.style.display = 'none';
+    if (viewLogin) viewLogin.style.display = 'none';
+
+    if (AppState.user && AppState.user.role === 'admin') {
       document.getElementById('view-guru').style.display = 'none';
       document.getElementById('nav-guru-bottom').style.display = 'none';
       document.getElementById('view-admin').style.display = 'block';
@@ -144,4 +219,3 @@ const AuthService = {
     }
   }
 };
-

@@ -16,9 +16,40 @@ const App = {
     this.setupInstallPrompt();
     this.setupGlobalEvents();
     this.checkApiEndpointConfig();
+    this.startHeaderClock();
 
     // Inisialisasi Sesi Pengguna
     await AuthService.initSession();
+  },
+
+  /**
+   * Jam & Tanggal Realtime di Header Aplikasi (Sesuai Referensi Desain)
+   */
+  startHeaderClock() {
+    const elDate = document.getElementById('header-live-date');
+    const elClock = document.getElementById('header-live-clock');
+
+    const update = () => {
+      const now = new Date();
+      const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][now.getDay()];
+      const bulan = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'][now.getMonth()];
+      const tgl = now.getDate();
+      const thn = now.getFullYear();
+
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
+
+      if (elDate) {
+        elDate.textContent = `${hari}, ${tgl} ${bulan} ${thn}`;
+      }
+      if (elClock) {
+        elClock.textContent = `${hh}:${mm}:${ss} WIB`;
+      }
+    };
+
+    update();
+    setInterval(update, 1000);
   },
 
   /**

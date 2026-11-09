@@ -27,6 +27,9 @@
   <!-- ========================================================================
        TOP HEADER
        ======================================================================== -->
+  <!-- ========================================================================
+       TOP HEADER (MATCHING REFERENCE IMAGE)
+       ======================================================================== -->
   <header class="app-header">
     <div class="header-container">
       <div class="brand-wrapper">
@@ -34,10 +37,24 @@
           <img src="icons/icon.svg" alt="Logo NIBRAS">
         </div>
         <div class="brand-text">
-          <h1>PERGURUAN ISLAM NIBRAS</h1>
-          <p>PRESENSI ONLINE BERBASIS GPS</p>
+          <h1>Perguruan Islam NIBRAS</h1>
+          <p>Kota Padang</p>
         </div>
       </div>
+
+      <!-- Realtime Date & Clock Badges -->
+      <div class="header-datetime-wrap">
+        <span class="header-meta-item">
+          <span class="meta-icon">📅</span>
+          <span id="header-live-date">-- -- ----</span>
+        </span>
+        <span class="header-meta-divider">|</span>
+        <span class="header-meta-item">
+          <span class="meta-icon">⏰</span>
+          <span id="header-live-clock">--:--:-- WIB</span>
+        </span>
+      </div>
+
       <div class="header-actions">
         <button id="btn-open-endpoint-config" class="btn btn-sm btn-outline" style="color:#FFF;border-color:rgba(255,255,255,0.4);" title="Pengaturan URL API Server">
           ⚙️ API
@@ -52,21 +69,174 @@
   <main class="main-container">
 
     <!-- ======================================================================
-         VIEW 1: LOGIN SCREEN
+         VIEW 0: HALAMAN AWAL / LANDING HOMEPAGE (MATCHING REFERENCE IMAGE)
          ====================================================================== -->
-    <section id="view-login" class="login-wrapper">
+    <section id="view-landing" class="landing-page-wrap">
+      
+      <!-- HERO MAIN SECTION -->
+      <div class="landing-hero">
+        <div class="landing-hero-grid">
+          
+          <!-- LEFT COLUMN: BRANDING & MOTTO -->
+          <div class="hero-brand-col">
+            <div class="hero-emblem-wrap">
+              <!-- Branded Calendar & Clock Icon (Reference Design) -->
+              <div class="hero-calendar-badge">
+                <div class="hero-calendar-rings">
+                  <span class="calendar-ring"></span>
+                  <span class="calendar-ring"></span>
+                </div>
+                <!-- Calendar & Clock SVG Illustration -->
+                <svg viewBox="0 0 64 64" width="56" height="56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Calendar Body -->
+                  <rect x="8" y="14" width="48" height="42" rx="8" fill="#FFFFFF" stroke="#0284C7" stroke-width="4"/>
+                  <rect x="8" y="14" width="48" height="12" rx="8" fill="#0284C7"/>
+                  <!-- Checkmark Badge -->
+                  <circle cx="24" cy="38" r="9" fill="#FEF3C7"/>
+                  <path d="M19 38 L23 42 L29 34" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                  <!-- Clock -->
+                  <circle cx="44" cy="42" r="12" fill="#FFFFFF" stroke="#0B2545" stroke-width="3"/>
+                  <path d="M44 35 V42 L48 45" stroke="#0B2545" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+              </div>
+
+              <div class="hero-brand-titles">
+                <h1>Absensi Online</h1>
+                <h2>Perguruan Islam NIBRAS</h2>
+              </div>
+            </div>
+
+            <div class="hero-motto-wrap">
+              <div class="hero-motto-text">
+                "Disiplin Hadir,<br>Untuk Pendidikan yang Lebih Baik"
+              </div>
+              <div class="hero-motto-wave"></div>
+            </div>
+          </div>
+
+          <!-- RIGHT COLUMN: 2 PORTAL LOGIN CHOICE CARDS -->
+          <div class="hero-portals-col">
+            
+            <!-- PORTAL 1: PEGAWAI (GURU & GTK) -->
+            <div class="portal-choice-card">
+              <div class="portal-avatar-circle avatar-pegawai">
+                <!-- Educator Male Vector Illustration SVG -->
+                <svg viewBox="0 0 100 100" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="50" cy="50" r="46" fill="#DBEAFE"/>
+                  <!-- Hair / Peci -->
+                  <ellipse cx="50" cy="34" rx="20" ry="16" fill="#0F172A"/>
+                  <rect x="32" y="30" width="36" height="10" rx="3" fill="#1E293B"/>
+                  <!-- Face -->
+                  <ellipse cx="50" cy="44" rx="15" ry="16" fill="#FCD34D"/>
+                  <ellipse cx="36" cy="45" rx="3" ry="5" fill="#FCD34D"/>
+                  <ellipse cx="64" cy="45" rx="3" ry="5" fill="#FCD34D"/>
+                  <!-- Eyes & Smile -->
+                  <circle cx="45" cy="42" r="2" fill="#0F172A"/>
+                  <circle cx="55" cy="42" r="2" fill="#0F172A"/>
+                  <path d="M46 50 Q50 54 54 50" stroke="#B45309" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <!-- Khaki Uniform Shirt -->
+                  <path d="M28 88 C28 66 38 62 50 62 C62 62 72 66 72 88 Z" fill="#D97706"/>
+                  <!-- Collar & Badge -->
+                  <path d="M44 62 L50 72 L56 62 Z" fill="#FFFFFF"/>
+                  <rect x="56" y="70" width="10" height="4" rx="1" fill="#FEF3C7"/>
+                </svg>
+              </div>
+              <div class="portal-pill-badge pill-blue">Pegawai</div>
+              <div class="portal-desc">Absensi untuk Guru dan Tenaga Kependidikan</div>
+              <button type="button" class="btn-portal btn-portal-blue" onclick="AuthService.openLoginPortal('guru')">
+                <span>→ Masuk</span>
+              </button>
+            </div>
+
+            <!-- PORTAL 2: ADMIN (ADMINISTRATOR) -->
+            <div class="portal-choice-card">
+              <div class="portal-avatar-circle avatar-admin">
+                <!-- Administrator Female with Hijab & Laptop Vector SVG -->
+                <svg viewBox="0 0 100 100" width="80" height="80" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="50" cy="50" r="46" fill="#EDE9FE"/>
+                  <!-- Hijab Outer -->
+                  <path d="M30 40 C30 22 70 22 70 40 C70 65 66 78 50 78 C34 78 30 65 30 40 Z" fill="#D97706"/>
+                  <!-- Face inside Hijab -->
+                  <ellipse cx="50" cy="44" rx="13" ry="14" fill="#FCD34D"/>
+                  <!-- Eyes with Glasses & Smile -->
+                  <circle cx="45" cy="42" r="2" fill="#0F172A"/>
+                  <circle cx="55" cy="42" r="2" fill="#0F172A"/>
+                  <rect x="41" y="39" width="8" height="6" rx="2" fill="none" stroke="#0F172A" stroke-width="1.2"/>
+                  <rect x="51" y="39" width="8" height="6" rx="2" fill="none" stroke="#0F172A" stroke-width="1.2"/>
+                  <line x1="49" y1="42" x2="51" y2="42" stroke="#0F172A" stroke-width="1.2"/>
+                  <path d="M46 51 Q50 54 54 51" stroke="#B45309" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <!-- Body & Laptop -->
+                  <path d="M26 90 C26 72 36 68 50 68 C64 68 74 72 74 90 Z" fill="#7C3AED"/>
+                  <!-- Silver Laptop -->
+                  <rect x="36" y="74" width="28" height="16" rx="2" fill="#94A3B8"/>
+                  <polygon points="32,90 68,90 64,86 36,86" fill="#64748B"/>
+                  <circle cx="50" cy="81" r="2" fill="#FFFFFF"/>
+                </svg>
+              </div>
+              <div class="portal-pill-badge pill-purple">Admin</div>
+              <div class="portal-desc">Pengelolaan Data dan Laporan Absensi</div>
+              <button type="button" class="btn-portal btn-portal-purple" onclick="AuthService.openLoginPortal('admin')">
+                <span>→ Masuk</span>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- BOTTOM FEATURES STRIP (MATCHING REFERENCE IMAGE) -->
+      <div class="landing-features-strip">
+        <div class="feature-strip-item">
+          <div class="feature-strip-icon">📍</div>
+          <div class="feature-strip-text">Berbasis Lokasi<br><span style="font-size:0.78rem;color:#64748B;font-weight:500;">(GPS Geofence)</span></div>
+        </div>
+        <div class="feature-strip-item">
+          <div class="feature-strip-icon">🛡️</div>
+          <div class="feature-strip-text">Aman & Terpercaya<br><span style="font-size:0.78rem;color:#64748B;font-weight:500;">(Foto & Waktu Server)</span></div>
+        </div>
+        <div class="feature-strip-item">
+          <div class="feature-strip-icon">📊</div>
+          <div class="feature-strip-text">Laporan Real-Time<br><span style="font-size:0.78rem;color:#64748B;font-weight:500;">(Excel & Rekap PDF)</span></div>
+        </div>
+        <div class="feature-strip-item">
+          <div class="feature-strip-icon">🤝</div>
+          <div class="feature-strip-text">Mendukung Kinerja<br><span style="font-size:0.78rem;color:#64748B;font-weight:500;">Pendidikan Berkualitas</span></div>
+        </div>
+      </div>
+
+      <!-- FOOTER STRIP -->
+      <footer class="landing-footer">
+        <div class="landing-footer-text">
+          © 2026 Perguruan Islam NIBRAS - Kota Padang • Sistem Presensi Online Berbasis GPS
+        </div>
+        <div class="landing-footer-waves"></div>
+      </footer>
+
+    </section>
+
+    <!-- ======================================================================
+         VIEW 1: FORM LOGIN (POP-UP / VIEW TRANSAKSI)
+         ====================================================================== -->
+    <section id="view-login" class="login-wrapper" style="display:none;">
       <div class="login-card">
+        
+        <!-- Back to Homepage Button -->
+        <button type="button" class="btn btn-sm btn-outline" onclick="AuthService.showLandingView()" style="margin-bottom:18px;">
+          ← Kembali ke Halaman Utama
+        </button>
+
         <div class="login-header">
-          <div class="logo-badge">
+          <div class="logo-badge" id="login-header-badge">
             <img src="icons/icon.svg" alt="Nibras Logo">
           </div>
-          <h2>Masuk ke Sistem</h2>
-          <p>Sistem Presensi Guru & Tenaga Kependidikan</p>
+          <h2 id="login-title">Masuk ke Sistem</h2>
+          <p id="login-subtitle">Sistem Presensi Guru & Tenaga Kependidikan</p>
         </div>
 
         <form id="form-login">
           <div class="form-group">
-            <label class="form-label" for="login-username">Username / NIY</label>
+            <label class="form-label" for="login-username" id="label-login-username">Username / NIY</label>
             <div class="form-input-wrap">
               <input type="text" id="login-username" class="form-input" placeholder="Masukkan NIY atau Username" required autocomplete="username">
             </div>
@@ -80,7 +250,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block btn-login">
+          <button type="submit" class="btn btn-primary btn-block btn-login" id="btn-submit-login">
             <span>Masuk ke Akun</span>
             <span class="btn-arrow">→</span>
           </button>
@@ -383,255 +553,610 @@
     </nav>
 
     <!-- ======================================================================
-         VIEW 3: ADMINISTRATOR DASHBOARD & MANAGEMENT
+         VIEW 3: ADMINISTRATOR DASHBOARD & MANAGEMENT (MATCHING REFERENCE DESIGN)
          ====================================================================== -->
     <section id="view-admin" style="display:none;">
-      <!-- Admin Top Navigation Tabs -->
-      <div class="admin-navbar">
-        <button class="admin-nav-item active" data-admin-tab="dashboard">📊 Dashboard</button>
-        <button class="admin-nav-item" data-admin-tab="guru">👨‍🏫 Data Guru</button>
-        <button class="admin-nav-item" data-admin-tab="sekolah">🏫 Data Sekolah</button>
-        <button class="admin-nav-item" data-admin-tab="absensi">📍 Data Absensi</button>
-        <button class="admin-nav-item" data-admin-tab="laporan">📑 Rekap Laporan</button>
-        <button class="admin-nav-item" data-admin-tab="pengaturan">⚙️ Pengaturan</button>
-        <button class="admin-nav-item" data-admin-tab="logs">📜 Audit Log</button>
-        <button id="btn-logout-admin" class="btn btn-sm btn-danger" style="margin-left:auto;">Keluar</button>
-      </div>
+      <div class="admin-wrapper">
+        
+        <!-- Mobile Sidebar Backdrop -->
+        <div id="admin-sidebar-backdrop" class="sidebar-backdrop" onclick="AdminModule.toggleSidebar()"></div>
 
-      <!-- TAB: DASHBOARD STATS -->
-      <div id="admin-tab-dashboard" class="admin-tab-content">
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-label">Total Guru Aktif</div>
-            <div id="stat-total-guru" class="stat-val">0</div>
-          </div>
-          <div class="stat-card" style="border-left:4px solid var(--primary);">
-            <div class="stat-label">Hadir Hari Ini</div>
-            <div id="stat-hadir-today" class="stat-val">0</div>
-          </div>
-          <div class="stat-card" style="border-left:4px solid var(--success);">
-            <div class="stat-label">Tepat Waktu</div>
-            <div id="stat-tepat-waktu" class="stat-val" style="color:var(--success);">0</div>
-          </div>
-          <div class="stat-card" style="border-left:4px solid var(--warning);">
-            <div class="stat-label">Terlambat</div>
-            <div id="stat-terlambat" class="stat-val" style="color:var(--warning);">0</div>
-          </div>
-          <div class="stat-card" style="border-left:4px solid var(--danger);">
-            <div class="stat-label">Belum Hadir</div>
-            <div id="stat-belum-hadir" class="stat-val" style="color:var(--danger);">0</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-label">Unit Sekolah</div>
-            <div id="stat-total-sekolah" class="stat-val">0</div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-title">Aksi Cepat Administrator</div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn btn-primary" onclick="AdminModule.openAddGuruModal()">+ Tambah Guru Baru</button>
-            <button class="btn btn-outline" onclick="AdminModule.openAddSekolahModal()">+ Tambah Unit Sekolah</button>
-            <button class="btn btn-secondary" onclick="AdminModule.switchTab('absensi')">Lihat Absensi Hari Ini</button>
-            <button class="btn btn-secondary" onclick="AdminModule.switchTab('laporan')">Cetak Laporan Bulanan</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB: DATA GURU -->
-      <div id="admin-tab-guru" class="admin-tab-content" style="display:none;">
-        <div class="card">
-          <div class="card-title">
-            <span>Daftar Guru & Tenaga Kependidikan</span>
-            <button class="btn btn-sm btn-primary" onclick="AdminModule.openAddGuruModal()">+ Tambah Guru</button>
-          </div>
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>NIY</th>
-                  <th>Nama Lengkap</th>
-                  <th>Jabatan</th>
-                  <th>Unit Sekolah</th>
-                  <th>Status</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="table-guru-body">
-                <tr><td colspan="7" class="text-center">Memuat...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB: DATA SEKOLAH -->
-      <div id="admin-tab-sekolah" class="admin-tab-content" style="display:none;">
-        <div class="card">
-          <div class="card-title">
-            <span>Daftar Unit Sekolah, Koordinat GPS & Radius</span>
-            <button class="btn btn-sm btn-primary" onclick="AdminModule.openAddSekolahModal()">+ Tambah Unit</button>
-          </div>
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Nama Unit</th>
-                  <th>Alamat</th>
-                  <th>Koordinat (Lat, Lng)</th>
-                  <th>Radius Absensi</th>
-                  <th>Status</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="table-sekolah-body">
-                <tr><td colspan="7" class="text-center">Memuat...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB: DATA ABSENSI -->
-      <div id="admin-tab-absensi" class="admin-tab-content" style="display:none;">
-        <div class="card">
-          <div class="card-title">Log Presensi Seluruh GTK</div>
-          <!-- Filter Bar -->
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;margin-bottom:14px;">
-            <input type="date" id="filter-admin-tanggal" class="form-input">
-            <select id="filter-admin-sekolah" class="form-input">
-              <option value="">Semua Unit Sekolah</option>
-            </select>
-            <select id="filter-admin-jenis" class="form-input">
-              <option value="">Semua Presensi</option>
-              <option value="MASUK">Hanya Masuk</option>
-              <option value="PULANG">Hanya Pulang</option>
-            </select>
-            <input type="text" id="filter-admin-search" class="form-input" placeholder="Cari Nama / NIY...">
-          </div>
-
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Waktu</th>
-                  <th>Guru</th>
-                  <th>Jenis</th>
-                  <th>Status</th>
-                  <th>Jarak</th>
-                  <th>Sekolah</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody id="table-absensi-body">
-                <tr><td colspan="8" class="text-center">Memuat...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB: REKAP LAPORAN -->
-      <div id="admin-tab-laporan" class="admin-tab-content" style="display:none;">
-        <div class="card">
-          <div class="card-title">Cetak Laporan & Ekspor Excel Kehadiran</div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;margin-bottom:14px;">
-            <div>
-              <label class="form-label">Tanggal Mulai</label>
-              <input type="date" id="report-date-start" class="form-input">
+        <!-- LEFT SIDEBAR (Dark Navy / Slate Theme) -->
+        <aside id="admin-sidebar" class="admin-sidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-logo-icon">🕌</div>
+            <div class="sidebar-logo-text">
+              <h2>NIBRAS</h2>
+              <p>SISTEM PRESENSI</p>
             </div>
-            <div>
-              <label class="form-label">Tanggal Akhir</label>
-              <input type="date" id="report-date-end" class="form-input">
-            </div>
-            <div>
-              <label class="form-label">Unit Sekolah</label>
-              <select id="report-filter-sekolah" class="form-input">
-                <option value="">Semua Unit Sekolah</option>
-              </select>
-            </div>
-            <div style="display:flex;align-items:flex-end;">
-              <button class="btn btn-primary btn-block" onclick="AdminModule.generateReport()">
-                Tampilkan Rekap
+          </div>
+
+          <div class="sidebar-menu">
+            <div class="sidebar-section-title">Aplikasi Presensi</div>
+            <ul class="sidebar-nav-list">
+              <li>
+                <a class="sidebar-nav-item active" data-admin-tab="dashboard">
+                  <span class="nav-icon">📊</span>
+                  <span>Dashboard</span>
+                </a>
+              </li>
+              <li>
+                <a class="sidebar-nav-item" data-admin-tab="riwayat">
+                  <span class="nav-icon">📋</span>
+                  <span>Riwayat Presensi</span>
+                </a>
+              </li>
+              <li>
+                <a class="sidebar-nav-item" data-admin-tab="rekap">
+                  <span class="nav-icon">📅</span>
+                  <span>Rekap Presensi</span>
+                </a>
+              </li>
+              <li>
+                <a class="sidebar-nav-item" data-admin-tab="guru">
+                  <span class="nav-icon">👨‍🏫</span>
+                  <span>Data Pegawai / Guru</span>
+                </a>
+              </li>
+              <li>
+                <a class="sidebar-nav-item" data-admin-tab="sekolah">
+                  <span class="nav-icon">🏫</span>
+                  <span>Data Unit Sekolah</span>
+                </a>
+              </li>
+              <li>
+                <a class="sidebar-nav-item" data-admin-tab="peta">
+                  <span class="nav-icon">📍</span>
+                  <span>Detail Lokasi & Peta</span>
+                </a>
+              </li>
+              <li>
+                <a class="sidebar-nav-item" data-admin-tab="pengaturan">
+                  <span class="nav-icon">⚙️</span>
+                  <span>Setting Presensi</span>
+                </a>
+              </li>
+            </ul>
+
+            <div class="sidebar-section-title">Master Aplikasi</div>
+            <ul class="sidebar-nav-list">
+              <li>
+                <a class="sidebar-nav-item" data-admin-tab="logs">
+                  <span class="nav-icon">📜</span>
+                  <span>Audit Log Aktivitas</span>
+                </a>
+              </li>
+              <li>
+                <a class="sidebar-nav-item" onclick="AdminModule.openBackupModal()" style="cursor:pointer;">
+                  <span class="nav-icon">💾</span>
+                  <span>Backup Database</span>
+                </a>
+              </li>
+              <li>
+                <a class="sidebar-nav-item" id="btn-logout-sidebar" style="color:#F87171;cursor:pointer;">
+                  <span class="nav-icon">🚪</span>
+                  <span>Keluar Sistem</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="sidebar-footer">
+            © 2026 Perguruan Islam NIBRAS
+          </div>
+        </aside>
+
+        <!-- MAIN ADMIN CONTENT AREA -->
+        <div class="admin-main">
+          
+          <!-- Admin Top Navbar -->
+          <header class="admin-topbar">
+            <div class="topbar-left">
+              <button class="sidebar-toggle-btn" onclick="AdminModule.toggleSidebar()" title="Toggle Sidebar">
+                ☰
               </button>
-            </div>
-          </div>
-
-          <div id="report-actions" style="display:none;gap:10px;margin-bottom:16px;">
-            <button class="btn btn-success" onclick="AdminModule.exportToCsv()">📊 Ekspor ke Excel (CSV)</button>
-            <button class="btn btn-primary" onclick="AdminModule.printReport()">🖨️ Cetak / Simpan PDF</button>
-          </div>
-
-          <div id="report-preview-container">
-            <div style="text-align:center;padding:30px;color:var(--text-muted);">
-              Pilih periode tanggal di atas dan klik <b>Tampilkan Rekap</b>.
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB: PENGATURAN SISTEM -->
-      <div id="admin-tab-pengaturan" class="admin-tab-content" style="display:none;">
-        <div class="card">
-          <div class="card-title">Konfigurasi Aturan Presensi</div>
-          <form id="form-settings">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-              <div class="form-group">
-                <label class="form-label">Jam Masuk Dibuka (WIB)</label>
-                <input type="time" id="setting-jam_masuk_mulai" class="form-input" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Batas Jam Masuk Normal (WIB)</label>
-                <input type="time" id="setting-jam_masuk_batas" class="form-input" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Toleransi Keterlambatan (Menit)</label>
-                <input type="number" id="setting-toleransi_terlambat_menit" class="form-input" min="0" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Jam Pulang Dibuka (WIB)</label>
-                <input type="time" id="setting-jam_pulang_mulai" class="form-input" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Maksimal Toleransi Akurasi GPS (Meter)</label>
-                <input type="number" id="setting-max_gps_accuracy" class="form-input" min="10" required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Radius Default Sekolah (Meter)</label>
-                <input type="number" id="setting-default_radius" class="form-input" min="10" required>
+              <div class="admin-breadcrumb">
+                <a href="#admin" onclick="AdminModule.switchTab('dashboard')">Home</a> » <span id="admin-breadcrumb-title">Dashboard</span>
               </div>
             </div>
-            <button type="submit" class="btn btn-primary" style="margin-top:10px;">Simpan Pengaturan</button>
-          </form>
-        </div>
-      </div>
+            <div class="topbar-right">
+              <div class="topbar-clock" id="admin-topbar-clock">--:--:-- WIB</div>
+              <div class="admin-user-profile" title="Administrator">
+                <div class="admin-avatar">A</div>
+                <div style="font-size:0.85rem;font-weight:700;color:#1E293B;display:none;display:inline-block;">Admin</div>
+              </div>
+            </div>
+          </header>
 
-      <!-- TAB: AUDIT LOG -->
-      <div id="admin-tab-logs" class="admin-tab-content" style="display:none;">
-        <div class="card">
-          <div class="card-title">Riwayat Aktivitas Sistem (Audit Trail)</div>
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Waktu</th>
-                  <th>User / Pelaku</th>
-                  <th>Aksi</th>
-                  <th>Keterangan</th>
-                </tr>
-              </thead>
-              <tbody id="table-logs-body">
-                <tr><td colspan="5" class="text-center">Memuat riwayat log...</td></tr>
-              </tbody>
-            </table>
+          <!-- Admin Tab Views Container -->
+          <div class="admin-body">
+
+            <!-- ==============================================================
+                 TAB 1: DASHBOARD (MATCHING REFERENCE IMAGE 1)
+                 ============================================================== -->
+            <div id="admin-tab-dashboard" class="admin-tab-content">
+              
+              <!-- 4 Top Colored Metric Cards -->
+              <div class="kpi-grid">
+                
+                <!-- Card 1: Presensi Tepat Waktu (Blue) -->
+                <div class="kpi-card kpi-card-blue">
+                  <div class="kpi-top">
+                    <div>
+                      <div class="kpi-number" id="kpi-tepat-waktu-count">0/0</div>
+                      <div class="kpi-title">Presensi Tepat Waktu <span id="kpi-tepat-waktu-pct">0%</span></div>
+                    </div>
+                    <div class="kpi-icon-bubble">⏱️</div>
+                  </div>
+                  <div class="kpi-bottom">
+                    <span>📈 Tingkat Kehadiran</span>
+                    <span class="kpi-badge">2026</span>
+                  </div>
+                </div>
+
+                <!-- Card 2: Terlambat Masuk (Green) -->
+                <div class="kpi-card kpi-card-green">
+                  <div class="kpi-top">
+                    <div>
+                      <div class="kpi-number" id="kpi-terlambat-count">0/0</div>
+                      <div class="kpi-title">Terlambat Masuk <span id="kpi-terlambat-pct">0%</span></div>
+                    </div>
+                    <div class="kpi-icon-bubble">⚠️</div>
+                  </div>
+                  <div class="kpi-bottom">
+                    <span>🕒 Toleransi 15 Menit</span>
+                    <span class="kpi-badge">2026</span>
+                  </div>
+                </div>
+
+                <!-- Card 3: Pulang Awal / Cepat (Orange) -->
+                <div class="kpi-card kpi-card-orange">
+                  <div class="kpi-top">
+                    <div>
+                      <div class="kpi-number" id="kpi-pulang-awal-count">0/0</div>
+                      <div class="kpi-title">Pulang Awal <span id="kpi-pulang-awal-pct">0%</span></div>
+                    </div>
+                    <div class="kpi-icon-bubble">🚪</div>
+                  </div>
+                  <div class="kpi-bottom">
+                    <span>⏳ Sebelum 15:30 WIB</span>
+                    <span class="kpi-badge">2026</span>
+                  </div>
+                </div>
+
+                <!-- Card 4: Tidak Hadir / Belum Absen (Red) -->
+                <div class="kpi-card kpi-card-red">
+                  <div class="kpi-top">
+                    <div>
+                      <div class="kpi-number" id="kpi-tidak-absen-count">0/0</div>
+                      <div class="kpi-title">Tidak Absen / Belum Hadir <span id="kpi-tidak-absen-pct">0%</span></div>
+                    </div>
+                    <div class="kpi-icon-bubble">👤</div>
+                  </div>
+                  <div class="kpi-bottom">
+                    <span>❌ Belum Tercatat</span>
+                    <span class="kpi-badge">2026</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Middle Charts Grid (Image 1) -->
+              <div class="charts-grid">
+                
+                <!-- Stacked Bar Chart: Presensi Perbulan -->
+                <div class="chart-card">
+                  <div class="chart-header">
+                    <h3 class="chart-title">Presensi Perbulan</h3>
+                    <div class="chart-legend">
+                      <span><span class="legend-dot" style="background:#16A34A;"></span>Tepat Waktu</span>
+                      <span><span class="legend-dot" style="background:#F59E0B;"></span>Terlambat Masuk</span>
+                      <span><span class="legend-dot" style="background:#EA580C;"></span>Pulang Sebelum Waktunya</span>
+                      <span><span class="legend-dot" style="background:#DC2626;"></span>Tidak Absen</span>
+                    </div>
+                  </div>
+                  <div class="chart-svg-container" id="chart-bar-container">
+                    <!-- Dynamic SVG Bar Chart injected by JS -->
+                  </div>
+                </div>
+
+                <!-- Donut Chart: Presensi Pertahun -->
+                <div class="chart-card">
+                  <div class="chart-header">
+                    <h3 class="chart-title">Presensi Pertahun</h3>
+                  </div>
+                  <div class="chart-svg-container" id="chart-pie-container">
+                    <!-- Dynamic SVG Pie/Donut Chart injected by JS -->
+                  </div>
+                  <div class="chart-legend" style="justify-content:center;margin-top:10px;">
+                    <span><span class="legend-dot" style="background:#8B5CF6;"></span>Tepat Waktu</span>
+                    <span><span class="legend-dot" style="background:#FDE047;"></span>Terlambat</span>
+                    <span><span class="legend-dot" style="background:#F97316;"></span>Pulang Awal</span>
+                    <span><span class="legend-dot" style="background:#EF4444;"></span>Tidak Absen</span>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- Bottom Row: Presensi Tepat Waktu Terbanyak & Presensi Terbaru -->
+              <div class="dash-bottom-grid">
+                
+                <!-- Top Ranking GTK -->
+                <div class="chart-card">
+                  <div class="chart-header">
+                    <h3 class="chart-title">Presensi Tepat Waktu Terbanyak</h3>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="data-table">
+                      <thead>
+                        <tr>
+                          <th style="width:40px;">No</th>
+                          <th>Nama Pegawai</th>
+                          <th style="text-align:right;">Tepat Waktu</th>
+                        </tr>
+                      </thead>
+                      <tbody id="table-top-gtk-body">
+                        <tr><td colspan="3" class="text-center">Memuat data...</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style="font-size:0.75rem;color:#64748B;margin-top:12px;font-style:italic;">
+                    *) Tepat waktu adalah akumulasi kehadiran masuk tepat waktu tahun 2026.
+                  </div>
+                </div>
+
+                <!-- Latest Attendance Table -->
+                <div class="chart-card">
+                  <div class="chart-header">
+                    <h3 class="chart-title">Presensi Terbaru Hari Ini</h3>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                      <button class="btn-export-xlsx" onclick="AdminModule.exportToCsv()">📊 XLSX</button>
+                      <input type="text" id="dash-quick-search" class="form-input" placeholder="Search..." style="padding:5px 10px;font-size:0.8rem;width:150px;">
+                    </div>
+                  </div>
+                  <div class="table-responsive">
+                    <table class="data-table">
+                      <thead>
+                        <tr>
+                          <th>No</th>
+                          <th>Nama Pegawai</th>
+                          <th>Tanggal</th>
+                          <th>Waktu</th>
+                          <th>Jenis</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody id="table-dash-latest-body">
+                        <tr><td colspan="6" class="text-center">Memuat...</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="pagination-wrap">
+                    <span id="dash-entries-info">Showing 1 to 5 entries</span>
+                    <button class="btn btn-sm btn-outline" onclick="AdminModule.switchTab('riwayat')">Lihat Seluruh Riwayat →</button>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- ==============================================================
+                 TAB 2: RIWAYAT PRESENSI (MATCHING REFERENCE IMAGE 2)
+                 ============================================================== -->
+            <div id="admin-tab-riwayat" class="admin-tab-content" style="display:none;">
+              
+              <!-- Filter Panel Card (Image 2) -->
+              <div class="filter-card">
+                <h3 style="font-size:1.1rem;font-weight:800;color:#1E293B;margin-bottom:16px;">Riwayat Presensi Guru & Tenaga Kependidikan</h3>
+                
+                <div class="filter-grid-row">
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">Rentang Tanggal</label>
+                    <div style="display:flex;gap:6px;align-items:center;">
+                      <input type="date" id="history-filter-start" class="form-input">
+                      <span>s.d.</span>
+                      <input type="date" id="history-filter-end" class="form-input">
+                    </div>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">Nama Pegawai</label>
+                    <select id="history-filter-guru" class="form-input">
+                      <option value="">Semua Pegawai</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">Status Kehadiran</label>
+                    <select id="history-filter-status" class="form-input">
+                      <option value="">Semua Status</option>
+                      <option value="Tepat Waktu">Tepat Waktu</option>
+                      <option value="Terlambat">Terlambat</option>
+                      <option value="Pulang Normal">Pulang Normal</option>
+                      <option value="Pulang Cepat">Pulang Cepat</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <button class="btn btn-primary btn-block" onclick="AdminModule.filterRiwayatTable()">
+                      🔍 Terapkan Filter
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Riwayat Table Card -->
+              <div class="chart-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+                  <div style="display:flex;align-items:center;gap:8px;font-size:0.85rem;">
+                    <span>Show</span>
+                    <select id="history-page-size" class="form-input" style="padding:4px 8px;width:75px;" onchange="AdminModule.changeHistoryPageSize()">
+                      <option value="10" selected>10</option>
+                      <option value="25">25</option>
+                      <option value="50">50</option>
+                    </select>
+                    <span>entries</span>
+                  </div>
+
+                  <div style="display:flex;gap:10px;align-items:center;">
+                    <button class="btn-export-pdf" onclick="AdminModule.printReport()">📄 PDF</button>
+                    <button class="btn-export-xlsx" onclick="AdminModule.exportToCsv()">📊 XLSX</button>
+                    <input type="text" id="history-search-input" class="form-input" placeholder="Search..." style="padding:6px 12px;font-size:0.85rem;width:180px;" oninput="AdminModule.searchRiwayatTable()">
+                  </div>
+                </div>
+
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th style="width:40px;">No</th>
+                        <th>Nama Pegawai</th>
+                        <th>Tanggal</th>
+                        <th>Masuk</th>
+                        <th>Pulang</th>
+                        <th>Status</th>
+                        <th style="text-align:center;">Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody id="table-riwayat-body">
+                      <tr><td colspan="7" class="text-center">Memuat riwayat presensi...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="pagination-wrap">
+                  <span id="history-pagination-info">Showing 1 to 10 of entries</span>
+                  <div class="pagination-pages" id="history-pagination-btns">
+                    <!-- Pagination buttons -->
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- ==============================================================
+                 TAB 3: REKAP PRESENSI MATRIX 1-31 (MATCHING REFERENCE IMAGE 3)
+                 ============================================================== -->
+            <div id="admin-tab-rekap" class="admin-tab-content" style="display:none;">
+              
+              <!-- Filter Card -->
+              <div class="filter-card">
+                <h3 style="font-size:1.1rem;font-weight:800;color:#1E293B;margin-bottom:16px;">Rekap Presensi Bulanan (Matrix 1 s/d 31)</h3>
+
+                <div class="filter-grid-row">
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">Pegawai</label>
+                    <select id="matrix-filter-guru" class="form-input">
+                      <option value="">Semua Pegawai</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label class="form-label">Periode Bulan & Tahun</label>
+                    <div style="display:flex;gap:6px;">
+                      <select id="matrix-filter-month" class="form-input">
+                        <option value="01">Januari</option>
+                        <option value="02">Februari</option>
+                        <option value="03">Maret</option>
+                        <option value="04">April</option>
+                        <option value="05">Mei</option>
+                        <option value="06">Juni</option>
+                        <option value="07">Juli</option>
+                        <option value="08">Agustus</option>
+                        <option value="09">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11" selected>November</option>
+                        <option value="12">Desember</option>
+                      </select>
+                      <select id="matrix-filter-year" class="form-input" style="width:100px;">
+                        <option value="2026" selected>2026</option>
+                        <option value="2025">2025</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <button class="btn btn-primary btn-block" onclick="AdminModule.generateMatrixReport()">
+                      Submit Rekap
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Matrix Result Card -->
+              <div class="matrix-container">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                  <h4 style="font-size:0.95rem;font-weight:700;color:#1E293B;" id="matrix-table-title">Rekap Presensi Bulan November 2026</h4>
+                  <button class="btn-export-xlsx" onclick="AdminModule.exportMatrixToCsv()">📊 XLSX</button>
+                </div>
+
+                <div class="matrix-legend">
+                  <b>Keterangan:</b> 
+                  <span class="cell-v" style="padding:2px 6px;border-radius:3px;">V</span> = Tepat Waktu, 
+                  <span class="cell-tl" style="padding:2px 6px;border-radius:3px;">TL</span> = Terlambat Masuk, 
+                  <span class="cell-psw" style="padding:2px 6px;border-radius:3px;">PSW</span> = Pulang Sebelum Waktunya, 
+                  <span class="cell-tam" style="padding:2px 6px;border-radius:3px;">TAM</span> = Tidak Hadir / Belum Absen,
+                  <span class="cell-off" style="padding:2px 6px;border-radius:3px;">-</span> = Hari Libur / Akhir Pekan
+                </div>
+
+                <div class="matrix-table-scroll">
+                  <table class="matrix-table" id="matrix-calendar-table">
+                    <!-- Dynamic Matrix Calendar injected by JS -->
+                  </table>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- ==============================================================
+                 TAB 4: DATA GURU (PEGAWAI)
+                 ============================================================== -->
+            <div id="admin-tab-guru" class="admin-tab-content" style="display:none;">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3 class="chart-title">Data Guru & Tenaga Kependidikan (GTK)</h3>
+                  <button class="btn btn-sm btn-primary" onclick="AdminModule.openAddGuruModal()">+ Tambah Guru Baru</button>
+                </div>
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th>NIY</th>
+                        <th>Nama Lengkap</th>
+                        <th>Jabatan</th>
+                        <th>Unit Sekolah</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody id="table-guru-body">
+                      <tr><td colspan="7" class="text-center">Memuat...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- ==============================================================
+                 TAB 5: DATA SEKOLAH & TITIK GPS
+                 ============================================================== -->
+            <div id="admin-tab-sekolah" class="admin-tab-content" style="display:none;">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3 class="chart-title">Data Unit Sekolah, Koordinat GPS & Radius Geofence</h3>
+                  <button class="btn btn-sm btn-primary" onclick="AdminModule.openAddSekolahModal()">+ Tambah Unit Sekolah</button>
+                </div>
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th>Nama Unit</th>
+                        <th>Alamat</th>
+                        <th>Koordinat (Lat, Lng)</th>
+                        <th>Radius Absensi</th>
+                        <th>Status</th>
+                        <th>Aksi</th>
+                      </tr>
+                    </thead>
+                    <tbody id="table-sekolah-body">
+                      <tr><td colspan="7" class="text-center">Memuat...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- ==============================================================
+                 TAB 6: DETAIL LOKASI & PETA GPS
+                 ============================================================== -->
+            <div id="admin-tab-peta" class="admin-tab-content" style="display:none;">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3 class="chart-title">Pemantauan Peta Interaktif & Koordinat Presensi</h3>
+                  <button class="btn btn-sm btn-outline" onclick="AdminModule.refreshMapPins()">🔄 Refresh Titik</button>
+                </div>
+                <div id="admin-interactive-map" style="width:100%;height:450px;border-radius:10px;border:1px solid #CBD5E1;margin-bottom:14px;"></div>
+                <div style="font-size:0.85rem;color:#64748B;">
+                  Lingkaran hijau menandakan batas radius sekolah. Pin menunjukkan lokasi transaksi absensi terakhir guru hari ini.
+                </div>
+              </div>
+            </div>
+
+            <!-- ==============================================================
+                 TAB 7: SETTING / PENGATURAN JAM & RADIUS
+                 ============================================================== -->
+            <div id="admin-tab-pengaturan" class="admin-tab-content" style="display:none;">
+              <div class="chart-card" style="max-width:760px;">
+                <div class="chart-header">
+                  <h3 class="chart-title">Konfigurasi Jam Kerja & Parameter Presensi</h3>
+                </div>
+                <form id="form-settings">
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                    <div class="form-group">
+                      <label class="form-label">Jam Masuk Dibuka (WIB)</label>
+                      <input type="time" id="setting-jam_masuk_mulai" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Batas Jam Masuk Normal (WIB)</label>
+                      <input type="time" id="setting-jam_masuk_batas" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Toleransi Keterlambatan (Menit)</label>
+                      <input type="number" id="setting-toleransi_terlambat_menit" class="form-input" min="0" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Jam Pulang Dibuka (WIB)</label>
+                      <input type="time" id="setting-jam_pulang_mulai" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Maksimal Toleransi Akurasi GPS (Meter)</label>
+                      <input type="number" id="setting-max_gps_accuracy" class="form-input" min="10" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Radius Default Sekolah (Meter)</label>
+                      <input type="number" id="setting-default_radius" class="form-input" min="10" required>
+                    </div>
+                  </div>
+                  <button type="submit" class="btn btn-primary" style="margin-top:10px;">💾 Simpan Pengaturan</button>
+                </form>
+              </div>
+            </div>
+
+            <!-- ==============================================================
+                 TAB 8: AUDIT LOG AKTIVITAS
+                 ============================================================== -->
+            <div id="admin-tab-logs" class="admin-tab-content" style="display:none;">
+              <div class="chart-card">
+                <div class="chart-header">
+                  <h3 class="chart-title">Riwayat Aktivitas Sistem (Audit Trail)</h3>
+                </div>
+                <div class="table-responsive">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>No</th>
+                        <th>Waktu</th>
+                        <th>User / Pelaku</th>
+                        <th>Aksi</th>
+                        <th>Keterangan</th>
+                      </tr>
+                    </thead>
+                    <tbody id="table-logs-body">
+                      <tr><td colspan="5" class="text-center">Memuat riwayat log...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
           </div>
-        </div>
-      </div>
 
+        </div>
+
+      </div>
     </section>
 
   </main>
