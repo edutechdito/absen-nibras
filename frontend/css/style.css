@@ -309,30 +309,66 @@ body {
 }
 
 .landing-hero {
-  background: linear-gradient(180deg, #F0F7FF 0%, #E0F2FE 45%, #BAE6FD 85%, #93C5FD 100%);
+  background: #E2E8F0;
   border-radius: 24px;
   padding: 44px 36px 36px;
-  box-shadow: 0 12px 36px rgba(11, 37, 69, 0.08);
+  box-shadow: 0 16px 40px rgba(11, 37, 69, 0.12);
   position: relative;
   overflow: hidden;
   margin-bottom: 24px;
-  border: 1px solid #BAE6FD;
+  border: 1px solid rgba(186, 230, 253, 0.8);
 }
 
-.landing-hero::after {
-  content: '';
+.hero-backdrop-scenery {
   position: absolute;
+  top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 90px;
-  background: 
-    radial-gradient(circle at 10% 100%, rgba(22, 101, 52, 0.22) 0%, transparent 60px),
-    radial-gradient(circle at 25% 100%, rgba(21, 128, 61, 0.18) 0%, transparent 80px),
-    radial-gradient(circle at 80% 100%, rgba(22, 101, 52, 0.22) 0%, transparent 70px),
-    linear-gradient(to top, rgba(255, 255, 255, 0.5) 0%, transparent 100%);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
   pointer-events: none;
   z-index: 1;
+}
+
+.hero-photo-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 32%;
+  filter: saturate(1.05) contrast(1.02);
+}
+
+.hero-photo-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.88) 42%, rgba(255, 255, 255, 0.40) 80%, rgba(255, 255, 255, 0.18) 100%);
+}
+
+@media (max-width: 900px) {
+  .hero-photo-overlay {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.90) 60%, rgba(255, 255, 255, 0.84) 100%);
+  }
+}
+
+.hero-brand-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.70);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  padding: 22px 24px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 24px rgba(11, 37, 69, 0.06);
 }
 
 .landing-hero-grid {

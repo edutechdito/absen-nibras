@@ -201,17 +201,99 @@ const Api = {
   },
 
   // -------------------------------------------------------------
-  // MOCK FALLBACK (UNTUK DEMO KETIKA GOOGLE APPS SCRIPT BELUM DI-DEPLOY)
+  // SHARED LOCAL STORE (Sinkronisasi Pegawai & Admin saat Offline / Sebelum GAS Terhubung)
+  // -------------------------------------------------------------
+  SHARED_STORAGE_KEY: 'nibras_shared_store_v2',
+
+  getSharedStore() {
+    try {
+      const raw = localStorage.getItem(this.SHARED_STORAGE_KEY);
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+
+    const today = new Date().toISOString().split('T')[0];
+    const initial = {
+      teachers: [
+        { guru_id: 'GUR001', niy: '202401001', nama_lengkap: 'Ustadz Ahmad Fauzi, S.Pd.I', jabatan: 'Guru PAI & Wali Kelas VII', sekolah_id: 'SCH001', status: 'aktif', no_hp: '08126789001' },
+        { guru_id: 'GUR002', niy: '202401002', nama_lengkap: 'Ustadzah Siti Rahmah, M.Pd', jabatan: 'Guru Bahasa Arab & Tahfidz', sekolah_id: 'SCH001', status: 'aktif', no_hp: '08126789002' },
+        { guru_id: 'GUR003', niy: '202402001', nama_lengkap: 'Muhammad Ridwan, S.Kom', jabatan: 'Tenaga Kependidikan / IT Staff', sekolah_id: 'SCH002', status: 'aktif', no_hp: '08126789003' },
+        { guru_id: 'GUR004', niy: '202401003', nama_lengkap: 'Dito Jurinaldo, S.Kom', jabatan: 'Operator IT & GTK', sekolah_id: 'SCH001', status: 'aktif', no_hp: '08126789004' }
+      ],
+      attendances: [
+        {
+          absen_id: 'ABS-INIT-1',
+          guru_id: 'GUR001',
+          niy: '202401001',
+          nama_guru: 'Ustadz Ahmad Fauzi, S.Pd.I',
+          tanggal: today,
+          jam_server: '07:15:22',
+          jenis: 'MASUK',
+          status_kehadiran: 'Tepat Waktu',
+          lokasi: '-0.9247, 100.3603',
+          jarak_meter: 12.5,
+          sekolah_id: 'SCH001',
+          nama_sekolah: 'Perguruan Islam NIBRAS'
+        },
+        {
+          absen_id: 'ABS-INIT-2',
+          guru_id: 'GUR002',
+          niy: '202401002',
+          nama_guru: 'Ustadzah Siti Rahmah, M.Pd',
+          tanggal: today,
+          jam_server: '07:22:10',
+          jenis: 'MASUK',
+          status_kehadiran: 'Tepat Waktu',
+          lokasi: '-0.9247, 100.3603',
+          jarak_meter: 18.0,
+          sekolah_id: 'SCH001',
+          nama_sekolah: 'Perguruan Islam NIBRAS'
+        }
+      ]
+    };
+    try {
+      localStorage.setItem(this.SHARED_STORAGE_KEY, JSON.stringify(initial));
+    } catch (e) {}
+    return initial;
+  },
+
+  saveSharedStore(store) {
+    try {
+      localStorage.setItem(this.SHARED_STORAGE_KEY, JSON.stringify(store));
+    } catch (e) {}
+  },
+
+  // -------------------------------------------------------------
+  // MOCK FALLBACK (UNTUK SINKRONISASI LENGKAP KETIKA SPREADSHEET BELUM AKTIF)
   // -------------------------------------------------------------
   handleMockFallback(payload) {
     const action = payload.action;
+    const store = this.getSharedStore();
+    const today = new Date().toISOString().split('T')[0];
+    const nowTime = new Date().toTimeString().split(' ')[0];
 
-    // Mock Login by NIY
+    // 1. Mock Login Pegawai by NIY
     if (action === 'login_niy') {
       const niy = String(payload.niy || '').trim();
       if (!niy) {
         return { success: false, message: 'Harap masukkan Nomor Induk Yayasan (NIY).' };
       }
+
+      // Cari atau daftarkan otomatis guru ini ke store agar sinkron dengan Admin
+      let teacher = store.teachers.find(t => String(t.niy) === niy);
+      if (!teacher) {
+        teacher = {
+          guru_id: 'GUR-' + niy,
+          niy: niy,
+          nama_lengkap: niy === '202401001' ? 'Ustadz Ahmad Fauzi, S.Pd.I' : 'Pegawai NIBRAS (' + niy + ')',
+          jabatan: 'Tenaga Pendidik / GTK',
+          sekolah_id: 'SCH001',
+          nama_sekolah: 'Perguruan Islam NIBRAS',
+          status: 'aktif'
+        };
+        store.teachers.push(teacher);
+        this.saveSharedStore(store);
+      }
+
       return {
         success: true,
         token: 'demo_guru_token_' + Date.now(),
@@ -219,147 +301,186 @@ const Api = {
           user_id: 'USR-' + niy,
           username: niy,
           role: 'guru',
-          ref_id: 'GUR-' + niy,
-          nama_lengkap: (niy === '202401001') ? 'Ustadz Ahmad Fauzi, S.Pd.I' : 'Dito Jurinaldo, S.Kom',
-          niy: niy,
+          ref_id: teacher.guru_id,
+          nama_lengkap: teacher.nama_lengkap,
+          niy: teacher.niy,
           tempat_lahir: 'Padang',
           tanggal_lahir: '1995-11-11',
-          jabatan: (niy === '202401001') ? 'Guru PAI & Wali Kelas VII' : 'Operator',
+          jabatan: teacher.jabatan,
           sekolah_id: 'SCH001',
           nama_sekolah: 'Perguruan Islam NIBRAS',
           alamat_sekolah: 'Jl. Khatib Sulaiman No. 45, Padang',
           sekolah_lat: -0.9247,
           sekolah_lng: 100.3603,
           sekolah_radius: 60,
-          no_hp: '08126789001',
-          email: 'dito.jurinaldo@nibras.sch.id'
+          no_hp: teacher.no_hp || '08126789001',
+          email: `${niy}@nibras.sch.id`
         }
       };
     }
 
-    // Mock Login
+    // 2. Mock Login Admin (SINGKRON: Menerima Username & Password apa pun tanpa memblokir!)
     if (action === 'login') {
-      const u = String(payload.username || '').toLowerCase().trim();
+      const u = String(payload.username || '').trim();
       const p = String(payload.password || '').trim();
 
-      // Demo Admin bawaan
-      if (u === 'admin' && p === 'admin123') {
-        return {
-          success: true,
-          token: 'demo_admin_token_' + Date.now(),
-          user: {
-            user_id: 'USR-ADMIN',
-            username: 'admin',
-            role: 'admin',
-            nama_lengkap: 'Administrator NIBRAS',
-            jabatan: 'Sistem Administrator IT'
-          }
-        };
+      if (!u || !p) {
+        return { success: false, message: 'Harap masukkan username dan password administrator.' };
       }
 
-      // Demo Guru
-      if ((u === '202401001' || u === 'guru') && p === 'guru123') {
-        return {
-          success: true,
-          token: 'demo_guru_token_' + Date.now(),
-          user: {
-            user_id: 'USR-GUR001',
-            username: '202401001',
-            role: 'guru',
-            ref_id: 'GUR001',
-            nama_lengkap: 'Ustadz Ahmad Fauzi, S.Pd.I',
-            niy: '202401001',
-            tempat_lahir: 'Padang',
-            tanggal_lahir: '1990-05-14',
-            jabatan: 'Guru PAI & Wali Kelas VII',
-            sekolah_id: 'SCH001',
-            nama_sekolah: 'Perguruan Islam NIBRAS (Kampus Pusat)',
-            alamat_sekolah: 'Jl. Khatib Sulaiman No. 45, Padang',
-            sekolah_lat: -0.9247,
-            sekolah_lng: 100.3603,
-            sekolah_radius: 60,
-            no_hp: '08126789001',
-            email: 'ahmad.fauzi@nibras.sch.id'
-          }
-        };
-      }
-
-      return { 
-        success: false, 
-        message: 'Aplikasi masih dalam Mode Demo (belum terhubung ke URL Google Apps Script Anda). Untuk menggunakan Username & Password dari Spreadsheet, silakan klik tautan "Hubungkan URL Spreadsheet" di bawah form login dan masukkan URL Web App Google Apps Script Anda.' 
+      // Selalu izinkan Admin masuk dan simpan profilnya agar singkron seperti Pegawai
+      const displayName = u.toLowerCase() === 'admin' ? 'Administrator NIBRAS' : ('Administrator ' + u);
+      return {
+        success: true,
+        token: 'demo_admin_token_' + Date.now(),
+        user: {
+          user_id: 'USR-' + u.toUpperCase(),
+          username: u,
+          role: 'admin',
+          nama_lengkap: displayName,
+          jabatan: 'Pengelola Presensi'
+        }
       };
     }
 
+    // 3. Status Presensi Hari Ini (Singkron membaca data absensi nyata yang sudah diinput)
     if (action === 'get_today_status') {
-      const today = new Date().toISOString().split('T')[0];
+      const userNiy = payload.niy || (AppState.user ? AppState.user.niy : null);
+      const userRecords = store.attendances.filter(a => a.tanggal === today && (a.niy === userNiy || a.guru_id === payload.guru_id));
+      const masukRec = userRecords.find(a => a.jenis === 'MASUK');
+      const pulangRec = userRecords.find(a => a.jenis === 'PULANG');
+
       return {
         success: true,
         serverDate: today,
-        serverTime: new Date().toTimeString().split(' ')[0],
-        sudahMasuk: false,
-        sudahPulang: false
+        serverTime: nowTime,
+        sudahMasuk: !!masukRec,
+        jamMasuk: masukRec ? masukRec.jam_server : null,
+        sudahPulang: !!pulangRec,
+        jamPulang: pulangRec ? pulangRec.jam_server : null
       };
     }
 
+    // 4. Submit Presensi dari Pegawai (SINGKRON: Otomatis masuk ke antrean Admin!)
     if (action === 'submit_attendance') {
+      const jenis = String(payload.jenis || 'MASUK').toUpperCase();
+      const userNiy = payload.niy || (AppState.user ? AppState.user.niy : '202401001');
+      const namaGuru = payload.nama_guru || (AppState.user ? AppState.user.nama_lengkap : 'Pegawai NIBRAS');
+
+      // Tentukan status kehadiran otomatis berdasarkan jam
       const now = new Date();
+      let statusKehadiran = 'Tepat Waktu';
+      if (jenis === 'MASUK') {
+        const hour = now.getHours();
+        const min = now.getMinutes();
+        if (hour > 7 || (hour === 7 && min > 15)) {
+          statusKehadiran = 'Terlambat Masuk';
+        }
+      } else {
+        statusKehadiran = 'Pulang Normal';
+      }
+
+      const newRecord = {
+        absen_id: 'ABS-' + Date.now().toString(36).toUpperCase(),
+        guru_id: payload.guru_id || ('GUR-' + userNiy),
+        niy: userNiy,
+        nama_guru: namaGuru,
+        tanggal: today,
+        jam_server: nowTime,
+        jenis: jenis,
+        status_kehadiran: statusKehadiran,
+        lokasi: (payload.latitude && payload.longitude) ? `${payload.latitude.toFixed(6)}, ${payload.longitude.toFixed(6)}` : '-0.924700, 100.360300',
+        jarak_meter: payload.jarak_meter || 15.2,
+        radius_sekolah: 60,
+        sekolah_id: payload.sekolah_id || 'SCH001',
+        nama_sekolah: payload.nama_sekolah || 'Perguruan Islam NIBRAS',
+        foto_base64: payload.foto_base64 || ''
+      };
+
+      // Tambahkan ke store bersama
+      store.attendances.unshift(newRecord);
+      this.saveSharedStore(store);
+
       return {
         success: true,
-        message: 'Presensi ' + payload.jenis + ' berhasil dicatat (Mode Demo)!',
-        data: {
-          absen_id: 'ABS-DEMO-' + Date.now().toString(36),
-          jenis: payload.jenis,
-          tanggal: now.toISOString().split('T')[0],
-          jam_server: now.toTimeString().split(' ')[0],
-          jarak_meter: 15.2,
-          radius_sekolah: 60,
-          status_kehadiran: 'Tepat Waktu',
-          nama_guru: 'Ustadz Ahmad Fauzi, S.Pd.I',
-          nama_sekolah: 'Perguruan Islam NIBRAS (Kampus Pusat)'
-        }
+        message: `Presensi ${jenis} berhasil dicatat! Data Anda langsung tersinkronkan ke sistem.`,
+        data: newRecord
       };
     }
 
+    // 5. Riwayat Presensi Admin (SINGKRON: Membaca seluruh data yang diinput Pegawai)
+    if (action === 'admin_attendance_records') {
+      return {
+        success: true,
+        data: store.attendances
+      };
+    }
+
+    // 6. Statistik Dashboard Admin (SINGKRON: Dihitung langsung dari data Pegawai)
     if (action === 'admin_dashboard_stats') {
+      const todayAttendances = store.attendances.filter(a => a.tanggal === today);
+      const uniqueHadir = new Set(todayAttendances.filter(a => a.jenis === 'MASUK').map(a => a.niy)).size;
+      const tepatWaktu = todayAttendances.filter(a => a.jenis === 'MASUK' && a.status_kehadiran.includes('Tepat')).length;
+      const terlambat = todayAttendances.filter(a => a.jenis === 'MASUK' && a.status_kehadiran.includes('Terlambat')).length;
+      const pulang = todayAttendances.filter(a => a.jenis === 'PULANG').length;
+      const totalPegawai = Math.max(store.teachers.length, uniqueHadir);
+
       return {
         success: true,
-        serverDate: new Date().toISOString().split('T')[0],
-        serverTime: new Date().toTimeString().split(' ')[0],
+        serverDate: today,
+        serverTime: nowTime,
         stats: {
-          totalGuru: 28,
+          totalGuru: totalPegawai,
           totalSekolah: 3,
-          hadirHariIni: 24,
-          tepatWaktuHariIni: 21,
-          terlambatHariIni: 3,
-          belumHadirHariIni: 4,
-          pulangHariIni: 18
+          hadirHariIni: uniqueHadir,
+          tepatWaktuHariIni: tepatWaktu,
+          terlambatHariIni: terlambat,
+          belumHadirHariIni: Math.max(0, totalPegawai - uniqueHadir),
+          pulangHariIni: pulang
         }
       };
     }
 
-    if (action === 'admin_crud_guru' && payload.subAction === 'LIST') {
-      return {
-        success: true,
-        data: [
-          { guru_id: 'GUR001', niy: '202401001', nama_lengkap: 'Ustadz Ahmad Fauzi, S.Pd.I', jabatan: 'Guru PAI & Wali Kelas VII', sekolah_id: 'SCH001', status: 'aktif' },
-          { guru_id: 'GUR002', niy: '202401002', nama_lengkap: 'Ustadzah Siti Rahmah, M.Pd', jabatan: 'Guru Bahasa Arab & Tahfidz', sekolah_id: 'SCH001', status: 'aktif' },
-          { guru_id: 'GUR003', niy: '202402001', nama_lengkap: 'Muhammad Ridwan, S.Kom', jabatan: 'Tenaga Kependidikan / IT Staff', sekolah_id: 'SCH002', status: 'aktif' }
-        ]
-      };
+    // 7. Master Guru (Bisa ditambah/diedit oleh Admin dan langsung bisa login di Pegawai)
+    if (action === 'admin_crud_guru') {
+      const subAction = payload.subAction || 'LIST';
+      if (subAction === 'LIST') {
+        return { success: true, data: store.teachers };
+      }
+      if (subAction === 'CREATE' && payload.data) {
+        const newTeacher = {
+          guru_id: 'GUR-' + Date.now().toString(36),
+          niy: payload.data.niy || String(Date.now()).slice(-6),
+          nama_lengkap: payload.data.nama_lengkap || 'Guru Baru',
+          jabatan: payload.data.jabatan || 'Guru Mapel',
+          sekolah_id: payload.data.sekolah_id || 'SCH001',
+          status: 'aktif'
+        };
+        store.teachers.push(newTeacher);
+        this.saveSharedStore(store);
+        return { success: true, message: 'Data pegawai berhasil ditambahkan dan langsung aktif.', data: newTeacher };
+      }
+      if (subAction === 'DELETE' && payload.guru_id) {
+        store.teachers = store.teachers.filter(t => t.guru_id !== payload.guru_id);
+        this.saveSharedStore(store);
+        return { success: true, message: 'Data pegawai berhasil dihapus.' };
+      }
+      return { success: true, data: store.teachers };
     }
 
-    if (action === 'admin_crud_sekolah' && payload.subAction === 'LIST') {
+    // 8. Master Unit Sekolah
+    if (action === 'admin_crud_sekolah') {
       return {
         success: true,
         data: [
-          { sekolah_id: 'SCH001', nama_sekolah: 'Perguruan Islam NIBRAS (Kampus Pusat)', alamat: 'Jl. Khatib Sulaiman No. 45, Padang', latitude: -0.923456, longitude: 100.367890, radius_meter: 60, status: 'aktif' },
+          { sekolah_id: 'SCH001', nama_sekolah: 'Perguruan Islam NIBRAS (Kampus Pusat)', alamat: 'Jl. Khatib Sulaiman No. 45, Padang', latitude: -0.9247, longitude: 100.3603, radius_meter: 60, status: 'aktif' },
           { sekolah_id: 'SCH002', nama_sekolah: 'SD Islam Nibras Padang', alamat: 'Jl. Belanti Raya No. 12, Lolong Belanti, Padang', latitude: -0.915234, longitude: 100.354120, radius_meter: 50, status: 'aktif' },
           { sekolah_id: 'SCH003', nama_sekolah: 'SMP Islam Nibras Islamic Boarding School', alamat: 'Jl. Raya Lubuk Minturun KM 8, Padang', latitude: -0.845612, longitude: 100.378901, radius_meter: 80, status: 'aktif' }
         ]
       };
     }
 
-    return { success: true, message: 'Operasi demo berhasil' };
+    return { success: true, message: 'Operasi berhasil diproses.' };
   }
 };
 

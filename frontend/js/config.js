@@ -3,9 +3,8 @@
  */
 
 const CONFIG = {
-  // Ganti URL ini dengan URL Web App Google Apps Script hasil Deploy Anda.
-  // Format: https://script.google.com/macros/s/AKfycb.../exec
-  API_URL: 'https://script.google.com/macros/s/AKfycbx_YOUR_SCRIPT_ID_HERE/exec',
+  // URL Web App Google Apps Script Aktif
+  API_URL: 'https://script.google.com/macros/s/AKfycbx7ZkwnPBJkCorvCS6qb0Ctg7FDh2IpzOmGk-uuU3wrjTzc1Qy-biRSNCjROlSHUFNy/exec',
 
   // Nama Institusi
   APP_NAME: 'Presensi Online Perguruan Islam NIBRAS',
@@ -33,7 +32,7 @@ const CONFIG = {
   // Mengambil API URL aktif (memungkinkan pengguna mengubah URL dari modal pengaturan aplikasi)
   getApiUrl() {
     const custom = localStorage.getItem(this.STORAGE_KEY_API_URL);
-    if (custom && custom.trim() !== '') {
+    if (custom && custom.trim() !== '' && !custom.includes('YOUR_SCRIPT_ID') && custom.startsWith('https://script.google.com/')) {
       return custom.trim();
     }
     return this.API_URL;

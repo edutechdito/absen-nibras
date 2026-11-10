@@ -125,22 +125,49 @@ const App = {
   openEndpointModal() {
     const modal = document.getElementById('modal-endpoint-config');
     const input = document.getElementById('input-custom-endpoint');
-    if (input) input.value = localStorage.getItem(CONFIG.STORAGE_KEY_API_URL) || '';
+    if (input) input.value = localStorage.getItem(CONFIG.STORAGE_KEY_API_URL) || CONFIG.API_URL || '';
     if (modal) modal.style.display = 'flex';
   },
 
-  saveCustomEndpoint() {
+  async saveCustomEndpoint() {
     const input = document.getElementById('input-custom-endpoint');
     const val = input ? input.value.trim() : '';
 
     if (val && !val.startsWith('https://script.google.com/')) {
-      this.showToast('URL harus diawali dengan https://script.google.com/...', 'warning');
+      this.showToast('URL harus diawali dengan https://script.google.com/macros/s/...', 'warning');
       return;
     }
 
-    CONFIG.setApiUrl(val);
-    document.getElementById('modal-endpoint-config').style.display = 'none';
-    this.showToast('URL Google Apps Script berhasil disimpan.', 'success');
+    if (!val) {
+      CONFIG.setApiUrl('');
+      document.getElementById('modal-endpoint-config').style.display = 'none';
+      this.showToast('Mode lokal aktif (URL spreadsheet dikosongkan).', 'info');
+      return;
+    }
+
+    this.showLoading(true, 'Menguji koneksi ke Google Spreadsheet...');
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+      await fetch(val, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ action: 'get_today_status' }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      this.showLoading(false);
+      CONFIG.setApiUrl(val);
+      document.getElementById('modal-endpoint-config').style.display = 'none';
+      this.showToast('✅ Berhasil terhubung ke Google Spreadsheet!', 'success');
+    } catch (e) {
+      this.showLoading(false);
+      CONFIG.setApiUrl(val);
+      document.getElementById('modal-endpoint-config').style.display = 'none';
+      this.showToast('URL disimpan! Pastikan saat Deploy Apps Script, opsi "Who has access" dipilih "Anyone".', 'info');
+    }
   },
 
   resetCustomEndpoint() {

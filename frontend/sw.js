@@ -3,7 +3,7 @@
  * PWA Cache & Network-First Navigation Strategy
  */
 
-const CACHE_NAME = 'nibras-presensi-v2.1.3';
+const CACHE_NAME = 'nibras-presensi-v2.2.3';
 
 const STATIC_ASSETS = [
   './',
@@ -22,7 +22,8 @@ const STATIC_ASSETS = [
   './js/app.js',
   './icons/logo.png',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './images/school-bg.jpg'
 ];
 
 // Install Event: Langsung skip waiting agar SW baru segera aktif

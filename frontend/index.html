@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
   <!-- Main Stylesheet (with cache-buster) -->
-  <link rel="stylesheet" href="css/style.css?v=2.1.3">
+  <link rel="stylesheet" href="css/style.css?v=2.2.3">
 
   <!-- Critical Layout & Landing Styles (Guarantees Perfect Render Always) -->
   <style>
@@ -31,17 +31,18 @@
       padding: 10px 0 20px;
     }
     .landing-hero {
-      background: linear-gradient(180deg, #F0F7FF 0%, #E0F2FE 40%, #BAE6FD 80%, #93C5FD 100%);
+      background: #E2E8F0;
       border-radius: 24px;
       padding: 40px 32px 32px;
-      box-shadow: 0 12px 36px rgba(11, 37, 69, 0.08);
+      box-shadow: 0 16px 40px rgba(11, 37, 69, 0.12);
       position: relative;
       overflow: hidden;
       margin-bottom: 24px;
-      border: 1px solid #BAE6FD;
+      border: 1px solid rgba(186, 230, 253, 0.8);
     }
     .hero-backdrop-scenery {
       position: absolute;
+      top: 0;
       bottom: 0;
       left: 0;
       right: 0;
@@ -51,13 +52,28 @@
       pointer-events: none;
       z-index: 1;
     }
-    .scenery-svg {
+    .hero-photo-img {
       position: absolute;
-      bottom: 0;
+      top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      opacity: 0.42;
+      object-fit: cover;
+      object-position: center 32%;
+      filter: saturate(1.05) contrast(1.02);
+    }
+    .hero-photo-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.88) 42%, rgba(255, 255, 255, 0.40) 80%, rgba(255, 255, 255, 0.18) 100%);
+    }
+    @media (max-width: 900px) {
+      .hero-photo-overlay {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.90) 60%, rgba(255, 255, 255, 0.84) 100%);
+      }
     }
     .landing-hero-grid {
       display: grid;
@@ -71,6 +87,13 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
+      background: rgba(255, 255, 255, 0.70);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      padding: 22px 24px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 8px 24px rgba(11, 37, 69, 0.06);
     }
     .hero-emblem-wrap {
       display: flex;
@@ -490,87 +513,10 @@
       <!-- HERO MAIN SECTION WITH SCENIC SCHOOL BACKDROP -->
       <div class="landing-hero">
         
-        <!-- Vector Scenic Backdrop (School Building, Flagpole with Indonesian Flag, Green Garden) -->
+        <!-- Real Campus Backdrop (Perguruan Islam NIBRAS Padang) -->
         <div class="hero-backdrop-scenery">
-          <svg viewBox="0 0 1000 380" preserveAspectRatio="xMidYMax slice" class="scenery-svg" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="roofGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#DC2626"/>
-                <stop offset="100%" stop-color="#991B1B"/>
-              </linearGradient>
-              <linearGradient id="wallGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" stop-color="#FFFFFF"/>
-                <stop offset="100%" stop-color="#F1F5F9"/>
-              </linearGradient>
-            </defs>
-
-            <!-- Distant Hills & Trees -->
-            <path d="M0 270 Q140 240 300 260 Q450 235 620 260 Q800 230 1000 255 L1000 380 L0 380 Z" fill="#BBF7D0" opacity="0.55"/>
-
-            <!-- School Building Base & Foundation -->
-            <rect x="20" y="235" width="600" height="90" fill="#E2E8F0" rx="3"/>
-            <rect x="15" y="318" width="610" height="15" fill="#CBD5E1"/>
-
-            <!-- Terracotta Tile Roof -->
-            <polygon points="10,235 50,175 600,175 635,235" fill="url(#roofGrad)"/>
-            <rect x="48" y="173" width="554" height="4" fill="#7F1D1D"/>
-            <!-- Roof Pavilion Center Ridge -->
-            <polygon points="250,175 305,135 385,135 440,175" fill="url(#roofGrad)"/>
-
-            <!-- School Front Colonnade Walkway -->
-            <rect x="25" y="235" width="590" height="85" fill="url(#wallGrad)"/>
-            
-            <!-- Walkway Pillars -->
-            <rect x="45" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
-            <rect x="110" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
-            <rect x="175" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
-            <rect x="240" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
-            <rect x="305" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
-            <rect x="370" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
-            <rect x="435" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
-            <rect x="500" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
-            <rect x="565" y="235" width="10" height="83" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1"/>
-
-            <!-- Classroom Windows (Glass with blue tint) -->
-            <rect x="65" y="248" width="32" height="42" rx="2" fill="#1E293B"/>
-            <rect x="68" y="251" width="26" height="36" fill="#0284C7" opacity="0.6"/>
-            <rect x="130" y="248" width="32" height="42" rx="2" fill="#1E293B"/>
-            <rect x="133" y="251" width="26" height="36" fill="#0284C7" opacity="0.6"/>
-            <rect x="195" y="248" width="32" height="42" rx="2" fill="#1E293B"/>
-            <rect x="198" y="251" width="26" height="36" fill="#0284C7" opacity="0.6"/>
-            
-            <!-- Center Main Hallway Door -->
-            <rect x="260" y="245" width="35" height="73" rx="2" fill="#334155"/>
-            
-            <rect x="325" y="248" width="32" height="42" rx="2" fill="#1E293B"/>
-            <rect x="328" y="251" width="26" height="36" fill="#0284C7" opacity="0.6"/>
-            <rect x="390" y="248" width="32" height="42" rx="2" fill="#1E293B"/>
-            <rect x="393" y="251" width="26" height="36" fill="#0284C7" opacity="0.6"/>
-            <rect x="455" y="248" width="32" height="42" rx="2" fill="#1E293B"/>
-            <rect x="458" y="251" width="26" height="36" fill="#0284C7" opacity="0.6"/>
-
-            <!-- Flagpole & Indonesian Merah Putih Flag -->
-            <rect x="330" y="315" width="20" height="15" rx="2" fill="#94A3B8"/>
-            <line x1="340" y1="318" x2="340" y2="90" stroke="#CBD5E1" stroke-width="3.5" stroke-linecap="round"/>
-            <circle cx="340" cy="88" r="3.5" fill="#F59E0B"/>
-            <!-- Waving Red & White Flag -->
-            <path d="M342 92 C362 95 372 88 392 93 L392 108 C372 103 362 110 342 107 Z" fill="#DC2626"/>
-            <path d="M342 107 C362 110 372 103 392 108 L392 123 C372 118 362 125 342 122 Z" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="0.5"/>
-
-            <!-- Campus Garden / Green Shrubbery & Trees -->
-            <ellipse cx="25" cy="320" rx="35" ry="30" fill="#15803D"/>
-            <ellipse cx="32" cy="305" rx="26" ry="25" fill="#16A34A"/>
-            <ellipse cx="295" cy="325" rx="25" ry="22" fill="#15803D"/>
-            <ellipse cx="300" cy="315" rx="18" ry="18" fill="#22C55E"/>
-            <ellipse cx="385" cy="325" rx="26" ry="22" fill="#15803D"/>
-            <ellipse cx="390" cy="315" rx="20" ry="18" fill="#16A34A"/>
-            <ellipse cx="610" cy="320" rx="40" ry="30" fill="#15803D"/>
-            <ellipse cx="615" cy="305" rx="30" ry="25" fill="#22C55E"/>
-
-            <!-- Lawn Base Strip -->
-            <path d="M0 340 Q50 325 120 338 Q200 325 300 338 Q400 322 520 338 Q650 324 800 338 L1000 338 L1000 380 L0 380 Z" fill="#16A34A" opacity="0.65"/>
-            <rect x="0" y="355" width="1000" height="25" fill="#15803D" opacity="0.8"/>
-          </svg>
+          <img src="images/school-bg.jpg" alt="Gedung Kampus Perguruan Islam NIBRAS Padang" class="hero-photo-img">
+          <div class="hero-photo-overlay"></div>
         </div>
 
         <div class="landing-hero-grid">
@@ -2180,15 +2126,15 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <!-- Application Modules (with cache-buster) -->
-  <script src="js/config.js?v=2.1.2"></script>
-  <script src="js/state.js?v=2.1.2"></script>
-  <script src="js/api.js?v=2.1.2"></script>
-  <script src="js/gps.js?v=2.1.2"></script>
-  <script src="js/camera.js?v=2.1.2"></script>
-  <script src="js/auth.js?v=2.1.2"></script>
-  <script src="js/guru.js?v=2.1.2"></script>
-  <script src="js/admin.js?v=2.1.2"></script>
-  <script src="js/app.js?v=2.1.2"></script>
+  <script src="js/config.js?v=2.2.3"></script>
+  <script src="js/state.js?v=2.2.3"></script>
+  <script src="js/api.js?v=2.2.3"></script>
+  <script src="js/gps.js?v=2.2.3"></script>
+  <script src="js/camera.js?v=2.2.3"></script>
+  <script src="js/auth.js?v=2.2.3"></script>
+  <script src="js/guru.js?v=2.2.3"></script>
+  <script src="js/admin.js?v=2.2.3"></script>
+  <script src="js/app.js?v=2.2.3"></script>
 
 </body>
 </html>
