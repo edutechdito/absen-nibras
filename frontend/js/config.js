@@ -14,9 +14,9 @@ const CONFIG = {
 
   // Default Koordinat & Radius (Jika data sekolah belum dimuat dari server)
   DEFAULT_SCHOOL: {
-    name: 'Perguruan Islam NIBRAS (Kampus Pusat)',
-    latitude: -0.923456,
-    longitude: 100.367890,
+    name: 'Perguruan Islam NIBRAS',
+    latitude: -0.9247,
+    longitude: 100.3603,
     radius: 60 // meter
   },
 

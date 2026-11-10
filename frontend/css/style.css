@@ -92,6 +92,32 @@ body {
   font-weight: 300;
 }
 
+.header-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-header-logout {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-header-logout:hover {
+  background: rgba(239, 68, 68, 0.9);
+  border-color: #EF4444;
+}
+
 @media (max-width: 768px) {
   .header-datetime-wrap {
     display: none;
@@ -776,269 +802,740 @@ body {
 }
 
 /* ==========================================================================
-   GURU DASHBOARD & SECTIONS
+   GURU DASHBOARD & PORTAL (MATCHING REFERENCE DESIGN EXACTLY)
    ========================================================================== */
-.guru-hero-card {
-  background: linear-gradient(135deg, var(--primary) 0%, #1E3A8A 100%);
-  color: #FFFFFF;
-  border-radius: var(--radius-md);
-  padding: 22px;
-  margin-bottom: 18px;
-  box-shadow: var(--shadow-md);
-  position: relative;
-  overflow: hidden;
-}
-
-.guru-hero-card::after {
-  content: '';
-  position: absolute;
-  top: -50px;
-  right: -50px;
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, transparent 70%);
-  border-radius: 50%;
-}
-
-.guru-hero-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
-}
-
-.guru-greeting {
-  font-size: 0.85rem;
-  color: #93C5FD;
-  font-weight: 500;
-}
-
-.guru-name {
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #FFFFFF;
-}
-
-.guru-niy {
-  font-size: 0.8rem;
-  color: #E2E8F0;
-}
-
-.guru-clock-box {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(8px);
-  padding: 10px 14px;
-  border-radius: 12px;
-  text-align: right;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.guru-live-clock {
-  font-size: 1.2rem;
-  font-weight: 800;
-  font-family: 'Courier New', Courier, monospace;
-  color: #FFFFFF;
-  letter-spacing: 1px;
-}
-
-.guru-live-date {
-  font-size: 0.75rem;
-  color: #BFDBFE;
-}
-
-.guru-school-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  color: #FCD34D;
-  font-weight: 600;
-}
-
-/* Today Status Cards */
-.today-status-grid {
+.guru-portal-wrapper {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 18px;
+  grid-template-columns: 240px 1fr;
+  gap: 22px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 0 30px;
+  align-items: start;
 }
 
-.status-card {
+/* LEFT SIDEBAR */
+.guru-portal-sidebar {
   background: #FFFFFF;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 14px;
-  box-shadow: var(--shadow-sm);
-}
-
-.status-card-header {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  margin-bottom: 8px;
+  border-radius: 20px;
+  padding: 20px 14px 14px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 8px 24px rgba(11, 37, 69, 0.05);
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: space-between;
-}
-
-.status-time {
-  font-size: 1.15rem;
-  font-weight: 800;
-  color: var(--primary);
-  margin-bottom: 4px;
-}
-
-.status-label {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-/* ==========================================================================
-   ATTENDANCE FORM & GEOFENCE RADAR
-   ========================================================================== */
-.attendance-card {
-  background: #FFFFFF;
-  border-radius: var(--radius-lg);
-  padding: 20px;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-color);
-  margin-bottom: 20px;
-}
-
-.radius-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 16px;
-  border-radius: var(--radius-sm);
-  font-weight: 700;
-  font-size: 0.9rem;
-  margin-bottom: 14px;
-  text-align: center;
-}
-
-.radius-badge.inside {
-  background: var(--success-bg);
-  color: var(--success);
-  border: 1.5px solid var(--success);
-}
-
-.radius-badge.outside {
-  background: var(--danger-bg);
-  color: var(--danger);
-  border: 1.5px solid var(--danger);
-}
-
-.gps-info-strip {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--primary-light);
-  padding: 10px 14px;
-  border-radius: var(--radius-sm);
-  font-size: 0.85rem;
-  margin-bottom: 14px;
-}
-
-.accuracy-indicator {
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 12px;
-}
-
-.acc-good { background: #DCFCE7; color: #166534; }
-.acc-med { background: #FEF9C3; color: #854D0E; }
-.acc-poor { background: #FEE2E2; color: #991B1B; }
-
-/* Camera Viewfinder */
-.camera-box {
-  width: 100%;
-  max-width: 320px;
-  height: 260px;
-  margin: 0 auto 16px;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: #0B2545;
+  min-height: 520px;
   position: relative;
-  border: 3px solid var(--primary);
+  overflow: hidden;
+}
+
+.guru-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.guru-sidebar-nav-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-}
-
-.camera-box video, .camera-box img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.camera-controls {
-  display: flex;
-  justify-content: center;
   gap: 12px;
-  margin-bottom: 16px;
-}
-
-.leaflet-map-box {
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #334155;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
   width: 100%;
-  height: 220px;
-  border-radius: var(--radius-md);
-  margin-bottom: 18px;
-  border: 1.5px solid var(--border-color);
-  overflow: hidden;
-  z-index: 1;
 }
 
-/* ==========================================================================
-   BOTTOM NAVIGATION BAR (GURU MOBILE)
-   ========================================================================== */
-.guru-bottom-nav {
-  position: fixed;
+.guru-sidebar-nav-item:hover {
+  background: #F1F5F9;
+  color: #0284C7;
+}
+
+.guru-sidebar-nav-item.active {
+  background: #DBEAFE;
+  color: #1D4ED8;
+  font-weight: 800;
+}
+
+.guru-sidebar-nav-item .nav-icon {
+  font-size: 1.25rem;
+  display: inline-flex;
+}
+
+.guru-sidebar-bottom-motto {
+  margin-top: auto;
+  padding: 20px 6px 12px;
+  position: relative;
+  z-index: 2;
+}
+
+.sidebar-motto-text {
+  font-family: 'Georgia', 'Palatino', serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1E293B;
+  line-height: 1.35;
+}
+
+.sidebar-wave-container {
+  position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  background: #FFFFFF;
-  border-top: 1px solid var(--border-color);
-  box-shadow: 0 -4px 16px rgba(11, 37, 69, 0.08);
-  display: flex;
-  justify-content: space-around;
-  padding: 8px 6px;
-  z-index: 90;
+  height: 65px;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.guru-tab-btn {
+.sidebar-wave-container svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* MAIN CONTENT AREA */
+.guru-portal-main {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+/* TOP WELCOME CARD */
+.guru-welcome-card {
+  background: #FFFFFF;
+  border-radius: 18px;
+  padding: 18px 26px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 6px 20px rgba(11, 37, 69, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.guru-welcome-left {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.guru-welcome-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #DBEAFE;
+}
+
+.welcome-salutation {
+  font-size: 0.88rem;
+  color: #64748B;
+  font-weight: 500;
+}
+
+.welcome-teacher-name {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #0B2545;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.welcome-teacher-role {
+  font-size: 0.86rem;
+  color: #64748B;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+.guru-welcome-right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.guru-welcome-date-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0B2545;
+}
+
+.guru-welcome-clock-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.welcome-clock-icon {
+  font-size: 1.4rem;
+}
+
+.welcome-clock-text {
+  font-size: 1.85rem;
+  font-weight: 900;
+  color: #0B2545;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  letter-spacing: -0.5px;
+}
+
+/* TWO COLUMN GRID */
+.guru-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+/* LEFT COLUMN: CARD "ABSENSI HARI INI" */
+.card-absensi-today {
+  background: #FFFFFF;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 8px 24px rgba(11, 37, 69, 0.06);
+}
+
+.absensi-today-header {
+  background: #1D4ED8;
+  color: #FFFFFF;
+  padding: 14px 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.absensi-today-header h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  letter-spacing: 0.2px;
+}
+
+.today-header-icon {
+  font-size: 1.25rem;
+}
+
+.absensi-today-body {
+  padding: 22px 20px 20px;
+}
+
+/* 2 SIDE-BY-SIDE STATUS PANELS */
+.absensi-panels-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.panel-box {
+  border-radius: 16px;
+  padding: 18px 14px 16px;
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
+  border: 1px solid;
+  transition: all 0.2s ease;
+}
+
+.panel-masuk {
+  background: #ECFDF5;
+  border-color: #A7F3D0;
+}
+
+.panel-pulang {
+  background: #F1F5F9;
+  border-color: #CBD5E1;
+}
+
+.panel-box-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.panel-masuk .panel-box-title {
+  color: #047857;
+}
+
+.panel-pulang .panel-box-title {
+  color: #0F172A;
+}
+
+.panel-badge-circle {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 0.7rem;
+  margin-bottom: 12px;
+}
+
+.circle-masuk {
+  background: #10B981;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+.circle-pulang {
+  background: #1E293B;
+  box-shadow: 0 4px 14px rgba(30, 41, 59, 0.25);
+}
+
+.circle-gray {
+  background: #94A3B8;
+}
+
+.panel-time {
+  font-size: 1.55rem;
+  font-weight: 900;
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+
+.panel-masuk .panel-time {
+  color: #064E3B;
+}
+
+.panel-pulang .panel-time {
+  color: #0F172A;
+}
+
+.panel-date {
+  font-size: 0.82rem;
   font-weight: 600;
+  color: #047857;
+}
+
+.panel-desc {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #64748B;
+}
+
+/* WIDE SOLID BLUE ACTION BUTTON */
+.btn-do-absen {
+  width: 100%;
+  background: #1D4ED8;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 36px;
+  padding: 14px 24px;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 8px;
-  transition: all 0.2s;
-  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.35);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-bottom: 16px;
 }
 
-.guru-tab-btn .tab-icon {
-  font-size: 1.3rem;
-  margin-bottom: 2px;
-}
-
-.guru-tab-btn.active {
-  color: var(--primary);
-}
-
-.guru-tab-btn.active .tab-icon {
+.btn-do-absen:hover {
+  background: #1E40AF;
   transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(29, 78, 216, 0.45);
+}
+
+.btn-do-absen:active {
+  transform: translateY(0);
+}
+
+.btn-do-pin-icon {
+  font-size: 1.7rem;
+}
+
+.btn-do-labels {
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-do-primary-text {
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.btn-do-sub-text {
+  font-size: 0.8rem;
+  opacity: 0.92;
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* GPS STATUS STRIP */
+.gps-status-strip {
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  border-radius: 12px;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.84rem;
+  color: #1E3A8A;
+}
+
+.gps-coords-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.gps-target-icon {
+  font-size: 1.1rem;
+}
+
+.gps-strip-divider {
+  color: #93C5FD;
+}
+
+.gps-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #DCFCE7;
+  color: #15803D;
+  padding: 4px 12px;
+  border-radius: 18px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  border: 1px solid #BBF7D0;
+}
+
+/* RIGHT COLUMN: CARD 1: STATUS KEHADIRAN */
+.card-status-kehadiran {
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  border-radius: 18px;
+  padding: 22px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.08);
+}
+
+.status-kehadiran-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.status-kehadiran-head h4 {
+  font-size: 1.18rem;
+  font-weight: 800;
+  color: #065F46;
+}
+
+.status-kehadiran-body {
+  font-size: 0.92rem;
+  color: #1F2937;
+  line-height: 1.45;
+  margin-bottom: 16px;
+}
+
+.btn-terima-kasih {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #10B981;
+  color: #FFFFFF;
+  font-size: 0.92rem;
+  font-weight: 700;
+  padding: 9px 20px;
+  border-radius: 22px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-terima-kasih:hover {
+  background: #059669;
+}
+
+/* RIGHT COLUMN: CARD 2: RIWAYAT ABSENSI MINI */
+.card-riwayat-mini {
+  background: #FFFFFF;
+  border-radius: 18px;
+  padding: 20px;
+  border: 1px solid #E2E8F0;
+  box-shadow: 0 6px 20px rgba(11, 37, 69, 0.05);
+}
+
+.riwayat-mini-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.riwayat-mini-head h4 {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0B2545;
+}
+
+.clock-mini-icon {
+  font-size: 1.25rem;
+}
+
+.riwayat-timeline-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline-row {
+  display: flex;
+  gap: 14px;
+}
+
+.timeline-dot-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 14px;
+}
+
+.timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.dot-green {
+  background: #10B981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+.dot-blue {
+  background: #0284C7;
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.2);
+}
+
+.timeline-vertical-line {
+  width: 2px;
+  flex-grow: 1;
+  background: #E2E8F0;
+  margin: 4px 0;
+  min-height: 28px;
+}
+
+.timeline-detail-col {
+  flex-grow: 1;
+  padding-bottom: 14px;
+}
+
+.timeline-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeline-item-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #1E293B;
+}
+
+.timeline-item-time {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0B2545;
+}
+
+.timeline-item-date {
+  font-size: 0.8rem;
+  color: #64748B;
+  margin-top: 2px;
+}
+
+.timeline-italic {
+  font-style: italic;
+}
+
+/* PAGE FOOTER */
+.guru-page-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 4px 6px;
+  font-size: 0.84rem;
+  color: #475569;
+  border-top: 1px solid #E2E8F0;
+  margin-top: 10px;
+}
+
+.footer-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ==========================================================================
+   ATTENDANCE MODAL (CAMERA & GPS POPUP)
+   ========================================================================== */
+.attendance-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(11, 37, 69, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  animation: fadeInModal 0.25s ease-out;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.attendance-modal-dialog {
+  background: #FFFFFF;
+  border-radius: 22px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 94vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+  border: 1px solid #E2E8F0;
+}
+
+.attendance-modal-header {
+  padding: 18px 22px;
+  border-bottom: 1px solid #E2E8F0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #F8FAFC;
+  border-radius: 22px 22px 0 0;
+}
+
+.modal-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-header-icon {
+  font-size: 1.6rem;
+}
+
+.btn-modal-close {
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #64748B;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.btn-modal-close:hover {
+  background: #E2E8F0;
+  color: #0F172A;
+}
+
+.attendance-modal-body {
+  padding: 20px 22px 24px;
+}
+
+/* ==========================================================================
+   RESPONSIVE LAYOUT FOR TABLET & MOBILE
+   ========================================================================== */
+@media (max-width: 900px) {
+  .guru-portal-wrapper {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 10px 8px 70px;
+  }
+
+  .guru-portal-sidebar {
+    display: none; /* Collapsed to bottom bar on mobile */
+  }
+
+  .guru-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .guru-welcome-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 18px 20px;
+  }
+
+  .guru-welcome-right {
+    text-align: left;
+    width: 100%;
+    border-top: 1px solid #E2E8F0;
+    padding-top: 12px;
+  }
+
+  .guru-welcome-date-wrap,
+  .guru-welcome-clock-wrap {
+    justify-content: flex-start;
+  }
+
+  .guru-page-footer {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .absensi-panels-row {
+    grid-template-columns: 1fr;
+  }
+
+  .gps-status-strip {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .gps-strip-divider {
+    display: none;
+  }
 }
 
 /* ==========================================================================

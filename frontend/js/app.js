@@ -153,7 +153,18 @@ const App = {
    * Event Listener Global
    */
   setupGlobalEvents() {
-    // Form Login Submit
+    // Form Login Pegawai (Hanya NIY - Sesuai Permintaan User)
+    const formLoginPegawai = document.getElementById('form-login-pegawai');
+    if (formLoginPegawai) {
+      formLoginPegawai.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const inputNiy = document.getElementById('login-pegawai-niy');
+        const niy = inputNiy ? inputNiy.value : '';
+        AuthService.handlePegawaiNiyLogin(niy);
+      });
+    }
+
+    // Form Login Admin / Umum
     const formLogin = document.getElementById('form-login');
     if (formLogin) {
       formLogin.addEventListener('submit', (e) => {

@@ -166,6 +166,98 @@ function loginUser(username, password) {
 }
 
 /**
+ * Login Cepat Pegawai / Guru menggunakan Nomor Induk Yayasan (NIY)
+ */
+function loginGuruByNiy(niy) {
+  if (!niy) {
+    return { success: false, message: 'Nomor Induk Yayasan (NIY) wajib diisi.' };
+  }
+
+  var cleanNiy = String(niy).trim();
+  var gurus = getRowsAsObjects(SHEET_NAMES.GURU);
+  var guru = null;
+
+  for (var i = 0; i < gurus.length; i++) {
+    if (String(gurus[i].niy).trim() === cleanNiy) {
+      guru = gurus[i];
+      break;
+    }
+  }
+
+  var users = getRowsAsObjects(SHEET_NAMES.USERS);
+  var user = null;
+  for (var j = 0; j < users.length; j++) {
+    if (String(users[j].username).trim().toLowerCase() === cleanNiy.toLowerCase() || (guru && users[j].ref_id === guru.guru_id)) {
+      user = users[j];
+      break;
+    }
+  }
+
+  if (!guru && !user) {
+    return { 
+      success: false, 
+      message: 'Nomor Induk Yayasan (NIY) "' + cleanNiy + '" tidak ditemukan. Pastikan data Anda telah terdaftar di database.' 
+    };
+  }
+
+  if (user && user.status !== 'aktif') {
+    return { success: false, message: 'Akun Anda berstatus nonaktif. Silakan hubungi Administrator.' };
+  }
+
+  // Generate Token sesi baru
+  var token = generateSessionToken();
+  var expiryDate = new Date();
+  expiryDate.setDate(expiryDate.getDate() + 7);
+  var tokenExpiryStr = expiryDate.toISOString();
+
+  if (user) {
+    updateRowByColumn(SHEET_NAMES.USERS, 'user_id', user.user_id, {
+      token: token,
+      token_expiry: tokenExpiryStr
+    });
+  }
+
+  var profile = {
+    user_id: user ? user.user_id : ('USR-' + cleanNiy),
+    username: cleanNiy,
+    role: 'guru',
+    ref_id: guru ? guru.guru_id : (user ? user.ref_id : ''),
+    nama_lengkap: guru ? guru.nama_lengkap : 'Pegawai NIBRAS',
+    niy: cleanNiy,
+    tempat_lahir: guru ? guru.tempat_lahir : '',
+    tanggal_lahir: guru ? guru.tanggal_lahir : '',
+    jabatan: guru ? (guru.jabatan || 'Guru') : 'Guru / GTK',
+    sekolah_id: guru ? guru.sekolah_id : 'SCH001',
+    no_hp: guru ? guru.no_hp : '',
+    email: guru ? guru.email : ''
+  };
+
+  // Ambil data sekolah
+  if (profile.sekolah_id) {
+    var schools = getRowsAsObjects(SHEET_NAMES.SEKOLAH);
+    for (var s = 0; s < schools.length; s++) {
+      if (schools[s].sekolah_id === profile.sekolah_id) {
+        profile.nama_sekolah = schools[s].nama_sekolah;
+        profile.alamat_sekolah = schools[s].alamat;
+        profile.sekolah_lat = Number(schools[s].latitude);
+        profile.sekolah_lng = Number(schools[s].longitude);
+        profile.sekolah_radius = Number(schools[s].radius_meter);
+        break;
+      }
+    }
+  }
+
+  logAudit(cleanNiy, 'LOGIN_NIY', 'Pegawai berhasil masuk dengan NIY');
+
+  return {
+    success: true,
+    message: 'Login berhasil.',
+    token: token,
+    user: profile
+  };
+}
+
+/**
  * Validasi Session Token aktif.
  */
 function validateToken(token) {

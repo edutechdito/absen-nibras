@@ -109,6 +109,10 @@ function doPost(e) {
         responseData = loginUser(payload.username, payload.password);
         break;
 
+      case 'login_niy':
+        responseData = loginGuruByNiy(payload.niy);
+        break;
+
       case 'logout':
         responseData = logoutUser(payload.token);
         break;

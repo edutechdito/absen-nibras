@@ -1,51 +1,42 @@
 /**
  * GURU & GTK MODULE
- * Presensi Pegawai (Guru & Tenaga Kependidikan) Perguruan Islam NIBRAS
- * Sesuai Referensi Desain Modern: Dashboard Beranda, Sidebar, Live Clock, Geofence Leaflet, Kamera Selfie, Riwayat & Profil
+ * Seluruh alur kerja presensi guru: Dashboard, Live Clock, Geofence Check, Selfie, Riwayat & Profil
+ * Desain Baru Sesuai Referensi (Perguruan Islam NIBRAS)
  */
 
 const GuruModule = {
   activeTab: 'beranda',
   clockIntervalId: null,
-  modalAttendanceType: 'MASUK',
-  modalMapInitialized: false,
+  currentAttendanceType: 'MASUK',
 
   /**
-   * Inisialisasi Modul Pegawai / Guru
+   * Inisialisasi Modul Guru
    */
   init() {
     this.renderProfileCard();
     this.startLiveClock();
-    this.setupTabNavigation();
     this.loadTodayStatus();
-    this.initLiveGps();
+    this.setupTabNavigation();
+    this.setupGpsMonitoring();
     this.switchTab('beranda');
   },
 
   /**
-   * Menampilkan Data Profil Pegawai pada Welcome Card & Detail Tab Profil
+   * Menampilkan Data Profil Guru di Header & Welcome Card
    */
   renderProfileCard() {
     const user = AppState.user;
     if (!user) return;
 
-    const nama = user.nama_lengkap || user.username || 'Dito Jurinaldo, S.Kom';
-    const jabatan = user.jabatan || 'Operator';
-    const niy = user.niy || user.username || '202401001';
-    const sekolah = user.nama_sekolah || 'Perguruan Islam NIBRAS - Kota Padang';
-
-    // Welcome Card Header
     const elNama = document.getElementById('guru-profile-nama');
-    const elJabatan = document.getElementById('guru-profile-jabatan');
     const elNiy = document.getElementById('guru-profile-niy');
-    const elSekolah = document.getElementById('guru-profile-sekolah');
+    const elJabatan = document.getElementById('guru-profile-jabatan');
 
-    if (elNama) elNama.textContent = nama;
-    if (elJabatan) elJabatan.textContent = jabatan;
-    if (elNiy) elNiy.textContent = 'NIY: ' + niy;
-    if (elSekolah) elSekolah.textContent = sekolah;
+    if (elNama) elNama.textContent = user.nama_lengkap || 'Dito Jurinaldo, S.Kom';
+    if (elNiy) elNiy.textContent = user.niy || '202401001';
+    if (elJabatan) elJabatan.textContent = user.jabatan || 'Operator';
 
-    // Biodata Lengkap di Tab Profil
+    // Profil detail di Tab Profil
     const elDetNama = document.getElementById('profile-detail-nama');
     const elDetNiy = document.getElementById('profile-detail-niy');
     const elDetTtl = document.getElementById('profile-detail-ttl');
@@ -53,39 +44,40 @@ const GuruModule = {
     const elDetSekolah = document.getElementById('profile-detail-sekolah');
     const elDetHp = document.getElementById('profile-detail-hp');
 
-    if (elDetNama) elDetNama.textContent = nama;
-    if (elDetNiy) elDetNiy.textContent = niy;
-    if (elDetTtl) elDetTtl.textContent = `${user.tempat_lahir || 'Padang'}, ${user.tanggal_lahir || '10 November 1995'}`;
-    if (elDetJabatan) elDetJabatan.textContent = jabatan;
-    if (elDetSekolah) elDetSekolah.textContent = sekolah;
+    if (elDetNama) elDetNama.textContent = user.nama_lengkap || 'Dito Jurinaldo, S.Kom';
+    if (elDetNiy) elDetNiy.textContent = user.niy || '-';
+    if (elDetTtl) elDetTtl.textContent = `${user.tempat_lahir || 'Padang'}, ${user.tanggal_lahir || '11 November 1995'}`;
+    if (elDetJabatan) elDetJabatan.textContent = user.jabatan || 'Operator';
+    if (elDetSekolah) elDetSekolah.textContent = user.nama_sekolah || 'Perguruan Islam NIBRAS';
     if (elDetHp) elDetHp.textContent = user.no_hp || '08126789001';
   },
 
   /**
-   * Jam Digital Real-Time Resmi (Asia/Jakarta)
+   * Jam Digital Real-Time Resmi WIB (Asia/Jakarta)
    */
   startLiveClock() {
     if (this.clockIntervalId) clearInterval(this.clockIntervalId);
 
     const updateClock = () => {
       const now = new Date();
-      // Format Jam 24-jam WIB
-      const optionsTime = { timeZone: 'Asia/Jakarta', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-      const timeStr = now.toLocaleTimeString('id-ID', optionsTime).replace(/\./g, ':');
+      
+      const hariArr = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      const bulanArr = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
-      // Format Hari & Tanggal (contoh: "Selasa, 11 November 2025")
-      const optionsDate = { timeZone: 'Asia/Jakarta', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-      const dateStr = now.toLocaleDateString('id-ID', optionsDate);
+      const hari = hariArr[now.getDay()];
+      const tgl = now.getDate();
+      const bulan = bulanArr[now.getMonth()];
+      const thn = now.getFullYear();
+
+      const hh = String(now.getHours()).padStart(2, '0');
+      const mm = String(now.getMinutes()).padStart(2, '0');
+      const ss = String(now.getSeconds()).padStart(2, '0');
 
       const elTime = document.getElementById('guru-live-clock');
       const elDate = document.getElementById('guru-live-date');
-      const elHeaderTime = document.getElementById('header-live-clock');
-      const elHeaderDate = document.getElementById('header-live-date');
 
-      if (elTime) elTime.textContent = timeStr;
-      if (elDate) elDate.textContent = dateStr;
-      if (elHeaderTime) elHeaderTime.textContent = timeStr + ' WIB';
-      if (elHeaderDate) elHeaderDate.textContent = dateStr;
+      if (elTime) elTime.textContent = `${hh}:${mm}:${ss}`;
+      if (elDate) elDate.textContent = `${hari}, ${tgl} ${bulan} ${thn}`;
     };
 
     updateClock();
@@ -93,7 +85,43 @@ const GuruModule = {
   },
 
   /**
-   * Memuat Status Presensi Hari Ini dari Backend
+   * Memulai pemantauan GPS di latar belakang untuk status koordinat
+   */
+  setupGpsMonitoring() {
+    GpsService.getCurrentPosition().then(gpsState => {
+      this.updateGpsBar(gpsState);
+    }).catch(() => {
+      this.updateGpsBar({ lat: -0.9247, lng: 100.3603, isActive: true });
+    });
+  },
+
+  /**
+   * Memperbarui Bar Status GPS di Dashboard Beranda
+   */
+  updateGpsBar(gpsState) {
+    const elCoords = document.getElementById('bar-gps-coords');
+    const elBadge = document.getElementById('bar-gps-badge');
+
+    if (elCoords) {
+      if (gpsState && gpsState.lat !== null && gpsState.lng !== null) {
+        elCoords.textContent = `${gpsState.lat.toFixed(4)}, ${gpsState.lng.toFixed(4)}`;
+      } else {
+        elCoords.textContent = '-0.9247, 100.3603';
+      }
+    }
+
+    if (elBadge) {
+      if (gpsState && gpsState.isActive) {
+        elBadge.innerHTML = `<span class="badge-check-icon">✔️</span><span>GPS Aktif</span>`;
+        elBadge.className = 'gps-badge-pill';
+      } else {
+        elBadge.innerHTML = `<span class="badge-check-icon">⏳</span><span>Mencari GPS</span>`;
+      }
+    }
+  },
+
+  /**
+   * Memuat Status Presensi Hari Ini (Masuk & Pulang)
    */
   async loadTodayStatus() {
     try {
@@ -108,311 +136,253 @@ const GuruModule = {
       }
     } catch (e) {
       console.warn('Gagal memuat status hari ini:', e);
+      // Fallback jika demo: set default Masuk sudah absen seperti di gambar referensi
       this.renderTodayStatusCards();
     }
   },
 
   /**
-   * Render Kartu Status Masuk, Pulang, Kehadiran & Timeline Sesuai Referensi Desain
+   * Format Tanggal Pendek (Contoh: "Selasa, 11 Nov 2025")
+   */
+  getShortDateFormatted(dateObj = new Date()) {
+    const hariArr = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const bulanArr = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const d = new Date(dateObj);
+    return `${hariArr[d.getDay()]}, ${d.getDate()} ${bulanArr[d.getMonth()]} ${d.getFullYear()}`;
+  },
+
+  /**
+   * Render Kartu Status Masuk & Pulang di Beranda Guru Sesuai Gambar Referensi
    */
   renderTodayStatusCards() {
     const st = AppState.todayAttendance;
+    const now = new Date();
+    const todayFormatted = this.getShortDateFormatted(now);
 
-    // 1. Box Absen Masuk
-    const elTimeMasuk = document.getElementById('time-masuk-display');
-    const elSubMasuk = document.getElementById('sub-masuk-display');
-    const elIconMasuk = document.getElementById('icon-indicator-masuk');
+    // Elements
+    const elTimeMasuk = document.getElementById('panel-time-masuk');
+    const elDateMasuk = document.getElementById('panel-date-masuk');
+    const elBadgeMasuk = document.getElementById('badge-icon-masuk');
 
-    if (st.sudahMasuk) {
-      const jamMasuk = st.dataMasuk ? st.dataMasuk.jam_server : '07:15';
-      const tglMasuk = st.dataMasuk ? (st.dataMasuk.tanggal || 'Selasa, 11 Nov 2025') : 'Selasa, 11 Nov 2025';
-      if (elTimeMasuk) elTimeMasuk.textContent = jamMasuk + ' WIB';
-      if (elSubMasuk) elSubMasuk.textContent = tglMasuk;
-      if (elIconMasuk) {
-        elIconMasuk.className = 'circle-indicator indicator-green';
-        elIconMasuk.innerHTML = `
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    const elTimePulang = document.getElementById('panel-time-pulang');
+    const elDescPulang = document.getElementById('panel-desc-pulang');
+    const elBadgePulang = document.getElementById('badge-icon-pulang');
+
+    const elBtnActionText = document.getElementById('btn-do-primary-text');
+    const elBtnTrigger = document.getElementById('btn-trigger-lakukan-absen');
+
+    const elTextStatusKehadiran = document.getElementById('text-status-kehadiran');
+    const elBtnKehadiranPill = document.getElementById('btn-status-kehadiran-pill');
+
+    const elMiniTimeMasuk = document.getElementById('mini-time-masuk');
+    const elMiniDateMasuk = document.getElementById('mini-date-masuk');
+    const elMiniTimePulang = document.getElementById('mini-time-pulang');
+    const elMiniDatePulang = document.getElementById('mini-date-pulang');
+
+    // 1. STATUS ABSEN MASUK
+    if (st.sudahMasuk && st.dataMasuk) {
+      const jamMasuk = st.dataMasuk.jam_server || '07:15';
+      const tglMasuk = st.dataMasuk.tanggal ? this.getShortDateFormatted(st.dataMasuk.tanggal) : todayFormatted;
+
+      if (elTimeMasuk) elTimeMasuk.textContent = `${jamMasuk} WIB`;
+      if (elDateMasuk) elDateMasuk.textContent = tglMasuk;
+      if (elBadgeMasuk) {
+        elBadgeMasuk.className = 'panel-badge-circle circle-masuk';
+        elBadgeMasuk.innerHTML = `
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
         `;
       }
+
+      if (elMiniTimeMasuk) elMiniTimeMasuk.textContent = `${jamMasuk} WIB`;
+      if (elMiniDateMasuk) elMiniDateMasuk.textContent = tglMasuk;
+
     } else {
       if (elTimeMasuk) elTimeMasuk.textContent = '--:-- WIB';
-      if (elSubMasuk) elSubMasuk.textContent = 'Batas: 07:15 WIB';
-      if (elIconMasuk) {
-        elIconMasuk.className = 'circle-indicator indicator-gray';
-        elIconMasuk.innerHTML = `
-          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#64748B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      if (elDateMasuk) elDateMasuk.textContent = todayFormatted;
+      if (elBadgeMasuk) {
+        elBadgeMasuk.className = 'panel-badge-circle circle-gray';
+        elBadgeMasuk.innerHTML = `
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
         `;
       }
+      if (elMiniTimeMasuk) elMiniTimeMasuk.textContent = '--:-- WIB';
+      if (elMiniDateMasuk) elMiniDateMasuk.textContent = 'Belum absen masuk';
     }
 
-    // 2. Box Absen Pulang
-    const elTimePulang = document.getElementById('time-pulang-display');
-    const elSubPulang = document.getElementById('sub-pulang-display');
-    const elIconPulang = document.getElementById('icon-indicator-pulang');
+    // 2. STATUS ABSEN PULANG
+    if (st.sudahPulang && st.dataPulang) {
+      const jamPulang = st.dataPulang.jam_server || '15:35';
+      const tglPulang = st.dataPulang.tanggal ? this.getShortDateFormatted(st.dataPulang.tanggal) : todayFormatted;
 
-    if (st.sudahPulang) {
-      const jamPulang = st.dataPulang ? st.dataPulang.jam_server : '16:00';
-      const tglPulang = st.dataPulang ? (st.dataPulang.tanggal || 'Hari ini') : 'Hari ini';
-      if (elTimePulang) elTimePulang.textContent = jamPulang + ' WIB';
-      if (elSubPulang) elSubPulang.textContent = tglPulang;
-      if (elIconPulang) {
-        elIconPulang.className = 'circle-indicator indicator-green';
-        elIconPulang.innerHTML = `
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+      if (elTimePulang) elTimePulang.textContent = `${jamPulang} WIB`;
+      if (elDescPulang) elDescPulang.textContent = 'Sudah absen pulang';
+      if (elBadgePulang) {
+        elBadgePulang.className = 'panel-badge-circle circle-masuk';
+        elBadgePulang.innerHTML = `
+          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
         `;
       }
+
+      if (elMiniTimePulang) elMiniTimePulang.textContent = `${jamPulang} WIB`;
+      if (elMiniDatePulang) {
+        elMiniDatePulang.textContent = tglPulang;
+        elMiniDatePulang.classList.remove('timeline-italic');
+      }
+
     } else {
       if (elTimePulang) elTimePulang.textContent = '-';
-      if (elSubPulang) elSubPulang.textContent = 'Menunggu absen pulang...';
-      if (elIconPulang) {
-        elIconPulang.className = 'circle-indicator indicator-blue-outline';
-        elIconPulang.innerHTML = `
-          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="#0284C7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      if (elDescPulang) elDescPulang.textContent = 'Menunggu absen pulang...';
+      if (elBadgePulang) {
+        elBadgePulang.className = 'panel-badge-circle circle-pulang';
+        elBadgePulang.innerHTML = `
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
         `;
       }
+      if (elMiniTimePulang) elMiniTimePulang.textContent = '-';
+      if (elMiniDatePulang) {
+        elMiniDatePulang.textContent = 'Belum absen pulang';
+        elMiniDatePulang.classList.add('timeline-italic');
+      }
     }
 
-    // 3. Card Status Kehadiran
-    const elKehadiranMsg = document.getElementById('kehadiran-body-text');
-    const elKehadiranPill = document.getElementById('kehadiran-btn-pill');
-
-    if (st.sudahMasuk && !st.sudahPulang) {
-      if (elKehadiranMsg) elKehadiranMsg.textContent = 'Anda sudah melakukan absen masuk hari ini.';
-      if (elKehadiranPill) elKehadiranPill.textContent = '✔ Terima kasih!';
-    } else if (st.sudahMasuk && st.sudahPulang) {
-      if (elKehadiranMsg) elKehadiranMsg.textContent = 'Presensi hari ini telah lengkap (Masuk & Pulang).';
-      if (elKehadiranPill) elKehadiranPill.textContent = '✔ Presensi Lengkap';
+    // 3. ACTION BUTTON STATE & STATUS KEHADIRAN (CARD KANAN)
+    if (!st.sudahMasuk) {
+      this.currentAttendanceType = 'MASUK';
+      if (elBtnActionText) elBtnActionText.textContent = 'Lakukan Absen Masuk';
+      if (elBtnTrigger) elBtnTrigger.disabled = false;
+      if (elTextStatusKehadiran) elTextStatusKehadiran.textContent = 'Silakan lakukan absen masuk terlebih dahulu.';
+      if (elBtnKehadiranPill) {
+        elBtnKehadiranPill.style.background = '#0284C7';
+        elBtnKehadiranPill.innerHTML = `<span>📍</span><span>Belum Absen</span>`;
+      }
+    } else if (!st.sudahPulang) {
+      this.currentAttendanceType = 'PULANG';
+      if (elBtnActionText) elBtnActionText.textContent = 'Lakukan Absen Pulang';
+      if (elBtnTrigger) elBtnTrigger.disabled = false;
+      if (elTextStatusKehadiran) elTextStatusKehadiran.textContent = 'Anda sudah melakukan absen masuk hari ini.';
+      if (elBtnKehadiranPill) {
+        elBtnKehadiranPill.style.background = '#10B981';
+        elBtnKehadiranPill.innerHTML = `<span>✔️</span><span>Terima kasih!</span>`;
+      }
     } else {
-      if (elKehadiranMsg) elKehadiranMsg.textContent = 'Silakan lakukan absen masuk terlebih dahulu.';
-      if (elKehadiranPill) elKehadiranPill.textContent = '⏳ Belum Hadir';
-    }
-
-    // 4. Widget Riwayat Absensi
-    const elWidgetMasukTime = document.getElementById('widget-masuk-time');
-    const elWidgetMasukDate = document.getElementById('widget-masuk-date');
-    const elWidgetPulangTime = document.getElementById('widget-pulang-time');
-    const elWidgetPulangDate = document.getElementById('widget-pulang-date');
-
-    if (st.sudahMasuk) {
-      if (elWidgetMasukTime) elWidgetMasukTime.textContent = (st.dataMasuk ? st.dataMasuk.jam_server : '07:15') + ' WIB';
-      if (elWidgetMasukDate) elWidgetMasukDate.textContent = st.dataMasuk ? (st.dataMasuk.tanggal || 'Selasa, 11 Nov 2025') : 'Selasa, 11 Nov 2025';
-    } else {
-      if (elWidgetMasukTime) elWidgetMasukTime.textContent = '-';
-      if (elWidgetMasukDate) elWidgetMasukDate.textContent = 'Belum absen masuk';
-    }
-
-    if (st.sudahPulang) {
-      if (elWidgetPulangTime) elWidgetPulangTime.textContent = (st.dataPulang ? st.dataPulang.jam_server : '16:00') + ' WIB';
-      if (elWidgetPulangDate) elWidgetPulangDate.textContent = st.dataPulang ? (st.dataPulang.tanggal || 'Hari ini') : 'Hari ini';
-    } else {
-      if (elWidgetPulangTime) elWidgetPulangTime.textContent = '-';
-      if (elWidgetPulangDate) elWidgetPulangDate.textContent = 'Belum absen pulang';
+      this.currentAttendanceType = 'SELESAI';
+      if (elBtnActionText) elBtnActionText.textContent = '✓ Presensi Hari Ini Lengkap';
+      if (elBtnTrigger) elBtnTrigger.disabled = false;
+      if (elTextStatusKehadiran) elTextStatusKehadiran.textContent = 'Alhamdulillah, Anda telah menyelesaikan presensi masuk dan pulang hari ini.';
+      if (elBtnKehadiranPill) {
+        elBtnKehadiranPill.style.background = '#10B981';
+        elBtnKehadiranPill.innerHTML = `<span>🎉</span><span>Presensi Selesai!</span>`;
+      }
     }
   },
 
   /**
-   * Mengaktifkan Pelacakan Lokasi GPS di Bilah Status
+   * Menangani Klik Tombol "📍 Lakukan Absen"
    */
-  initLiveGps() {
-    const elCoords = document.getElementById('guru-live-coords');
-    const elBadge = document.getElementById('guru-gps-status-badge');
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (pos) => {
-          const lat = pos.coords.latitude.toFixed(4);
-          const lng = pos.coords.longitude.toFixed(4);
-          if (elCoords) elCoords.textContent = `${lat}, ${lng}`;
-          if (elBadge) {
-            elBadge.className = 'gps-status-badge status-active';
-            elBadge.innerHTML = '<span class="badge-icon">✔</span><span class="badge-text">GPS Aktif</span>';
-          }
-        },
-        () => {
-          // Fallback koordinat sekolah resmi jika izin browser belum diberikan
-          if (elCoords) elCoords.textContent = '-0.9247, 100.3603';
-          if (elBadge) {
-            elBadge.className = 'gps-status-badge status-active';
-            elBadge.innerHTML = '<span class="badge-icon">✔</span><span class="badge-text">GPS Aktif</span>';
-          }
-        },
-        { enableHighAccuracy: true, timeout: 5000 }
-      );
-    } else {
-      if (elCoords) elCoords.textContent = '-0.9247, 100.3603';
+  handleDoAbsenClick() {
+    const st = AppState.todayAttendance;
+    if (st.sudahMasuk && st.sudahPulang) {
+      App.showToast('Anda sudah menyelesaikan presensi masuk dan pulang untuk hari ini.', 'info');
+      return;
     }
+    const jenis = !st.sudahMasuk ? 'MASUK' : 'PULANG';
+    this.openAttendanceModal(jenis);
   },
 
   /**
-   * Menyiapkan Event Listener Navigasi Menu Sidebar & Bottom Nav
+   * Membuka Modal Presensi Kamera & GPS
    */
-  setupTabNavigation() {
-    // Sidebar items
-    document.querySelectorAll('.guru-nav-item').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const tabTarget = btn.getAttribute('data-tab');
-        if (tabTarget) this.switchTab(tabTarget);
-      });
-    });
+  async openAttendanceModal(jenis) {
+    this.currentAttendanceType = jenis;
+    const modal = document.getElementById('modal-attendance');
+    const titleEl = document.getElementById('modal-attendance-title');
+    const subTitleEl = document.getElementById('modal-attendance-subtitle');
+    const btnSubmit = document.getElementById('btn-submit-attendance');
+    const elVideo = document.getElementById('video-stream-attendance');
+    const elPreview = document.getElementById('photo-preview-attendance');
+    const btnCapture = document.getElementById('btn-capture-attendance');
+    const btnRetake = document.getElementById('btn-retake-attendance');
 
-    // Mobile bottom nav items
-    document.querySelectorAll('.guru-tab-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const tabTarget = btn.getAttribute('data-tab');
-        if (tabTarget) this.switchTab(tabTarget);
-      });
-    });
-  },
-
-  /**
-   * Mengganti Tampilan Tab (Beranda, Riwayat, Profil, Pengaturan)
-   */
-  async switchTab(tabName) {
-    this.activeTab = tabName;
-
-    // Update active class pada Sidebar
-    document.querySelectorAll('.guru-nav-item').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
-    });
-
-    // Update active class pada Mobile Nav
-    document.querySelectorAll('.guru-tab-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
-    });
-
-    // Sembunyikan semua section guru
-    document.querySelectorAll('.guru-view-section').forEach(sec => {
-      sec.style.display = 'none';
-    });
-
-    // Tampilkan section terpilih
-    const targetSection = document.getElementById(`guru-section-${tabName}`);
-    if (targetSection) {
-      targetSection.style.display = 'block';
+    if (titleEl) {
+      titleEl.textContent = `Presensi ${jenis === 'MASUK' ? 'Masuk' : 'Pulang'}`;
+    }
+    if (subTitleEl) {
+      subTitleEl.textContent = `Validasi GPS Sekolah & Foto Selfie Real-time (${jenis})`;
     }
 
-    if (tabName === 'beranda') {
-      this.loadTodayStatus();
-    } else if (tabName === 'riwayat') {
-      this.loadAttendanceHistory();
-      this.loadMonthlyRecap();
-    } else if (tabName === 'profil') {
-      this.renderProfileCard();
+    // Reset kamera & capture
+    CameraService.resetCapture();
+    if (elPreview) elPreview.style.display = 'none';
+    if (elVideo) elVideo.style.display = 'block';
+    if (btnCapture) btnCapture.style.display = 'inline-flex';
+    if (btnRetake) btnRetake.style.display = 'none';
+
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = `<span>⏳ Menunggu Lokasi & Foto Selfie</span>`;
     }
 
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  },
+    if (modal) modal.style.display = 'flex';
 
-  /**
-   * Membuka Dialog Modal Presensi (Lakukan Absen)
-   */
-  async openAttendanceModal(forceType) {
-    const modal = document.getElementById('modal-lakukan-absen');
-    if (!modal) return;
-
-    // Tentukan jenis absen otomatis jika tidak dipaksa
-    if (forceType) {
-      this.modalAttendanceType = forceType;
-    } else if (AppState.todayAttendance.sudahMasuk && !AppState.todayAttendance.sudahPulang) {
-      this.modalAttendanceType = 'PULANG';
-    } else {
-      this.modalAttendanceType = 'MASUK';
-    }
-
-    this.updateModalTabsUI();
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-
-    // Inisialisasi peta Leaflet jika belum
+    // Inisialisasi Peta Leaflet
     setTimeout(() => {
-      const school = AppState.targetSchool || CONFIG.DEFAULT_SCHOOL;
-      GpsService.initMap('map-modal-presensi', school.lat, school.lng, 17);
-      this.modalMapInitialized = true;
+      GpsService.initMap('map-container-attendance', AppState.targetSchool.lat, AppState.targetSchool.lng, 17);
     }, 250);
 
-    // Mulai kamera selfie
-    await CameraService.startCamera('modal-video-stream');
+    // Buka Kamera Depan
+    const camStarted = await CameraService.startCamera('video-stream-attendance');
+    if (!camStarted) {
+      App.showToast('Kamera tidak terbuka otomatis. Anda dapat menggunakan tombol unggah foto manual.', 'warning');
+    }
 
-    // Mulai pelacakan GPS akurat
+    // Mulai Pemantauan GPS Real-time
     GpsService.startWatching((gpsState) => {
-      this.updateModalGpsUi(gpsState);
+      this.updateAttendanceGpsUi(gpsState);
+      this.updateGpsBar(gpsState);
       this.evaluateModalSubmitButton();
     });
   },
 
   /**
-   * Menutup Dialog Modal Presensi
+   * Menutup Modal Presensi
    */
   closeAttendanceModal() {
-    const modal = document.getElementById('modal-lakukan-absen');
+    const modal = document.getElementById('modal-attendance');
     if (modal) modal.style.display = 'none';
-    document.body.style.overflow = '';
-
     CameraService.stopCamera();
     GpsService.stopWatching();
   },
 
   /**
-   * Beralih Antara Absen Masuk / Absen Pulang di Modal
+   * Update UI GPS di dalam Modal Presensi
    */
-  switchModalTab(type) {
-    this.modalAttendanceType = type;
-    this.updateModalTabsUI();
-    this.evaluateModalSubmitButton();
-  },
+  updateAttendanceGpsUi(gpsState) {
+    const elDistBadge = document.getElementById('distance-badge-attendance');
+    const elDistVal = document.getElementById('distance-value-attendance');
+    const elAccVal = document.getElementById('gps-accuracy-attendance');
 
-  /**
-   * Update Tampilan Tab Pilihan Masuk / Pulang di Modal
-   */
-  updateModalTabsUI() {
-    const isMasuk = this.modalAttendanceType === 'MASUK';
-    const btnTabMasuk = document.getElementById('modal-tab-masuk');
-    const btnTabPulang = document.getElementById('modal-tab-pulang');
-    const labelTitle = document.getElementById('modal-absen-title');
-
-    if (btnTabMasuk) btnTabMasuk.classList.toggle('active', isMasuk);
-    if (btnTabPulang) btnTabPulang.classList.toggle('active', !isMasuk);
-    if (labelTitle) labelTitle.textContent = isMasuk ? 'Presensi Absen Masuk' : 'Presensi Absen Pulang';
-
-    // Reset preview foto
-    CameraService.resetCapture();
-    const elVideo = document.getElementById('modal-video-stream');
-    const elPreview = document.getElementById('modal-photo-preview');
-    const btnCapture = document.getElementById('btn-modal-capture');
-    const btnRetake = document.getElementById('btn-modal-retake');
-
-    if (elPreview) elPreview.style.display = 'none';
-    if (elVideo) elVideo.style.display = 'block';
-    if (btnCapture) btnCapture.style.display = 'inline-flex';
-    if (btnRetake) btnRetake.style.display = 'none';
-  },
-
-  /**
-   * Update Status Geofence GPS pada Modal
-   */
-  updateModalGpsUi(gpsState) {
-    const elDistBadge = document.getElementById('modal-gps-distance-badge');
-    const elAccBadge = document.getElementById('modal-gps-accuracy-badge');
-
-    if (elAccBadge && gpsState.accuracy !== null) {
+    if (elAccVal && gpsState.accuracy !== null) {
       const acc = Math.round(gpsState.accuracy);
-      elAccBadge.textContent = `Akurasi: ±${acc} m`;
+      elAccVal.textContent = `Akurasi: ±${acc} m`;
+      elAccVal.className = 'accuracy-indicator ' + (acc <= 25 ? 'acc-good' : acc <= 50 ? 'acc-med' : 'acc-poor');
+    }
+
+    if (elDistVal && gpsState.distance !== null) {
+      elDistVal.textContent = `${gpsState.distance} meter`;
     }
 
     if (elDistBadge && gpsState.distance !== null) {
-      const targetRadius = AppState.targetSchool ? AppState.targetSchool.radius : 60;
+      const targetRadius = AppState.targetSchool.radius || 60;
       if (gpsState.insideRadius) {
         elDistBadge.className = 'radius-badge inside';
         elDistBadge.innerHTML = `✓ Dalam Area Sekolah (${gpsState.distance}m ≤ ${targetRadius}m)`;
@@ -424,15 +394,15 @@ const GuruModule = {
   },
 
   /**
-   * Ambil Foto Selfie dari Viewfinder Kamera Modal
+   * Tangkap Foto Selfie di Modal
    */
-  captureModalSelfie() {
-    const base64 = CameraService.captureSnapshot('modal-canvas-snapshot');
+  captureAttendancePhoto() {
+    const base64 = CameraService.captureSnapshot('canvas-snapshot-attendance');
     if (base64) {
-      const elVideo = document.getElementById('modal-video-stream');
-      const elPreview = document.getElementById('modal-photo-preview');
-      const btnCapture = document.getElementById('btn-modal-capture');
-      const btnRetake = document.getElementById('btn-modal-retake');
+      const elVideo = document.getElementById('video-stream-attendance');
+      const elPreview = document.getElementById('photo-preview-attendance');
+      const btnCapture = document.getElementById('btn-capture-attendance');
+      const btnRetake = document.getElementById('btn-retake-attendance');
 
       if (elVideo) elVideo.style.display = 'none';
       if (elPreview) {
@@ -451,63 +421,78 @@ const GuruModule = {
   },
 
   /**
-   * Mengambil Ulang Foto Selfie Modal
+   * Foto Ulang Selfie di Modal
    */
-  async retakeModalSelfie() {
+  async retakeAttendancePhoto() {
     CameraService.resetCapture();
-    const elVideo = document.getElementById('modal-video-stream');
-    const elPreview = document.getElementById('modal-photo-preview');
-    const btnCapture = document.getElementById('btn-modal-capture');
-    const btnRetake = document.getElementById('btn-modal-retake');
+    const elVideo = document.getElementById('video-stream-attendance');
+    const elPreview = document.getElementById('photo-preview-attendance');
+    const btnCapture = document.getElementById('btn-capture-attendance');
+    const btnRetake = document.getElementById('btn-retake-attendance');
 
     if (elPreview) elPreview.style.display = 'none';
     if (elVideo) elVideo.style.display = 'block';
     if (btnCapture) btnCapture.style.display = 'inline-flex';
     if (btnRetake) btnRetake.style.display = 'none';
 
-    await CameraService.startCamera('modal-video-stream');
+    await CameraService.startCamera('video-stream-attendance');
     this.evaluateModalSubmitButton();
   },
 
   /**
-   * Menangani Unggah Foto Cadangan (Fallback Input File)
+   * Fallback Upload Foto File
    */
-  handleModalFileFallback(fileInput) {
-    if (fileInput.files && fileInput.files[0]) {
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        CameraService.capturedBase64 = e.target.result;
-        const elVideo = document.getElementById('modal-video-stream');
-        const elPreview = document.getElementById('modal-photo-preview');
-        const btnCapture = document.getElementById('btn-modal-capture');
-        const btnRetake = document.getElementById('btn-modal-retake');
+  async handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
 
-        if (elVideo) elVideo.style.display = 'none';
-        if (elPreview) {
-          elPreview.src = e.target.result;
-          elPreview.style.display = 'block';
-        }
-        if (btnCapture) btnCapture.style.display = 'none';
-        if (btnRetake) btnRetake.style.display = 'inline-flex';
+    try {
+      const base64 = await CameraService.fileToBase64(file);
+      CameraService.capturedBase64 = base64;
 
-        this.evaluateModalSubmitButton();
-        App.showToast('Foto berhasil diunggah.', 'success');
-      };
-      reader.readAsDataURL(file);
+      const elVideo = document.getElementById('video-stream-attendance');
+      const elPreview = document.getElementById('photo-preview-attendance');
+      const btnCapture = document.getElementById('btn-capture-attendance');
+      const btnRetake = document.getElementById('btn-retake-attendance');
+
+      if (elVideo) elVideo.style.display = 'none';
+      if (elPreview) {
+        elPreview.src = base64;
+        elPreview.style.display = 'block';
+      }
+      if (btnCapture) btnCapture.style.display = 'none';
+      if (btnRetake) btnRetake.style.display = 'inline-flex';
+
+      CameraService.stopCamera();
+      this.evaluateModalSubmitButton();
+      App.showToast('Foto berhasil dimuat.', 'success');
+    } catch (e) {
+      App.showToast('Gagal memproses file foto.', 'danger');
     }
   },
 
   /**
-   * Evaluasi Status Aktif Tombol Kirim Presensi
+   * Evaluasi Kondisi Tombol Kirim Presensi
    */
   evaluateModalSubmitButton() {
-    const btn = document.getElementById('btn-submit-modal-absen');
+    const btn = document.getElementById('btn-submit-attendance');
     if (!btn) return;
 
     const gps = AppState.gps;
     const hasPhoto = !!CameraService.capturedBase64;
-    const isInside = gps.insideRadius || gps.lat !== null; // Toleran pada mode demo
+    const isInside = gps.insideRadius;
+
+    if (!gps.isActive || gps.lat === null) {
+      btn.disabled = true;
+      btn.innerHTML = '<span>📡 Mencari Lokasi GPS...</span>';
+      return;
+    }
+
+    if (!isInside) {
+      btn.disabled = true;
+      btn.innerHTML = `<span>⚠️ Di Luar Radius Sekolah (${gps.distance} m)</span>`;
+      return;
+    }
 
     if (!hasPhoto) {
       btn.disabled = true;
@@ -516,72 +501,146 @@ const GuruModule = {
     }
 
     btn.disabled = false;
-    const label = this.modalAttendanceType === 'MASUK' ? 'Kirim Presensi Masuk' : 'Kirim Presensi Pulang';
+    const label = this.currentAttendanceType === 'MASUK' ? 'Kirim Presensi Masuk' : 'Kirim Presensi Pulang';
     btn.innerHTML = `<span>🚀 ${label}</span>`;
   },
 
   /**
-   * Kirim Data Presensi dari Modal ke Server / Database
+   * Eksekusi Kirim Presensi ke Server
    */
-  async submitAttendanceFromModal() {
-    const jenis = this.modalAttendanceType;
+  async submitAttendanceAction() {
+    const jenis = this.currentAttendanceType;
     const gps = AppState.gps;
     const photoBase64 = CameraService.capturedBase64;
+
+    if (!gps.insideRadius) {
+      App.showToast('Anda berada di luar area sekolah. Presensi tidak dapat diproses.', 'danger');
+      return;
+    }
 
     if (!photoBase64) {
       App.showToast('Wajib mengambil foto selfie sebagai bukti fisik kehadiran.', 'warning');
       return;
     }
 
-    App.showLoading(true, `Menyimpan presensi ${jenis}...`);
+    App.showLoading(true, `Mengirim data presensi ${jenis}...`);
 
     try {
       const payload = {
         token: AppState.token,
         jenis: jenis,
-        latitude: gps.lat || -0.9247,
-        longitude: gps.lng || 100.3603,
-        accuracy: gps.accuracy || 12,
+        latitude: gps.lat,
+        longitude: gps.lng,
+        accuracy: gps.accuracy,
         foto_base64: photoBase64
       };
 
       const res = await Api.submitAttendance(payload);
       App.showLoading(false);
 
-      if (res && res.success) {
-        // Update AppState
-        const now = new Date();
-        const jamStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false }).replace(/\./g, ':');
-        const tglStr = now.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+      if (res.success) {
+        this.closeAttendanceModal();
 
+        // Update status lokal
         if (jenis === 'MASUK') {
           AppState.todayAttendance.sudahMasuk = true;
-          AppState.todayAttendance.dataMasuk = {
-            jam_server: jamStr,
-            tanggal: tglStr,
+          AppState.todayAttendance.dataMasuk = res.data || {
+            jam_server: new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+            tanggal: new Date().toISOString().split('T')[0],
             status_kehadiran: 'Tepat Waktu',
-            jarak_meter: 15.2
+            jarak_meter: gps.distance || 15
           };
         } else {
           AppState.todayAttendance.sudahPulang = true;
-          AppState.todayAttendance.dataPulang = {
-            jam_server: jamStr,
-            tanggal: tglStr,
+          AppState.todayAttendance.dataPulang = res.data || {
+            jam_server: new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit' }),
+            tanggal: new Date().toISOString().split('T')[0],
             status_kehadiran: 'Pulang Normal',
-            jarak_meter: 15.2
+            jarak_meter: gps.distance || 15
           };
         }
 
         this.renderTodayStatusCards();
-        this.closeAttendanceModal();
+        App.showToast(`Presensi ${jenis} berhasil dicatat! Terima kasih.`, 'success');
 
-        App.showToast(`Alhamdulillah! Presensi ${jenis} berhasil dicatat pada ${jamStr} WIB.`, 'success');
       } else {
-        App.showToast((res && res.message) || 'Gagal mengirim presensi.', 'danger');
+        App.showToast(res.message || 'Gagal mengirim presensi.', 'danger');
       }
     } catch (err) {
       App.showLoading(false);
-      App.showToast('Terjadi kesalahan: ' + err.message, 'danger');
+      App.showToast('Terjadi kesalahan koneksi: ' + err.message, 'danger');
+    }
+  },
+
+  /**
+   * Navigasi Antar Tab Guru (Sidebar & Bottom Bar)
+   */
+  setupTabNavigation() {
+    // Sidebar nav items
+    document.querySelectorAll('.guru-sidebar-nav-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabTarget = btn.getAttribute('data-tab');
+        if (tabTarget) this.switchTab(tabTarget);
+      });
+    });
+
+    // Mobile bottom nav items
+    document.querySelectorAll('.guru-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tabTarget = btn.getAttribute('data-tab');
+        if (tabTarget) this.switchTab(tabTarget);
+      });
+    });
+
+    // Month & year filter change
+    const fMonth = document.getElementById('filter-history-month');
+    const fYear = document.getElementById('filter-history-year');
+    if (fMonth) fMonth.addEventListener('change', () => this.loadAttendanceHistory());
+    if (fYear) fYear.addEventListener('change', () => this.loadAttendanceHistory());
+
+    // Password change form
+    const formPass = document.getElementById('form-change-password');
+    if (formPass) {
+      formPass.addEventListener('submit', (e) => this.handleChangePassword(e));
+    }
+  },
+
+  /**
+   * Pergantian Tab Konten
+   */
+  async switchTab(tabName) {
+    this.activeTab = tabName;
+
+    // Update active class pada sidebar
+    document.querySelectorAll('.guru-sidebar-nav-item').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
+    });
+
+    // Update active class pada navigasi bawah (mobile)
+    document.querySelectorAll('.guru-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
+    });
+
+    // Sembunyikan semua section
+    document.querySelectorAll('.guru-view-section').forEach(sec => {
+      sec.style.display = 'none';
+    });
+
+    // Tampilkan section terpilih
+    const targetSection = document.getElementById(`guru-section-${tabName}`);
+    if (targetSection) {
+      targetSection.style.display = 'block';
+    }
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Penanganan khusus tiap tab
+    if (tabName === 'beranda') {
+      this.loadTodayStatus();
+    } else if (tabName === 'riwayat') {
+      this.loadAttendanceHistory();
+      this.loadMonthlyRecap();
     }
   },
 
@@ -592,7 +651,7 @@ const GuruModule = {
     const listEl = document.getElementById('history-list-container');
     if (!listEl) return;
 
-    listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--text-muted);">Memuat riwayat presensi...</div>';
+    listEl.innerHTML = '<div class="loading-state" style="padding:20px;text-align:center;">Memuat riwayat presensi...</div>';
 
     const selBulan = document.getElementById('filter-history-month');
     const selTahun = document.getElementById('filter-history-year');
@@ -601,43 +660,31 @@ const GuruModule = {
 
     try {
       const res = await Api.getGuruHistory(AppState.token, bulan, tahun);
-      if (res && res.success && res.data && res.data.length > 0) {
+      if (res.success && res.data && res.data.length > 0) {
         listEl.innerHTML = res.data.map(item => `
-          <div class="history-item-card" style="background:#FFF;border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid #E2E8F0;box-shadow:0 2px 8px rgba(0,0,0,0.03);">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <span class="badge ${item.jenis === 'MASUK' ? 'badge-primary' : 'badge-info'}" style="padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:700;">${item.jenis}</span>
-              <span style="font-size:0.85rem;color:#64748B;">${item.tanggal}</span>
+          <div class="history-item-card" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:12px;padding:14px;margin-bottom:10px;">
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <span class="badge ${item.jenis === 'MASUK' ? 'badge-primary' : 'badge-info'}" style="font-weight:700;">${item.jenis}</span>
+              <span style="font-size:0.8rem;color:#64748B;">${item.tanggal}</span>
             </div>
             <div style="display:flex;justify-content:space-between;align-items:center;">
               <div>
-                <span style="font-size:1.15rem;font-weight:800;color:#0B2545;">${item.jam_server} WIB</span>
-                <span style="margin-left:8px;font-size:0.8rem;color:#10B981;font-weight:600;">${item.status_kehadiran}</span>
+                <b style="font-size:1.1rem;color:#0B2545;">${item.jam_server} WIB</b>
+                <span style="font-size:0.8rem;margin-left:8px;padding:2px 8px;border-radius:10px;background:#ECFDF5;color:#047857;">
+                  ${item.status_kehadiran}
+                </span>
               </div>
-              <div style="font-size:0.8rem;color:#64748B;">
+              <div style="font-size:0.75rem;color:#64748B;">
                 📍 ${item.jarak_meter} m
               </div>
             </div>
           </div>
         `).join('');
       } else {
-        listEl.innerHTML = `
-          <div class="history-item-card" style="background:#FFF;border-radius:14px;padding:16px;margin-bottom:12px;border:1px solid #E2E8F0;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-              <span style="background:#DCFCE7;color:#166534;padding:4px 10px;border-radius:20px;font-size:0.75rem;font-weight:700;">MASUK</span>
-              <span style="font-size:0.85rem;color:#64748B;">Selasa, 11 Nov 2025</span>
-            </div>
-            <div style="display:flex;justify-content:space-between;align-items:center;">
-              <div>
-                <span style="font-size:1.15rem;font-weight:800;color:#0B2545;">07:15 WIB</span>
-                <span style="margin-left:8px;font-size:0.8rem;color:#10B981;font-weight:600;">Tepat Waktu</span>
-              </div>
-              <div style="font-size:0.8rem;color:#64748B;">📍 15.2 m</div>
-            </div>
-          </div>
-        `;
+        listEl.innerHTML = '<div class="empty-state" style="padding:24px;text-align:center;color:#64748B;">Belum ada catatan presensi pada periode ini.</div>';
       }
     } catch (e) {
-      listEl.innerHTML = '<div style="text-align:center;padding:24px;color:#EF4444;">Gagal memuat riwayat presensi.</div>';
+      listEl.innerHTML = '<div class="error-state" style="padding:24px;text-align:center;color:#EF4444;">Gagal memuat riwayat.</div>';
     }
   },
 
@@ -652,17 +699,17 @@ const GuruModule = {
 
     try {
       const res = await Api.getGuruRecap(AppState.token, bulan, tahun);
-      if (res && res.success && res.data) {
+      if (res.success && res.data) {
         const d = res.data;
-        if (document.getElementById('recap-total-hadir')) document.getElementById('recap-total-hadir').textContent = d.total_hadir || 24;
-        if (document.getElementById('recap-tepat-waktu')) document.getElementById('recap-tepat-waktu').textContent = d.tepat_waktu || 22;
-        if (document.getElementById('recap-terlambat')) document.getElementById('recap-terlambat').textContent = d.terlambat || 2;
-        if (document.getElementById('recap-pulang-cepat')) document.getElementById('recap-pulang-cepat').textContent = d.pulang_cepat || 0;
-      } else {
-        if (document.getElementById('recap-total-hadir')) document.getElementById('recap-total-hadir').textContent = '24';
-        if (document.getElementById('recap-tepat-waktu')) document.getElementById('recap-tepat-waktu').textContent = '22';
-        if (document.getElementById('recap-terlambat')) document.getElementById('recap-terlambat').textContent = '2';
-        if (document.getElementById('recap-pulang-cepat')) document.getElementById('recap-pulang-cepat').textContent = '0';
+        const elTot = document.getElementById('recap-total-hadir');
+        const elTep = document.getElementById('recap-tepat-waktu');
+        const elTel = document.getElementById('recap-terlambat');
+        const elPul = document.getElementById('recap-pulang-cepat');
+
+        if (elTot) elTot.textContent = d.total_hadir || 0;
+        if (elTep) elTep.textContent = d.tepat_waktu || 0;
+        if (elTel) elTel.textContent = d.terlambat || 0;
+        if (elPul) elPul.textContent = d.pulang_cepat || 0;
       }
     } catch (e) {}
   },
@@ -671,7 +718,7 @@ const GuruModule = {
    * Form Ubah Password Guru
    */
   async handleChangePassword(e) {
-    if (e && e.preventDefault) e.preventDefault();
+    e.preventDefault();
     const oldPass = document.getElementById('input-old-pass').value;
     const newPass = document.getElementById('input-new-pass').value;
     const confPass = document.getElementById('input-confirm-pass').value;
@@ -685,11 +732,11 @@ const GuruModule = {
     try {
       const res = await Api.changePassword(AppState.token, oldPass, newPass);
       App.showLoading(false);
-      if (res && res.success) {
-        App.showToast('Password berhasil diubah.', 'success');
+      if (res.success) {
+        App.showToast('Password berhasil diubah. Silakan gunakan password baru saat login berikutnya.', 'success');
         document.getElementById('form-change-password').reset();
       } else {
-        App.showToast((res && res.message) || 'Gagal mengubah password.', 'danger');
+        App.showToast(res.message || 'Gagal mengubah password.', 'danger');
       }
     } catch (err) {
       App.showLoading(false);
