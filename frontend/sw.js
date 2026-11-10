@@ -3,7 +3,7 @@
  * PWA Cache & Network-First Navigation Strategy
  */
 
-const CACHE_NAME = 'nibras-presensi-v2.2.3';
+const CACHE_NAME = 'nibras-presensi-v2.2.4';
 
 const STATIC_ASSETS = [
   './',
