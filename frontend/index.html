@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
   <!-- Main Stylesheet (with cache-buster) -->
-  <link rel="stylesheet" href="css/style.css?v=2.1.2">
+  <link rel="stylesheet" href="css/style.css?v=2.1.3">
 
   <!-- Critical Layout & Landing Styles (Guarantees Perfect Render Always) -->
   <style>
@@ -1462,8 +1462,9 @@
           <!-- Admin Top Navbar -->
           <header class="admin-topbar">
             <div class="topbar-left">
-              <button class="sidebar-toggle-btn" onclick="AdminModule.toggleSidebar()" title="Toggle Sidebar">
-                ☰
+              <button class="sidebar-toggle-btn" onclick="AdminModule.toggleSidebar()" title="Buka Menu Admin" aria-label="Buka Menu Admin">
+                <span class="toggle-icon">☰</span>
+                <span class="toggle-label">Menu</span>
               </button>
               <div class="admin-breadcrumb">
                 <a href="#admin" onclick="AdminModule.switchTab('dashboard')">Home</a> » <span id="admin-breadcrumb-title">Dashboard</span>
