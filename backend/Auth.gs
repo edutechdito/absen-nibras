@@ -55,41 +55,68 @@ function loginUser(username, password) {
   }
 
   if (!user) {
-    return { success: false, message: 'Username atau password tidak cocok.' };
+    Logger.log('[Auth] Username "' + username + '" tidak ditemukan di sheet USERS.');
+    return { success: false, message: 'Username tidak ditemukan di database.' };
   }
 
-  if (user.status !== 'aktif') {
-    return { success: false, message: 'Akun Anda dinonaktifkan. Silakan hubungi Administrator.' };
+  // Cek Status Akun (Fleksibel terhadap variasi penulisan seperti "Aktif", "aktif", atau kosong)
+  var statusClean = String(user.status || 'aktif').trim().toLowerCase();
+  if (statusClean && statusClean !== 'aktif') {
+    Logger.log('[Auth] Akun ' + username + ' berstatus non-aktif: ' + user.status);
+    return { success: false, message: 'Akun Anda berstatus nonaktif. Silakan hubungi Administrator.' };
   }
 
-  // Verifikasi Password (Mendukung Hash Kriptografis DAN Password Teks Biasa dari Spreadsheet)
+  // Verifikasi Password (Mendukung Plaintext Langsung dari Spreadsheet MAUPUN Hash SHA-256 + Salt)
+  var cleanInputPassword = String(password).trim();
+  var dbPasswordHash = String(user.password_hash !== undefined && user.password_hash !== null ? user.password_hash : '').trim();
+  var dbPasswordPlain = String(user.password !== undefined && user.password !== null ? user.password : (user.pass || user.kata_sandi || '')).trim();
+  var dbSalt = String(user.salt || '').trim();
+
   var isPasswordValid = false;
 
-  // 1. Cek jika sudah berupa SHA-256 Hash + Salt
-  if (user.salt && user.password_hash) {
-    var calculatedHash = hashPassword(password, user.salt);
-    if (calculatedHash === user.password_hash) {
+  // 1. Cek pencocokan teks biasa langsung (Plaintext) di kolom password_hash atau password
+  if (dbPasswordPlain && dbPasswordPlain === cleanInputPassword) {
+    isPasswordValid = true;
+  } else if (dbPasswordHash && dbPasswordHash === cleanInputPassword) {
+    isPasswordValid = true;
+  }
+
+  // 2. Cek pencocokan Kriptografi SHA-256 Hash + Salt
+  if (!isPasswordValid && dbSalt && dbPasswordHash) {
+    var calculatedHash = hashPassword(cleanInputPassword, dbSalt);
+    if (calculatedHash.toLowerCase() === dbPasswordHash.toLowerCase()) {
       isPasswordValid = true;
     }
   }
 
-  // 2. Cek jika admin mengetikkan password teks biasa (plaintext) langsung di Spreadsheet
-  if (!isPasswordValid && String(user.password_hash).trim() === String(password).trim()) {
-    isPasswordValid = true;
+  // 3. Cek pencocokan SHA-256 Hash tanpa Salt
+  if (!isPasswordValid && dbPasswordHash) {
+    var noSaltHash = hashPassword(cleanInputPassword, '');
+    if (noSaltHash.toLowerCase() === dbPasswordHash.toLowerCase()) {
+      isPasswordValid = true;
+    }
+  }
 
-    // Otomatis amankan menjadi Hash SHA-256 + Salt baru di Spreadsheet
-    var newSalt = generateSalt();
-    var secureHash = hashPassword(password, newSalt);
-    updateRowByColumn(SHEET_NAMES.USERS, 'user_id', user.user_id, {
-      password_hash: secureHash,
-      salt: newSalt
-    });
-    user.salt = newSalt;
-    user.password_hash = secureHash;
+  // Jika password valid dan sebelumnya tertulis teks biasa di sheet, otomatis enkripsi ke SHA-256 + Salt
+  if (isPasswordValid && (dbPasswordHash === cleanInputPassword || dbPasswordPlain === cleanInputPassword)) {
+    try {
+      var newSalt = generateSalt();
+      var secureHash = hashPassword(cleanInputPassword, newSalt);
+      updateRowByColumn(SHEET_NAMES.USERS, 'user_id', user.user_id, {
+        password_hash: secureHash,
+        salt: newSalt
+      });
+      user.salt = newSalt;
+      user.password_hash = secureHash;
+      Logger.log('[Auth] Password plaintext untuk ' + username + ' otomatis dienkripsi menjadi SHA-256 + Salt baru.');
+    } catch (hashErr) {
+      Logger.log('[Auth] Catatan: Gagal auto-update hash: ' + hashErr.message);
+    }
   }
 
   if (!isPasswordValid) {
-    return { success: false, message: 'Username atau password tidak cocok.' };
+    Logger.log('[Auth] Password untuk ' + username + ' tidak cocok.');
+    return { success: false, message: 'Password yang Anda masukkan salah.' };
   }
 
   // Generate Token baru (masa berlaku 7 hari)

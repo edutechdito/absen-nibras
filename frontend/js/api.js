@@ -239,8 +239,11 @@ const Api = {
 
     // Mock Login
     if (action === 'login') {
-      const u = String(payload.username).toLowerCase().trim();
-      if (u === 'admin' && payload.password === 'admin123') {
+      const u = String(payload.username || '').toLowerCase().trim();
+      const p = String(payload.password || '').trim();
+
+      // Demo Admin bawaan
+      if (u === 'admin' && p === 'admin123') {
         return {
           success: true,
           token: 'demo_admin_token_' + Date.now(),
@@ -253,7 +256,9 @@ const Api = {
           }
         };
       }
-      if ((u === '202401001' || u === 'guru') && payload.password === 'guru123') {
+
+      // Demo Guru
+      if ((u === '202401001' || u === 'guru') && p === 'guru123') {
         return {
           success: true,
           token: 'demo_guru_token_' + Date.now(),
@@ -270,15 +275,19 @@ const Api = {
             sekolah_id: 'SCH001',
             nama_sekolah: 'Perguruan Islam NIBRAS (Kampus Pusat)',
             alamat_sekolah: 'Jl. Khatib Sulaiman No. 45, Padang',
-            sekolah_lat: -0.923456,
-            sekolah_lng: 100.367890,
+            sekolah_lat: -0.9247,
+            sekolah_lng: 100.3603,
             sekolah_radius: 60,
             no_hp: '08126789001',
             email: 'ahmad.fauzi@nibras.sch.id'
           }
         };
       }
-      return { success: false, message: 'Username atau password tidak sesuai. Silakan periksa kembali kredensial Anda.' };
+
+      return { 
+        success: false, 
+        message: 'Aplikasi masih dalam Mode Demo (belum terhubung ke URL Google Apps Script Anda). Untuk menggunakan Username & Password dari Spreadsheet, silakan klik tautan "Hubungkan URL Spreadsheet" di bawah form login dan masukkan URL Web App Google Apps Script Anda.' 
+      };
     }
 
     if (action === 'get_today_status') {
