@@ -274,8 +274,44 @@ function adminGetSettings(token) {
   var check = requireAdmin(token);
   if (!check.authorized) return { success: false, message: check.message };
 
-  var rows = getRowsAsObjects(SHEET_NAMES.PENGATURAN);
-  return { success: true, data: rows };
+  var sheet = getSheet(SHEET_NAMES.PENGATURAN);
+  if (!sheet) return { success: false, message: 'Sheet PENGATURAN tidak ditemukan.' };
+
+  var displayData = sheet.getDataRange().getDisplayValues();
+  if (displayData.length <= 1) return { success: true, data: [] };
+
+  var headers = displayData[0].map(function(h) { return String(h).trim().toLowerCase(); });
+  var keyCol = headers.indexOf('setting_key');
+  var valCol = headers.indexOf('setting_value');
+  var ketCol = headers.indexOf('keterangan');
+
+  if (keyCol === -1 || valCol === -1) {
+    keyCol = 0;
+    valCol = 1;
+  }
+
+  var list = [];
+  for (var i = 1; i < displayData.length; i++) {
+    var k = String(displayData[i][keyCol] || '').trim();
+    var v = String(displayData[i][valCol] || '').trim();
+    if (!k) continue;
+
+    // Normalisasi format waktu jika nilai berbentuk "06.00" atau sejenisnya
+    if (/^\d{1,2}[.:]\d{2}/.test(v)) {
+      v = v.replace('.', ':');
+      var parts = v.split(':');
+      if (parts[0].length === 1) parts[0] = '0' + parts[0];
+      v = parts.slice(0, 2).join(':');
+    }
+
+    list.push({
+      setting_key: k,
+      setting_value: v,
+      keterangan: ketCol !== -1 ? String(displayData[i][ketCol] || '').trim() : ''
+    });
+  }
+
+  return { success: true, data: list };
 }
 
 function adminUpdateSettings(token, settingsArray) {
@@ -286,15 +322,44 @@ function adminUpdateSettings(token, settingsArray) {
     return { success: false, message: 'Data pengaturan harus berupa array.' };
   }
 
+  var sheet = getSheet(SHEET_NAMES.PENGATURAN);
+  if (!sheet) return { success: false, message: 'Sheet PENGATURAN tidak ditemukan.' };
+
+  var data = sheet.getDataRange().getValues();
+  var headers = data[0].map(function(h) { return String(h).trim().toLowerCase(); });
+  var keyCol = headers.indexOf('setting_key');
+  var valCol = headers.indexOf('setting_value');
+  if (keyCol === -1 || valCol === -1) {
+    keyCol = 0;
+    valCol = 1;
+  }
+
   for (var i = 0; i < settingsArray.length; i++) {
     var item = settingsArray[i];
     if (item.setting_key && item.setting_value !== undefined) {
-      updateRowByColumn(SHEET_NAMES.PENGATURAN, 'setting_key', item.setting_key, {
-        setting_value: String(item.setting_value)
-      });
+      var targetKey = String(item.setting_key).trim().toLowerCase();
+      var newVal = String(item.setting_value).trim();
+      var found = false;
+
+      for (var r = 1; r < data.length; r++) {
+        if (String(data[r][keyCol]).trim().toLowerCase() === targetKey) {
+          // Format sel sebagai teks murni (@) agar Google Sheets tidak mengubah "06:00" menjadi Date/Waktu acak
+          var cell = sheet.getRange(r + 1, valCol + 1);
+          cell.setNumberFormat('@');
+          cell.setValue(newVal);
+          found = true;
+          break;
+        }
+      }
+
+      // Jika key belum ada di spreadsheet, tambahkan baris baru
+      if (!found) {
+        sheet.appendRow([item.setting_key, newVal, '']);
+      }
     }
   }
 
+  SpreadsheetApp.flush();
   logAudit(check.user.username, 'UPDATE_SETTINGS', 'Memperbarui konfigurasi sistem operasional');
   return { success: true, message: 'Pengaturan sistem berhasil disimpan.' };
 }

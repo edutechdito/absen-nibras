@@ -27,6 +27,7 @@ const AdminModule = {
     await this.loadSchoolsDropdown();
     await this.loadGuruDropdowns();
     await this.loadAllAttendanceData();
+    this.loadSettingsForm(); // Preload pengaturan sistem
     this.switchTab('dashboard');
   },
 
@@ -717,29 +718,49 @@ const AdminModule = {
   },
 
   /**
-   * Ekspor Rekap Matrix ke Excel (CSV)
+   * Ekspor Rekap Matrix Bulanan ke Excel (.xls) Asli Bertabel & Berwarna
    */
   exportMatrixToCsv() {
+    this.exportMatrixToExcel();
+  },
+
+  exportMatrixToExcel() {
     const table = document.getElementById('matrix-calendar-table');
     if (!table) return;
 
-    let csv = 'data:text/csv;charset=utf-8,\uFEFF';
-    const rows = table.querySelectorAll('tr');
+    const titleEl = document.getElementById('matrix-table-title');
+    const titleText = titleEl ? titleEl.textContent : 'Rekap Presensi Bulanan';
+    const nowStr = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+    const selYear = document.getElementById('matrix-filter-year')?.value || '2026';
+    const selMonth = document.getElementById('matrix-filter-month')?.value || '11';
 
-    rows.forEach(r => {
-      const cols = r.querySelectorAll('th, td');
-      const rowData = [];
-      cols.forEach(c => rowData.push(`"${c.innerText.replace(/"/g, '""')}"`));
-      csv += rowData.join(',') + '\r\n';
-    });
+    // Clone table HTML
+    const tableClone = table.cloneNode(true);
+    const colsCount = tableClone.querySelector('tr')?.children.length || 33;
 
-    const link = document.createElement('a');
-    link.href = encodeURI(csv);
-    link.download = `Rekap_Presensi_Matrix_NIBRAS_${Date.now()}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    App.showToast('Rekap Matrix Excel berhasil diunduh.', 'success');
+    const tableHtml = `
+      <table>
+        <tr>
+          <th colspan="${colsCount}" class="kop-title" style="background:#FFFFFF;color:#0B2545;border:none;font-size:15pt;padding-bottom:2px;">PERGURUAN ISLAM NIBRAS PADANG</th>
+        </tr>
+        <tr>
+          <th colspan="${colsCount}" class="kop-sub" style="background:#FFFFFF;color:#134074;border:none;font-size:12pt;padding-top:0;">${titleText.toUpperCase()}</th>
+        </tr>
+        <tr>
+          <td colspan="${colsCount}" class="kop-meta" style="background:#FFFFFF;color:#64748B;border:none;text-align:center;font-size:9pt;padding-bottom:8px;">Dicetak pada: ${nowStr} WIB</td>
+        </tr>
+        <tr>
+          <td colspan="${colsCount}" style="background:#FEF3C7;color:#92400E;border:1pt solid #FDE68A;font-size:9pt;font-weight:bold;text-align:center;padding:6px;">
+            KETERANGAN KODE: V = Tepat Waktu | TL = Terlambat Masuk | PSW = Pulang Sebelum Waktunya | TAM = Tidak Absen Masuk | (-) = Libur / Akhir Pekan
+          </td>
+        </tr>
+        ${tableClone.innerHTML}
+      </table>
+    `;
+
+    const filename = `Rekap_Matrix_Presensi_NIBRAS_${selYear}_${String(selMonth).padStart(2, '0')}.xls`;
+    this.downloadAsExcelTable(tableHtml, filename, 'Rekap Matrix Bulanan');
+    App.showToast('✅ Rekap Matrix Excel bertabel (.xls) berhasil diunduh.', 'success');
   },
 
   // =========================================================================
@@ -1166,23 +1187,158 @@ const AdminModule = {
       });
   },
 
-  // Export CSV & PDF
-  exportToCsv() {
-    let csv = 'data:text/csv;charset=utf-8,\uFEFF';
-    csv += 'No,Nama Pegawai,NIY,Tanggal,Masuk,Pulang,Status\r\n';
+  // =========================================================================
+  // EKSPOR LAPORAN EXCEL BERTABEL (.XLS)
+  // =========================================================================
 
-    const list = this.historyFiltered.length > 0 ? this.historyFiltered : this.historyData;
-    list.forEach((r, i) => {
-      csv += `"${i + 1}","${r.nama_guru}","${r.niy}","${r.tanggal}","${r.jam_masuk}","${r.jam_pulang}","${r.status_masuk}"\r\n`;
+  /**
+   * Helper Universal: Unduh Tabel HTML menjadi File Excel (.xls) Asli Bertabel & Berwarna
+   */
+  downloadAsExcelTable(tableHtml, filename, sheetName = 'Presensi') {
+    const fullHtml = `
+      <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+      <head>
+        <meta http-equiv="content-type" content="application/vnd.ms-excel; charset=UTF-8"/>
+        <!--[if gte mso 9]>
+        <xml>
+          <x:ExcelWorkbook>
+            <x:ExcelWorksheets>
+              <x:ExcelWorksheet>
+                <x:Name>${sheetName}</x:Name>
+                <x:WorksheetOptions>
+                  <x:DisplayGridlines/>
+                  <x:Print><x:ValidPrinterInfo/></x:Print>
+                </x:WorksheetOptions>
+              </x:ExcelWorksheet>
+            </x:ExcelWorksheets>
+          </x:ExcelWorkbook>
+        </xml>
+        <![endif]-->
+        <style>
+          body { font-family: 'Segoe UI', Calibri, Arial, sans-serif; }
+          table { border-collapse: collapse; width: 100%; margin-top: 8px; }
+          .kop-title { font-size: 14pt; font-weight: bold; color: #0B2545; text-align: center; }
+          .kop-sub { font-size: 11pt; font-weight: bold; color: #134074; text-align: center; }
+          .kop-meta { font-size: 9pt; color: #64748B; text-align: center; font-style: italic; }
+          th { background-color: #0B2545; color: #FFFFFF; font-weight: bold; border: 1pt solid #000000; padding: 8px 6px; text-align: center; vertical-align: middle; }
+          td { border: 0.5pt solid #CBD5E1; padding: 6px 8px; font-size: 10pt; vertical-align: middle; }
+          tr:nth-child(even) td { background-color: #F8FAFC; }
+          .text-center { text-align: center; mso-number-format: "\\@"; }
+          .text-left { text-align: left; }
+          .text-right { text-align: right; }
+          .text-niy { mso-number-format: "\\@"; text-align: center; }
+          .cell-v { background-color: #DCFCE7; color: #15803D; font-weight: bold; text-align: center; }
+          .cell-tl { background-color: #FEF9C3; color: #854D0E; font-weight: bold; text-align: center; }
+          .cell-psw { background-color: #FFEDD5; color: #C2410C; font-weight: bold; text-align: center; }
+          .cell-tam { background-color: #FEE2E2; color: #991B1B; font-weight: bold; text-align: center; }
+          .cell-off { background-color: #E2E8F0; color: #94A3B8; text-align: center; }
+          .status-pill-green { background-color: #DCFCE7; color: #15803D; font-weight: bold; text-align: center; }
+          .status-pill-yellow { background-color: #FEF9C3; color: #854D0E; font-weight: bold; text-align: center; }
+          .status-pill-red { background-color: #FEE2E2; color: #991B1B; font-weight: bold; text-align: center; }
+          .status-pill-blue { background-color: #E0F2FE; color: #0369A1; font-weight: bold; text-align: center; }
+        </style>
+      </head>
+      <body>
+        ${tableHtml}
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob(['\uFEFF' + fullHtml], {
+      type: 'application/vnd.ms-excel;charset=utf-8;'
     });
-
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.href = encodeURI(csv);
-    link.download = `Riwayat_Presensi_NIBRAS_${Date.now()}.csv`;
+    link.href = url;
+    link.download = filename.endsWith('.xls') ? filename : (filename + '.xls');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    App.showToast('File XLSX/CSV berhasil diunduh.', 'success');
+    URL.revokeObjectURL(url);
+  },
+
+  /**
+   * Ekspor Riwayat Presensi ke Excel Bertabel Asli
+   */
+  exportToCsv() {
+    this.exportRiwayatToExcel();
+  },
+
+  exportRiwayatToExcel() {
+    const list = this.historyFiltered.length > 0 ? this.historyFiltered : this.historyData;
+    const nowStr = new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' });
+    const today = new Date().toISOString().split('T')[0];
+
+    let rowsHtml = '';
+    let countTepat = 0;
+    let countTelat = 0;
+    let countPulang = 0;
+
+    list.forEach((r, i) => {
+      let statusClass = 'status-pill-green';
+      const st = String(r.status_masuk || r.status_kehadiran || 'Tepat Waktu');
+      if (st.includes('Terlambat') || st.includes('TL')) {
+        statusClass = 'status-pill-yellow';
+        countTelat++;
+      } else if (st.includes('Tidak') || st.includes('Alpa') || st.includes('TAM')) {
+        statusClass = 'status-pill-red';
+      } else {
+        countTepat++;
+      }
+      if (r.jam_pulang && r.jam_pulang !== '-') countPulang++;
+
+      rowsHtml += `
+        <tr>
+          <td class="text-center">${i + 1}</td>
+          <td class="text-left"><b>${r.nama_guru || '-'}</b></td>
+          <td class="text-niy">${r.niy || '-'}</td>
+          <td class="text-center">${r.tanggal || '-'}</td>
+          <td class="text-center">${r.jam_masuk || '-'}</td>
+          <td class="text-center">${r.jam_pulang || '-'}</td>
+          <td class="${statusClass}">${st}</td>
+        </tr>
+      `;
+    });
+
+    const tableHtml = `
+      <table>
+        <tr>
+          <th colspan="7" class="kop-title" style="background:#FFFFFF;color:#0B2545;border:none;font-size:15pt;padding-bottom:2px;">PERGURUAN ISLAM NIBRAS PADANG</th>
+        </tr>
+        <tr>
+          <th colspan="7" class="kop-sub" style="background:#FFFFFF;color:#134074;border:none;font-size:12pt;padding-top:0;">LAPORAN REKAP RIWAYAT PRESENSI PEGAWAI & GURU</th>
+        </tr>
+        <tr>
+          <td colspan="7" class="kop-meta" style="background:#FFFFFF;color:#64748B;border:none;text-align:center;font-size:9pt;padding-bottom:12px;">Dicetak pada: ${nowStr} WIB | Total: ${list.length} Baris Data</td>
+        </tr>
+        <thead>
+          <tr>
+            <th style="width:45px;">No</th>
+            <th style="width:240px;text-align:left;">Nama Pegawai</th>
+            <th style="width:120px;">NIY</th>
+            <th style="width:110px;">Tanggal</th>
+            <th style="width:100px;">Jam Masuk</th>
+            <th style="width:100px;">Jam Pulang</th>
+            <th style="width:150px;">Status Kehadiran</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rowsHtml || '<tr><td colspan="7" class="text-center">Tidak ada data presensi.</td></tr>'}
+        </tbody>
+        <tfoot>
+          <tr style="background:#F1F5F9;font-weight:bold;">
+            <td colspan="4" class="text-left" style="font-weight:bold;background:#E2E8F0;">REKAP TOTAL: ${list.length} Data Kehadiran</td>
+            <td class="text-center" style="background:#DCFCE7;color:#15803D;">Tepat: ${countTepat}</td>
+            <td class="text-center" style="background:#FEF9C3;color:#854D0E;">Telat: ${countTelat}</td>
+            <td class="text-center" style="background:#E0F2FE;color:#0369A1;">Pulang: ${countPulang}</td>
+          </tr>
+        </tfoot>
+      </table>
+    `;
+
+    const filename = `Laporan_Presensi_NIBRAS_${today}.xls`;
+    this.downloadAsExcelTable(tableHtml, filename, 'Riwayat Presensi');
+    App.showToast('✅ File Excel bertabel (.xls) berhasil diunduh.', 'success');
   },
 
   printReport() {
@@ -1193,36 +1349,139 @@ const AdminModule = {
     alert('Database presensi tersimpan otomatis di Google Spreadsheet dan foto selfie di Google Drive Anda secara real-time.');
   },
 
-  // Setting & Logs
+  // =========================================================================
+  // SETTING & AUDIT LOGS
+  // =========================================================================
+
+  /**
+   * Helper Normalisasi Nilai Waktu ke Format HTML5 "HH:mm"
+   * Menangani berbagai format dari Google Apps Script: ISO string ("1899-12-30T..."),
+   * format titik ("06.00"), detik ("06:00:00"), 1 digit ("6:00"), atau AM/PM.
+   */
+  formatTimeForInput(val, defaultVal = '') {
+    if (val === null || val === undefined || val === '') return defaultVal;
+
+    const str = String(val).trim();
+
+    // 1. Sudah tepat format HH:mm (contoh: "06:00", "07:15", "15:30")
+    if (/^\d{2}:\d{2}$/.test(str)) {
+      return str;
+    }
+
+    // 2. Format HH:mm:ss (contoh: "06:00:00", "15:30:00")
+    if (/^\d{2}:\d{2}:\d{2}/.test(str)) {
+      return str.substring(0, 5);
+    }
+
+    // 3. Format H:mm atau format titik (contoh: "6:00", "06.00", "7.15")
+    const simpleMatch = str.match(/^(\d{1,2})[:.](\d{2})/);
+    if (simpleMatch && !str.includes('T') && !str.includes('GMT') && !str.includes('Z')) {
+      let hh = parseInt(simpleMatch[1], 10);
+      const mm = simpleMatch[2];
+      if (/pm/i.test(str) && hh < 12) hh += 12;
+      if (/am/i.test(str) && hh === 12) hh = 0;
+      return `${String(hh).padStart(2, '0')}:${mm}`;
+    }
+
+    // 4. Format ISO Date atau Date Object dari Google Apps Script (contoh: "1899-12-30T06:00:00.000Z")
+    if (str.includes('T') || str.includes('Z') || str.includes('GMT') || str.includes('1899')) {
+      try {
+        const dt = new Date(str);
+        if (!isNaN(dt.getTime())) {
+          const hh = String(dt.getHours()).padStart(2, '0');
+          const mm = String(dt.getMinutes()).padStart(2, '0');
+          if (hh !== '00' || mm !== '00') {
+            return `${hh}:${mm}`;
+          }
+        }
+      } catch (err) {}
+
+      // Fallback regex jika parsing Date gagal: ambil 2 digit jam dan menit setelah 'T'
+      const tMatch = str.match(/T(\d{2}):(\d{2})/);
+      if (tMatch) {
+        return `${tMatch[1]}:${tMatch[2]}`;
+      }
+    }
+
+    return defaultVal;
+  },
+
+  /**
+   * Memuat Nilai Pengaturan Presensi dari Spreadsheet
+   */
   async loadSettingsForm() {
+    const defaults = {
+      'jam_masuk_mulai': '06:00',
+      'jam_masuk_batas': '07:15',
+      'toleransi_terlambat_menit': '15',
+      'jam_pulang_mulai': '15:30',
+      'max_gps_accuracy': '100',
+      'default_radius': '50'
+    };
+
+    // Pastikan seluruh input memiliki nilai awal (mencegah form tampil kosong/--.--)
+    Object.keys(defaults).forEach(key => {
+      const el = document.getElementById(`setting-${key}`);
+      if (el && !el.value) {
+        el.value = defaults[key];
+      }
+    });
+
     try {
       const res = await Api.getAdminSettings(AppState.token);
-      if (res.success && res.data) {
+      if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+        // Buat map pencarian fleksibel (case-insensitive & pembersihan spasi)
+        const settingsMap = {};
         res.data.forEach(item => {
-          const el = document.getElementById(`setting-${item.setting_key}`);
-          if (el) el.value = item.setting_value;
+          if (!item) return;
+          const rawKey = item.setting_key || item.key || item.kunci || item.Setting_Key || item.Kunci || '';
+          const rawVal = item.setting_value !== undefined ? item.setting_value : (item.value !== undefined ? item.value : item.nilai);
+
+          if (rawKey && rawVal !== undefined && rawVal !== null) {
+            const cleanKey = String(rawKey).trim().toLowerCase().replace(/\s+/g, '_');
+            settingsMap[cleanKey] = rawVal;
+          }
+        });
+
+        // Terapkan ke masing-masing input form pengaturan
+        Object.keys(defaults).forEach(key => {
+          const el = document.getElementById(`setting-${key}`);
+          if (!el) return;
+
+          const val = settingsMap[key];
+          if (val === undefined || val === null || val === '') return;
+
+          if (el.type === 'time') {
+            const timeStr = this.formatTimeForInput(val, defaults[key]);
+            if (timeStr) el.value = timeStr;
+          } else {
+            const num = parseInt(val, 10);
+            el.value = !isNaN(num) ? num : val;
+          }
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn('Gagal memuat pengaturan dari server:', e);
+    }
   },
 
   async handleSaveSettings(e) {
     e.preventDefault();
     const settings = [
-      { setting_key: 'jam_masuk_mulai', setting_value: document.getElementById('setting-jam_masuk_mulai').value },
-      { setting_key: 'jam_masuk_batas', setting_value: document.getElementById('setting-jam_masuk_batas').value },
-      { setting_key: 'toleransi_terlambat_menit', setting_value: document.getElementById('setting-toleransi_terlambat_menit').value },
-      { setting_key: 'jam_pulang_mulai', setting_value: document.getElementById('setting-jam_pulang_mulai').value },
-      { setting_key: 'max_gps_accuracy', setting_value: document.getElementById('setting-max_gps_accuracy').value },
-      { setting_key: 'default_radius', setting_value: document.getElementById('setting-default_radius').value }
+      { setting_key: 'jam_masuk_mulai', setting_value: document.getElementById('setting-jam_masuk_mulai')?.value || '06:00' },
+      { setting_key: 'jam_masuk_batas', setting_value: document.getElementById('setting-jam_masuk_batas')?.value || '07:15' },
+      { setting_key: 'toleransi_terlambat_menit', setting_value: document.getElementById('setting-toleransi_terlambat_menit')?.value || '15' },
+      { setting_key: 'jam_pulang_mulai', setting_value: document.getElementById('setting-jam_pulang_mulai')?.value || '15:30' },
+      { setting_key: 'max_gps_accuracy', setting_value: document.getElementById('setting-max_gps_accuracy')?.value || '100' },
+      { setting_key: 'default_radius', setting_value: document.getElementById('setting-default_radius')?.value || '50' }
     ];
 
-    App.showLoading(true, 'Menyimpan pengaturan...');
+    App.showLoading(true, 'Menyimpan konfigurasi presensi ke Spreadsheet...');
     try {
       const res = await Api.updateAdminSettings(AppState.token, settings);
       App.showLoading(false);
       if (res.success) {
-        App.showToast('Pengaturan presensi berhasil disimpan.', 'success');
+        App.showToast('✅ Pengaturan jam kerja berhasil disimpan ke Google Spreadsheet.', 'success');
       } else {
         App.showToast(res.message || 'Gagal menyimpan.', 'danger');
       }

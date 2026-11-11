@@ -307,29 +307,26 @@ const GuruModule = {
     const modal = document.getElementById('modal-attendance');
     const titleEl = document.getElementById('modal-attendance-title');
     const subTitleEl = document.getElementById('modal-attendance-subtitle');
+    const modal = document.getElementById('modal-attendance');
+    const titleEl = document.getElementById('modal-attendance-title');
+    const subTitleEl = document.getElementById('modal-attendance-subtitle');
     const btnSubmit = document.getElementById('btn-submit-attendance');
-    const elVideo = document.getElementById('video-stream-attendance');
-    const elPreview = document.getElementById('photo-preview-attendance');
-    const btnCapture = document.getElementById('btn-capture-attendance');
-    const btnRetake = document.getElementById('btn-retake-attendance');
+    const inputAlasan = document.getElementById('input-alasan-luar-radius');
+    const boxAlasan = document.getElementById('box-alasan-luar-radius');
 
     if (titleEl) {
       titleEl.textContent = `Presensi ${jenis === 'MASUK' ? 'Masuk' : 'Pulang'}`;
     }
     if (subTitleEl) {
-      subTitleEl.textContent = `Validasi GPS Sekolah & Foto Selfie Real-time (${jenis})`;
+      subTitleEl.textContent = `Validasi Lokasi GPS Presensi (${jenis})`;
     }
 
-    // Reset kamera & capture
-    CameraService.resetCapture();
-    if (elPreview) elPreview.style.display = 'none';
-    if (elVideo) elVideo.style.display = 'block';
-    if (btnCapture) btnCapture.style.display = 'inline-flex';
-    if (btnRetake) btnRetake.style.display = 'none';
+    if (inputAlasan) inputAlasan.value = '';
+    if (boxAlasan) boxAlasan.style.display = 'none';
 
     if (btnSubmit) {
       btnSubmit.disabled = true;
-      btnSubmit.innerHTML = `<span>⏳ Menunggu Lokasi & Foto Selfie</span>`;
+      btnSubmit.innerHTML = `<span>📡 Mendeteksi Lokasi GPS...</span>`;
     }
 
     if (modal) modal.style.display = 'flex';
@@ -338,12 +335,6 @@ const GuruModule = {
     setTimeout(() => {
       GpsService.initMap('map-container-attendance', AppState.targetSchool.lat, AppState.targetSchool.lng, 17);
     }, 250);
-
-    // Buka Kamera Depan
-    const camStarted = await CameraService.startCamera('video-stream-attendance');
-    if (!camStarted) {
-      App.showToast('Kamera tidak terbuka otomatis. Anda dapat menggunakan tombol unggah foto manual.', 'warning');
-    }
 
     // Mulai Pemantauan GPS Real-time
     GpsService.startWatching((gpsState) => {
@@ -359,7 +350,6 @@ const GuruModule = {
   closeAttendanceModal() {
     const modal = document.getElementById('modal-attendance');
     if (modal) modal.style.display = 'none';
-    CameraService.stopCamera();
     GpsService.stopWatching();
   },
 
@@ -472,56 +462,68 @@ const GuruModule = {
   },
 
   /**
-   * Evaluasi Kondisi Tombol Kirim Presensi
+   * Evaluasi Kondisi Tombol Kirim Presensi (Tanpa Perlu Foto Selfie)
    */
   evaluateModalSubmitButton() {
     const btn = document.getElementById('btn-submit-attendance');
     if (!btn) return;
 
     const gps = AppState.gps;
-    const hasPhoto = !!CameraService.capturedBase64;
-    const isInside = gps.insideRadius;
+    const boxAlasan = document.getElementById('box-alasan-luar-radius');
+    const inputAlasan = document.getElementById('input-alasan-luar-radius');
+    const alasanText = inputAlasan ? inputAlasan.value.trim() : '';
 
     if (!gps.isActive || gps.lat === null) {
       btn.disabled = true;
+      btn.style.background = '#94A3B8';
       btn.innerHTML = '<span>📡 Mencari Lokasi GPS...</span>';
       return;
     }
 
-    if (!isInside) {
-      btn.disabled = true;
-      btn.innerHTML = `<span>⚠️ Di Luar Radius Sekolah (${gps.distance} m)</span>`;
-      return;
-    }
+    const label = this.currentAttendanceType === 'MASUK' ? 'Presensi Masuk' : 'Presensi Pulang';
 
-    if (!hasPhoto) {
-      btn.disabled = true;
-      btn.innerHTML = '<span>📸 Silakan Ambil Foto Selfie Dulu</span>';
-      return;
+    if (gps.insideRadius) {
+      // Posisi di dalam radius sekolah
+      if (boxAlasan) boxAlasan.style.display = 'none';
+      btn.disabled = false;
+      btn.style.background = '#10B981';
+      btn.innerHTML = `<span>🚀 Kirim ${label}</span>`;
+    } else {
+      // Posisi di luar radius sekolah -> form alasan wajib diisi
+      if (boxAlasan) boxAlasan.style.display = 'block';
+      if (!alasanText) {
+        btn.disabled = true;
+        btn.style.background = '#94A3B8';
+        btn.innerHTML = `<span>⚠️ Isi Alasan Absen di Luar Radius</span>`;
+      } else {
+        btn.disabled = false;
+        btn.style.background = '#D97706';
+        btn.innerHTML = `<span>🟡 Kirim ${label} (Luar Radius)</span>`;
+      }
     }
-
-    btn.disabled = false;
-    const label = this.currentAttendanceType === 'MASUK' ? 'Kirim Presensi Masuk' : 'Kirim Presensi Pulang';
-    btn.innerHTML = `<span>🚀 ${label}</span>`;
   },
 
   /**
-   * Eksekusi Kirim Presensi ke Server
+   * Eksekusi Kirim Presensi ke Server (Tanpa Foto & Mendukung Alasan Luar Radius)
    */
   async submitAttendanceAction() {
     const jenis = this.currentAttendanceType;
     const gps = AppState.gps;
-    const photoBase64 = CameraService.capturedBase64;
+    const inputAlasan = document.getElementById('input-alasan-luar-radius');
+    const alasan = inputAlasan ? inputAlasan.value.trim() : '';
 
-    if (!gps.insideRadius) {
-      App.showToast('Anda berada di luar area sekolah. Presensi tidak dapat diproses.', 'danger');
+    if (!gps.isActive || gps.lat === null) {
+      App.showToast('Lokasi GPS belum terdeteksi. Pastikan GPS HP diizinkan dan aktif.', 'warning');
       return;
     }
 
-    if (!photoBase64) {
-      App.showToast('Wajib mengambil foto selfie sebagai bukti fisik kehadiran.', 'warning');
+    if (!gps.insideRadius && !alasan) {
+      App.showToast('Harap tuliskan keterangan alasan melakukan absen di luar radius jangkauan.', 'warning');
+      if (inputAlasan) inputAlasan.focus();
       return;
     }
+
+    const labelLuar = !gps.insideRadius ? `[Luar Radius: ${gps.distance}m] ${alasan}` : `Presensi ${jenis} (Dalam Radius)`;
 
     App.showLoading(true, `Mengirim data presensi ${jenis}...`);
 
@@ -532,7 +534,9 @@ const GuruModule = {
         latitude: gps.lat,
         longitude: gps.lng,
         accuracy: gps.accuracy,
-        foto_base64: photoBase64
+        foto_base64: '',
+        keterangan: labelLuar,
+        alasan: alasan
       };
 
       const res = await Api.submitAttendance(payload);
@@ -561,13 +565,17 @@ const GuruModule = {
         }
 
         this.renderTodayStatusCards();
-        App.showToast(`Presensi ${jenis} berhasil dicatat! Terima kasih.`, 'success');
+        await this.loadTodayStatus();
+        App.showToast(`✅ Presensi ${jenis} berhasil dicatat! Terima kasih.`, 'success');
 
       } else {
         App.showToast(res.message || 'Gagal mengirim presensi.', 'danger');
       }
     } catch (err) {
       App.showLoading(false);
+      App.showToast('Kesalahan server: ' + err.message, 'danger');
+    }
+  },
       App.showToast('Terjadi kesalahan koneksi: ' + err.message, 'danger');
     }
   },

@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
   <!-- Main Stylesheet (with cache-buster) -->
-  <link rel="stylesheet" href="css/style.css?v=2.2.4">
+  <link rel="stylesheet" href="css/style.css?v=2.2.7">
 
   <!-- Critical Layout & Landing Styles (Guarantees Perfect Render Always) -->
   <style>
@@ -348,6 +348,13 @@
       border: 1px solid #E2E8F0;
       position: relative;
       overflow: hidden;
+    }
+    .login-card > button:first-child,
+    .login-card button.btn-outline,
+    .login-card button[onclick*="showLandingView"],
+    .login-card button[onclick*="openEndpointModal"],
+    .login-card div[style*="text-align:center"] {
+      display: none !important;
     }
     .login-card::before {
       content: '';
@@ -1205,16 +1212,16 @@
 
       </div>
 
-      <!-- ==================== MODAL LAKUKAN ABSEN (KAMERA & GPS) ==================== -->
+      <!-- ==================== MODAL LAKUKAN ABSEN (BERBASIS GPS) ==================== -->
       <div id="modal-attendance" class="attendance-modal-backdrop" style="display:none;">
         <div class="attendance-modal-dialog">
           
           <div class="attendance-modal-header">
             <div class="modal-header-left">
-              <span class="modal-header-icon" id="modal-attendance-icon">📸</span>
+              <span class="modal-header-icon" id="modal-attendance-icon">📍</span>
               <div>
                 <h3 id="modal-attendance-title" style="font-size:1.1rem;font-weight:800;color:#0B2545;">Lakukan Presensi</h3>
-                <p id="modal-attendance-subtitle" style="font-size:0.78rem;color:#64748B;">Validasi GPS Sekolah & Foto Selfie Real-time</p>
+                <p id="modal-attendance-subtitle" style="font-size:0.78rem;color:#64748B;">Validasi Posisi Lokasi GPS & Presensi Cepat</p>
               </div>
             </div>
             <button type="button" class="btn-modal-close" onclick="GuruModule.closeAttendanceModal()" title="Tutup">✕</button>
@@ -1233,32 +1240,22 @@
             </div>
 
             <!-- Leaflet Interactive Map -->
-            <div id="map-container-attendance" class="leaflet-map-box" style="height:150px;border-radius:12px;margin-bottom:12px;"></div>
+            <div id="map-container-attendance" class="leaflet-map-box" style="height:170px;border-radius:12px;margin-bottom:12px;"></div>
 
-            <!-- Live Camera Viewfinder & Photo Canvas -->
-            <div class="camera-box" style="border-radius:14px;overflow:hidden;position:relative;background:#000;margin-bottom:12px;height:220px;display:flex;align-items:center;justify-content:center;">
-              <video id="video-stream-attendance" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;transform:scaleX(-1);"></video>
-              <img id="photo-preview-attendance" alt="Foto Selfie" style="display:none;width:100%;height:100%;object-fit:cover;">
-              <canvas id="canvas-snapshot-attendance" style="display:none;"></canvas>
-            </div>
-
-            <!-- Camera Action Buttons -->
-            <div class="camera-controls" style="display:flex;gap:10px;justify-content:center;margin-bottom:14px;">
-              <button type="button" id="btn-capture-attendance" class="btn btn-primary" onclick="GuruModule.captureAttendancePhoto()" style="background:#1D4ED8;padding:10px 18px;font-weight:700;">
-                📸 Ambil Foto Selfie
-              </button>
-              <button type="button" id="btn-retake-attendance" class="btn btn-secondary" onclick="GuruModule.retakeAttendancePhoto()" style="display:none;padding:10px 16px;">
-                🔄 Foto Ulang
-              </button>
-              <label class="btn btn-outline" style="cursor:pointer;padding:10px 14px;" title="Alternatif bila kamera terkendala">
-                📁 Unggah
-                <input type="file" id="file-fallback-attendance" accept="image/*" capture="user" style="display:none;" onchange="GuruModule.handleFileUpload(event)">
+            <!-- Form Alasan / Keterangan Luar Radius (Muncul Otomatis Jika di Luar Area) -->
+            <div id="box-alasan-luar-radius" style="margin-bottom:14px;background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:12px;padding:12px;display:none;">
+              <div style="font-size:0.85rem;font-weight:700;color:#B45309;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+                <span>⚠️</span> <span>Anda berada di luar radius jangkauan sekolah</span>
+              </div>
+              <label class="form-label" style="font-size:0.8rem;color:#78350F;margin-bottom:4px;font-weight:600;">
+                Keterangan / Alasan Ambil Absen di Luar Radius: <span style="color:#DC2626;">*</span>
               </label>
+              <textarea id="input-alasan-luar-radius" class="form-input" rows="2" placeholder="Tuliskan alasan (contoh: Tugas dinas luar, mendampingi kegiatan siswa, izin WFH, dll.)" style="width:100%;font-size:0.85rem;border-color:#F59E0B;border-radius:8px;resize:none;" oninput="GuruModule.evaluateModalSubmitButton()"></textarea>
             </div>
 
             <!-- Main Attendance Submit Button -->
             <button type="button" id="btn-submit-attendance" class="btn btn-success btn-block" onclick="GuruModule.submitAttendanceAction()" style="padding:14px;font-size:1.05rem;font-weight:800;border-radius:14px;background:#10B981;" disabled>
-              <span>⏳ Menunggu Lokasi & Foto Selfie</span>
+              <span>⏳ Menunggu Lokasi GPS...</span>
             </button>
 
           </div>
@@ -1836,27 +1833,27 @@
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
                     <div class="form-group">
                       <label class="form-label">Jam Masuk Dibuka (WIB)</label>
-                      <input type="time" id="setting-jam_masuk_mulai" class="form-input" required>
+                      <input type="time" id="setting-jam_masuk_mulai" class="form-input" value="06:00" required>
                     </div>
                     <div class="form-group">
                       <label class="form-label">Batas Jam Masuk Normal (WIB)</label>
-                      <input type="time" id="setting-jam_masuk_batas" class="form-input" required>
+                      <input type="time" id="setting-jam_masuk_batas" class="form-input" value="07:15" required>
                     </div>
                     <div class="form-group">
                       <label class="form-label">Toleransi Keterlambatan (Menit)</label>
-                      <input type="number" id="setting-toleransi_terlambat_menit" class="form-input" min="0" required>
+                      <input type="number" id="setting-toleransi_terlambat_menit" class="form-input" min="0" value="15" required>
                     </div>
                     <div class="form-group">
                       <label class="form-label">Jam Pulang Dibuka (WIB)</label>
-                      <input type="time" id="setting-jam_pulang_mulai" class="form-input" required>
+                      <input type="time" id="setting-jam_pulang_mulai" class="form-input" value="15:30" required>
                     </div>
                     <div class="form-group">
                       <label class="form-label">Maksimal Toleransi Akurasi GPS (Meter)</label>
-                      <input type="number" id="setting-max_gps_accuracy" class="form-input" min="10" required>
+                      <input type="number" id="setting-max_gps_accuracy" class="form-input" min="10" value="100" required>
                     </div>
                     <div class="form-group">
                       <label class="form-label">Radius Default Sekolah (Meter)</label>
-                      <input type="number" id="setting-default_radius" class="form-input" min="10" required>
+                      <input type="number" id="setting-default_radius" class="form-input" min="10" value="50" required>
                     </div>
                   </div>
                   <button type="submit" class="btn btn-primary" style="margin-top:10px;">💾 Simpan Pengaturan</button>
@@ -2108,15 +2105,15 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <!-- Application Modules (with cache-buster) -->
-  <script src="js/config.js?v=2.2.4"></script>
-  <script src="js/state.js?v=2.2.4"></script>
-  <script src="js/api.js?v=2.2.4"></script>
-  <script src="js/gps.js?v=2.2.4"></script>
-  <script src="js/camera.js?v=2.2.4"></script>
-  <script src="js/auth.js?v=2.2.4"></script>
-  <script src="js/guru.js?v=2.2.4"></script>
-  <script src="js/admin.js?v=2.2.4"></script>
-  <script src="js/app.js?v=2.2.4"></script>
+  <script src="js/config.js?v=2.2.7"></script>
+  <script src="js/state.js?v=2.2.7"></script>
+  <script src="js/api.js?v=2.2.7"></script>
+  <script src="js/gps.js?v=2.2.7"></script>
+  <script src="js/camera.js?v=2.2.7"></script>
+  <script src="js/auth.js?v=2.2.7"></script>
+  <script src="js/guru.js?v=2.2.7"></script>
+  <script src="js/admin.js?v=2.2.7"></script>
+  <script src="js/app.js?v=2.2.7"></script>
 
 </body>
 </html>

@@ -695,6 +695,14 @@ body {
   overflow: hidden;
 }
 
+.login-card > button:first-child,
+.login-card button.btn-outline,
+.login-card button[onclick*="showLandingView"],
+.login-card button[onclick*="openEndpointModal"],
+.login-card div[style*="text-align:center"] {
+  display: none !important;
+}
+
 .login-card::before {
   content: '';
   position: absolute;

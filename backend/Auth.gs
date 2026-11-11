@@ -242,6 +242,24 @@ function loginGuruByNiy(niy) {
       token: token,
       token_expiry: tokenExpiryStr
     });
+  } else {
+    // Buat otomatis akun pengguna di sheet USERS agar session token tersimpan valid
+    var newUserId = 'USR-' + cleanNiy;
+    var salt = generateSalt();
+    var hash = hashPassword('nibras123', salt);
+    user = {
+      user_id: newUserId,
+      username: cleanNiy,
+      password_hash: hash,
+      salt: salt,
+      role: 'guru',
+      ref_id: guru ? guru.guru_id : cleanNiy,
+      token: token,
+      token_expiry: tokenExpiryStr,
+      status: 'aktif',
+      created_at: Utilities.formatDate(new Date(), 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss')
+    };
+    insertRow(SHEET_NAMES.USERS, user);
   }
 
   var profile = {
@@ -290,15 +308,18 @@ function loginGuruByNiy(niy) {
 function validateToken(token) {
   if (!token) return { valid: false, message: 'Sesi tidak ditemukan atau telah kedaluwarsa.' };
 
+  var cleanToken = String(token).trim();
   var users = getRowsAsObjects(SHEET_NAMES.USERS);
   for (var i = 0; i < users.length; i++) {
-    if (users[i].token === token) {
+    if (String(users[i].token || '').trim() === cleanToken) {
       // Cek expiry
-      var expiry = new Date(users[i].token_expiry);
-      if (new Date() > expiry) {
-        return { valid: false, message: 'Sesi Anda telah kedaluwarsa. Silakan login kembali.' };
+      if (users[i].token_expiry) {
+        var expiry = new Date(users[i].token_expiry);
+        if (new Date() > expiry) {
+          return { valid: false, message: 'Sesi Anda telah kedaluwarsa. Silakan login kembali.' };
+        }
       }
-      if (users[i].status !== 'aktif') {
+      if (users[i].status && users[i].status !== 'aktif') {
         return { valid: false, message: 'Akun Anda dinonaktifkan.' };
       }
       return { valid: true, user: users[i] };

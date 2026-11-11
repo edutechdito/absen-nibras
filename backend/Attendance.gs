@@ -35,10 +35,25 @@ function calculateHaversineDistance(lat1, lon1, lat2, lon2) {
  * Mengambil pengaturan sistem sebagai key-value map.
  */
 function getSettingsMap() {
-  var rows = getRowsAsObjects(SHEET_NAMES.PENGATURAN);
+  var sheet = getSheet(SHEET_NAMES.PENGATURAN);
+  if (!sheet) return {};
+
+  var displayData = sheet.getDataRange().getDisplayValues();
+  if (displayData.length <= 1) return {};
+
+  var headers = displayData[0].map(function(h) { return String(h).trim().toLowerCase(); });
+  var keyCol = headers.indexOf('setting_key');
+  var valCol = headers.indexOf('setting_value');
+  if (keyCol === -1 || valCol === -1) {
+    keyCol = 0;
+    valCol = 1;
+  }
+
   var map = {};
-  for (var i = 0; i < rows.length; i++) {
-    map[rows[i].setting_key] = rows[i].setting_value;
+  for (var i = 1; i < displayData.length; i++) {
+    var k = String(displayData[i][keyCol] || '').trim().toLowerCase();
+    var v = String(displayData[i][valCol] || '').trim();
+    if (k) map[k] = v;
   }
   return map;
 }
@@ -48,7 +63,12 @@ function getSettingsMap() {
  */
 function timeStringToMinutes(timeStr) {
   if (!timeStr) return 0;
-  var parts = timeStr.split(':');
+  var str = String(timeStr).trim().replace('.', ':');
+  if (str.includes('T')) {
+    var m = str.match(/T(\d{2}):(\d{2})/);
+    if (m) return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+  }
+  var parts = str.split(':');
   var hours = parseInt(parts[0], 10) || 0;
   var minutes = parseInt(parts[1], 10) || 0;
   return hours * 60 + minutes;
@@ -146,14 +166,21 @@ function submitAttendance(payload) {
     };
   }
 
-  // Validasi Radius Geofence
+  // Validasi Radius Geofence & Alasan Luar Radius
+  var keteranganPresensi = '';
   if (distance > allowedRadius) {
-    return {
-      success: false,
-      distance: distance,
-      allowedRadius: allowedRadius,
-      message: 'Anda berada di luar area sekolah! Jarak Anda: ' + distance + ' meter (Batas radius sekolah: ' + allowedRadius + ' meter). Absensi tidak dapat dilakukan.'
-    };
+    var alasanLuar = String(payload.keterangan || payload.alasan || '').trim();
+    if (!alasanLuar) {
+      return {
+        success: false,
+        distance: distance,
+        allowedRadius: allowedRadius,
+        message: 'Anda berada di luar area sekolah (' + distance + ' m, radius: ' + allowedRadius + ' m). Harap sertakan keterangan alasan mengambil absen di luar radius.'
+      };
+    }
+    keteranganPresensi = '[Luar Radius: ' + distance + 'm] ' + alasanLuar;
+  } else {
+    keteranganPresensi = payload.keterangan || (jenis === 'MASUK' ? 'Presensi Masuk (Dalam Radius)' : 'Presensi Pulang (Dalam Radius)');
   }
 
   // 5. Waktu Resmi Server (WIB / GMT+7)
@@ -166,7 +193,8 @@ function submitAttendance(payload) {
   var attendances = getRowsAsObjects(SHEET_NAMES.ABSENSI);
   for (var a = 0; a < attendances.length; a++) {
     var rec = attendances[a];
-    if (rec.guru_id === guru.guru_id && rec.tanggal === todayDateStr && rec.jenis === jenis) {
+    var isSameGuru = (rec.guru_id === guru.guru_id) || (rec.niy && guru.niy && String(rec.niy).trim() === String(guru.niy).trim());
+    if (isSameGuru && String(rec.tanggal).startsWith(todayDateStr) && rec.jenis === jenis) {
       return {
         success: false,
         message: 'Anda sudah melakukan Absen ' + jenis + ' hari ini pada pukul ' + rec.jam_server + ' WIB.'
@@ -196,9 +224,9 @@ function submitAttendance(payload) {
     }
   }
 
-  // 8. Simpan Foto Selfie ke Google Drive (jika ada)
-  var photoUrl = '';
-  if (payload.foto_base64) {
+  // 8. Simpan Foto Selfie ke Google Drive (Opsional)
+  var photoUrl = '-';
+  if (payload.foto_base64 && String(payload.foto_base64).length > 50) {
     var filename = 'ABSEN_' + guru.niy + '_' + todayDateStr + '_' + jenis + '_' + Date.now() + '.jpg';
     photoUrl = saveBase64ImageToDrive(payload.foto_base64, filename);
   }
@@ -221,7 +249,7 @@ function submitAttendance(payload) {
     jarak_meter: distance,
     status_kehadiran: statusKehadiran,
     foto_url: photoUrl,
-    keterangan: payload.keterangan || (jenis === 'MASUK' ? 'Presensi Masuk Berhasil' : 'Presensi Pulang Berhasil')
+    keterangan: keteranganPresensi
   };
 
   insertRow(SHEET_NAMES.ABSENSI, newAttendance);
@@ -230,7 +258,7 @@ function submitAttendance(payload) {
   logAudit(
     guru.niy,
     'ABSEN_' + jenis,
-    'Berhasil absen ' + jenis + ' | Jarak: ' + distance + 'm | Status: ' + statusKehadiran
+    'Berhasil absen ' + jenis + ' | Jarak: ' + distance + 'm | Status: ' + statusKehadiran + ' | Ket: ' + keteranganPresensi
   );
 
   return {
@@ -246,7 +274,8 @@ function submitAttendance(payload) {
       status_kehadiran: statusKehadiran,
       nama_guru: guru.nama_lengkap,
       nama_sekolah: school.nama_sekolah,
-      foto_url: photoUrl
+      foto_url: photoUrl,
+      keterangan: keteranganPresensi
     }
   };
 }
@@ -267,9 +296,12 @@ function getGuruAttendanceHistory(token, month, year) {
 
   for (var i = allRecords.length - 1; i >= 0; i--) {
     var rec = allRecords[i];
-    if (rec.guru_id === user.ref_id) {
+    var isMatch = (user.ref_id && String(rec.guru_id).trim() === String(user.ref_id).trim()) ||
+                  (user.username && String(rec.niy).trim() === String(user.username).trim()) ||
+                  (user.niy && String(rec.niy).trim() === String(user.niy).trim());
+    if (isMatch) {
       if (targetYear && targetMonth) {
-        var recDate = rec.tanggal; // YYYY-MM-DD
+        var recDate = String(rec.tanggal);
         if (recDate.startsWith(targetYear + '-' + targetMonth)) {
           filtered.push(rec);
         }
@@ -313,7 +345,10 @@ function getGuruMonthlyRecap(token, month, year) {
 
   for (var i = 0; i < allRecords.length; i++) {
     var rec = allRecords[i];
-    if (rec.guru_id === user.ref_id && String(rec.tanggal).startsWith(prefix)) {
+    var isMatch = (user.ref_id && String(rec.guru_id).trim() === String(user.ref_id).trim()) ||
+                  (user.username && String(rec.niy).trim() === String(user.username).trim()) ||
+                  (user.niy && String(rec.niy).trim() === String(user.niy).trim());
+    if (isMatch && String(rec.tanggal).startsWith(prefix)) {
       stats.hari_kerja_tercatat[rec.tanggal] = true;
       if (rec.jenis === 'MASUK') {
         stats.total_hadir++;
@@ -350,7 +385,10 @@ function getTodayAttendanceStatus(token) {
 
   for (var i = 0; i < allRecords.length; i++) {
     var rec = allRecords[i];
-    if (rec.guru_id === user.ref_id && rec.tanggal === todayDateStr) {
+    var isMatch = (user.ref_id && String(rec.guru_id).trim() === String(user.ref_id).trim()) ||
+                  (user.username && String(rec.niy).trim() === String(user.username).trim()) ||
+                  (user.niy && String(rec.niy).trim() === String(user.niy).trim());
+    if (isMatch && String(rec.tanggal).startsWith(todayDateStr)) {
       if (rec.jenis === 'MASUK') recordMasuk = rec;
       if (rec.jenis === 'PULANG') recordPulang = rec;
     }

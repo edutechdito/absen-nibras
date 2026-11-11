@@ -15,6 +15,7 @@ const App = {
     this.registerServiceWorker();
     this.setupInstallPrompt();
     this.setupGlobalEvents();
+    this.cleanObsoleteButtons();
     this.checkApiEndpointConfig();
     this.startHeaderClock();
 
@@ -50,6 +51,23 @@ const App = {
 
     update();
     setInterval(update, 1000);
+  },
+
+  /**
+   * Menghapus elemen tombol usang jika masih tersisa dari cache browser
+   */
+  cleanObsoleteButtons() {
+    document.querySelectorAll('.login-card button').forEach(b => {
+      const t = (b.textContent || '').trim();
+      if (t.includes('Kembali ke Halaman Utama') || t.includes('Hubungkan URL Spreadsheet')) {
+        const parentDiv = b.parentElement;
+        if (parentDiv && parentDiv.tagName === 'DIV' && parentDiv.style.textAlign === 'center') {
+          parentDiv.remove();
+        } else {
+          b.remove();
+        }
+      }
+    });
   },
 
   /**
