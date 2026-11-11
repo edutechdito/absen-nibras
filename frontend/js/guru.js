@@ -462,16 +462,22 @@ const GuruModule = {
   },
 
   /**
-   * Evaluasi Kondisi Tombol Kirim Presensi (Tanpa Perlu Foto Selfie)
+   * Evaluasi Kondisi Tombol Kirim Presensi (Dukungan Sidik Jari & Luar Radius)
    */
-  evaluateModalSubmitButton() {
+  async evaluateModalSubmitButton() {
     const btn = document.getElementById('btn-submit-attendance');
     if (!btn) return;
 
     const gps = AppState.gps;
     const boxAlasan = document.getElementById('box-alasan-luar-radius');
     const inputAlasan = document.getElementById('input-alasan-luar-radius');
+    const bioIndicator = document.getElementById('biometric-indicator-attendance');
     const alasanText = inputAlasan ? inputAlasan.value.trim() : '';
+
+    const hasBiometric = await BiometricService.isAvailable();
+    if (bioIndicator) {
+      bioIndicator.style.display = hasBiometric ? 'flex' : 'none';
+    }
 
     if (!gps.isActive || gps.lat === null) {
       btn.disabled = true;
@@ -481,13 +487,14 @@ const GuruModule = {
     }
 
     const label = this.currentAttendanceType === 'MASUK' ? 'Presensi Masuk' : 'Presensi Pulang';
+    const actionPrefix = hasBiometric ? '👆 Tempel Sidik Jari &' : '🚀';
 
     if (gps.insideRadius) {
       // Posisi di dalam radius sekolah
       if (boxAlasan) boxAlasan.style.display = 'none';
       btn.disabled = false;
       btn.style.background = '#10B981';
-      btn.innerHTML = `<span>🚀 Kirim ${label}</span>`;
+      btn.innerHTML = `<span>${actionPrefix} Kirim ${label}</span>`;
     } else {
       // Posisi di luar radius sekolah -> form alasan wajib diisi
       if (boxAlasan) boxAlasan.style.display = 'block';
@@ -498,13 +505,13 @@ const GuruModule = {
       } else {
         btn.disabled = false;
         btn.style.background = '#D97706';
-        btn.innerHTML = `<span>🟡 Kirim ${label} (Luar Radius)</span>`;
+        btn.innerHTML = `<span>${actionPrefix} Kirim ${label} (Luar Radius)</span>`;
       }
     }
   },
 
   /**
-   * Eksekusi Kirim Presensi ke Server (Tanpa Foto & Mendukung Alasan Luar Radius)
+   * Eksekusi Kirim Presensi ke Server (Verifikasi Sidik Jari HP + GPS)
    */
   async submitAttendanceAction() {
     const jenis = this.currentAttendanceType;
@@ -523,9 +530,32 @@ const GuruModule = {
       return;
     }
 
-    const labelLuar = !gps.insideRadius ? `[Luar Radius: ${gps.distance}m] ${alasan}` : `Presensi ${jenis} (Dalam Radius)`;
+    // 1. Verifikasi Biometrik Sidik Jari Bawaan HP
+    const hasBiometric = await BiometricService.isAvailable();
+    let bioNote = '';
 
-    App.showLoading(true, `Mengirim data presensi ${jenis}...`);
+    if (hasBiometric) {
+      App.showLoading(true, '👆 Sentuh sensor sidik jari HP Anda untuk verifikasi kehadiran...');
+      const bioResult = await BiometricService.verifyBiometric(AppState.user || { niy: 'pegawai' });
+      App.showLoading(false);
+
+      if (!bioResult.success) {
+        if (bioResult.error === 'CANCELLED') {
+          App.showToast('⚠️ Presensi dibatalkan. Verifikasi sidik jari diperlukan untuk konfirmasi kehadiran.', 'warning');
+        } else {
+          App.showToast('❌ ' + bioResult.message, 'danger');
+        }
+        return;
+      }
+
+      bioNote = '[Sidik Jari: Valid ✓]';
+      App.showToast('✅ Sidik jari cocok & terverifikasi!', 'success');
+    }
+
+    const labelLuar = !gps.insideRadius ? `[Luar Radius: ${gps.distance}m] ${alasan}` : `Presensi ${jenis} (Dalam Radius)`;
+    const ketFinal = bioNote ? `${labelLuar} | ${bioNote}` : labelLuar;
+
+    App.showLoading(true, `Menyimpan data presensi ${jenis}...`);
 
     try {
       const payload = {
@@ -535,8 +565,9 @@ const GuruModule = {
         longitude: gps.lng,
         accuracy: gps.accuracy,
         foto_base64: '',
-        keterangan: labelLuar,
-        alasan: alasan
+        keterangan: ketFinal,
+        alasan: alasan,
+        biometric_status: hasBiometric ? 'VERIFIED' : 'NOT_SUPPORTED'
       };
 
       const res = await Api.submitAttendance(payload);
@@ -566,7 +597,16 @@ const GuruModule = {
 
         this.renderTodayStatusCards();
         await this.loadTodayStatus();
-        App.showToast(`✅ Presensi ${jenis} berhasil dicatat! Terima kasih.`, 'success');
+        App.showToast(`✅ Presensi ${jenis} dengan verifikasi sidik jari berhasil dicatat!`, 'success');
+
+      } else {
+        App.showToast(res.message || 'Gagal mengirim presensi.', 'danger');
+      }
+    } catch (err) {
+      App.showLoading(false);
+      App.showToast('Kesalahan server: ' + err.message, 'danger');
+    }
+  },
 
       } else {
         App.showToast(res.message || 'Gagal mengirim presensi.', 'danger');

@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
   <!-- Main Stylesheet (with cache-buster) -->
-  <link rel="stylesheet" href="css/style.css?v=2.2.7">
+  <link rel="stylesheet" href="css/style.css?v=2.2.8">
 
   <!-- Critical Layout & Landing Styles (Guarantees Perfect Render Always) -->
   <style>
@@ -1242,6 +1242,15 @@
             <!-- Leaflet Interactive Map -->
             <div id="map-container-attendance" class="leaflet-map-box" style="height:170px;border-radius:12px;margin-bottom:12px;"></div>
 
+            <!-- Biometric Fingerprint Badge -->
+            <div id="biometric-indicator-attendance" style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:12px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;">
+              <div style="font-size:1.8rem;line-height:1;">👆</div>
+              <div>
+                <div style="font-size:0.85rem;font-weight:700;color:#166534;">Autentikasi Sidik Jari HP Aktif</div>
+                <div style="font-size:0.75rem;color:#15803D;">Saat tombol ditekan, sentuh sensor sidik jari HP Anda untuk konfirmasi.</div>
+              </div>
+            </div>
+
             <!-- Form Alasan / Keterangan Luar Radius (Muncul Otomatis Jika di Luar Area) -->
             <div id="box-alasan-luar-radius" style="margin-bottom:14px;background:#FFFBEB;border:1.5px solid #FCD34D;border-radius:12px;padding:12px;display:none;">
               <div style="font-size:0.85rem;font-weight:700;color:#B45309;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
@@ -2105,15 +2114,16 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <!-- Application Modules (with cache-buster) -->
-  <script src="js/config.js?v=2.2.7"></script>
-  <script src="js/state.js?v=2.2.7"></script>
-  <script src="js/api.js?v=2.2.7"></script>
-  <script src="js/gps.js?v=2.2.7"></script>
-  <script src="js/camera.js?v=2.2.7"></script>
-  <script src="js/auth.js?v=2.2.7"></script>
-  <script src="js/guru.js?v=2.2.7"></script>
-  <script src="js/admin.js?v=2.2.7"></script>
-  <script src="js/app.js?v=2.2.7"></script>
+  <script src="js/config.js?v=2.2.8"></script>
+  <script src="js/state.js?v=2.2.8"></script>
+  <script src="js/api.js?v=2.2.8"></script>
+  <script src="js/gps.js?v=2.2.8"></script>
+  <script src="js/biometric.js?v=2.2.8"></script>
+  <script src="js/camera.js?v=2.2.8"></script>
+  <script src="js/auth.js?v=2.2.8"></script>
+  <script src="js/guru.js?v=2.2.8"></script>
+  <script src="js/admin.js?v=2.2.8"></script>
+  <script src="js/app.js?v=2.2.8"></script>
 
 </body>
 </html>
