@@ -16,6 +16,7 @@ const GuruModule = {
     this.renderProfileCard();
     this.startLiveClock();
     this.loadTodayStatus();
+    this.loadDashRecapMini();
     this.setupTabNavigation();
     this.setupGpsMonitoring();
     this.switchTab('beranda');
@@ -758,8 +759,45 @@ const GuruModule = {
         if (elTep) elTep.textContent = d.tepat_waktu || 0;
         if (elTel) elTel.textContent = d.terlambat || 0;
         if (elPul) elPul.textContent = d.pulang_cepat || 0;
+
+        // Sinkronkan juga ke kartu mini di dashboard beranda
+        const dTot = document.getElementById('dash-mini-hadir');
+        const dTep = document.getElementById('dash-mini-tepat');
+        const dTel = document.getElementById('dash-mini-telat');
+        if (dTot) dTot.textContent = d.total_hadir || 0;
+        if (dTep) dTep.textContent = d.tepat_waktu || 0;
+        if (dTel) dTel.textContent = d.terlambat || 0;
       }
     } catch (e) {}
+  },
+
+  /**
+   * Memuat Rekap Mini Bulan Ini untuk Kartu Sebelah Kanan Bawah di Beranda
+   */
+  async loadDashRecapMini() {
+    const now = new Date();
+    const bulan = String(now.getMonth() + 1).padStart(2, '0');
+    const tahun = String(now.getFullYear());
+    const bulanNames = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    const lbl = document.getElementById('dash-recap-month-label');
+    if (lbl) lbl.textContent = `${bulanNames[now.getMonth() + 1]} ${tahun}`;
+
+    try {
+      const res = await Api.getGuruRecap(AppState.token, bulan, tahun);
+      if (res && res.success && res.data) {
+        const d = res.data;
+        const dTot = document.getElementById('dash-mini-hadir');
+        const dTep = document.getElementById('dash-mini-tepat');
+        const dTel = document.getElementById('dash-mini-telat');
+
+        if (dTot) dTot.textContent = d.total_hadir || 0;
+        if (dTep) dTep.textContent = d.tepat_waktu || 0;
+        if (dTel) dTel.textContent = d.terlambat || 0;
+      }
+    } catch (e) {
+      console.warn('Gagal memuat rekap mini:', e);
+    }
   },
 
   /**

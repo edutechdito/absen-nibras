@@ -47,6 +47,15 @@ const App = {
       if (elClock) {
         elClock.textContent = `${hh}:${mm}:${ss} WIB`;
       }
+
+      const elGuruDate = document.getElementById('guru-live-date');
+      const elGuruClock = document.getElementById('guru-live-clock');
+      if (elGuruDate) {
+        elGuruDate.textContent = `${hari}, ${tgl} ${bulan} ${thn}`;
+      }
+      if (elGuruClock) {
+        elGuruClock.textContent = `${hh}:${mm}:${ss}`;
+      }
     };
 
     update();

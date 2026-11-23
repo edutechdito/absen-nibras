@@ -295,7 +295,10 @@ const AuthService = {
     } else {
       document.getElementById('view-admin').style.display = 'none';
       document.getElementById('view-guru').style.display = 'block';
-      document.getElementById('nav-guru-bottom').style.display = 'flex';
+      const navGuru = document.getElementById('nav-guru-bottom');
+      if (navGuru) {
+        navGuru.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+      }
       GuruModule.init();
     }
   }
