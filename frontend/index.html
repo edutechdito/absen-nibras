@@ -20,7 +20,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
   <!-- Main Stylesheet (with cache-buster) -->
-  <link rel="stylesheet" href="css/style.css?v=2.2.9">
+  <link rel="stylesheet" href="css/style.css?v=2.3.0">
 
   <!-- Critical Layout & Landing Styles (Guarantees Perfect Render Always) -->
   <style>
@@ -824,249 +824,241 @@
          VIEW 2: GURU / GTK DASHBOARD (MATCHING REFERENCE DESIGN)
          ====================================================================== -->
     <section id="view-guru" style="display:none;">
-      <div class="guru-portal-wrapper">
-        
-        <!-- ==================== LEFT SIDEBAR ==================== -->
-        <aside class="guru-portal-sidebar">
-          <div class="guru-sidebar-nav">
-            <button type="button" class="guru-sidebar-nav-item active" data-tab="beranda" onclick="GuruModule.switchTab('beranda')">
-              <span class="nav-icon">🏠</span>
-              <span class="nav-label">Beranda</span>
-            </button>
-            <button type="button" class="guru-sidebar-nav-item" data-tab="riwayat" onclick="GuruModule.switchTab('riwayat')">
-              <span class="nav-icon">📊</span>
-              <span class="nav-label">Riwayat Absensi</span>
-            </button>
-            <button type="button" class="guru-sidebar-nav-item" data-tab="profil" onclick="GuruModule.switchTab('profil')">
-              <span class="nav-icon">ℹ️</span>
-              <span class="nav-label">Profil</span>
-            </button>
-            <button type="button" class="guru-sidebar-nav-item" data-tab="pengaturan" onclick="GuruModule.switchTab('pengaturan')">
-              <span class="nav-icon">⚙️</span>
-              <span class="nav-label">Pengaturan</span>
-            </button>
-          </div>
-
-          <!-- Bottom Slogan & Corner Wave Accent -->
-          <div class="guru-sidebar-bottom-motto">
-            <div class="sidebar-motto-text">
-              Disiplin Hadir,<br>
-              Untuk Pendidikan<br>
-              yang Lebih Baik
-            </div>
-            <div class="sidebar-wave-container">
-              <svg viewBox="0 0 200 90" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0 90 C 50 85, 120 40, 200 15 L 200 90 Z" fill="#18181B"/>
-                <path d="M0 90 C 70 88, 140 55, 200 35 L 200 90 Z" fill="#DC2626"/>
-                <path d="M0 90 C 90 89, 160 70, 200 55 L 200 90 Z" fill="#F59E0B"/>
-              </svg>
-            </div>
-          </div>
-        </aside>
-
-        <!-- ==================== MAIN CONTENT AREA ==================== -->
-        <div class="guru-portal-main">
+      <div class="guru-mobile-app-shell">
 
           <!-- TAB 1: BERANDA (MATCHING REFERENCE EXACTLY) -->
           <div id="guru-section-beranda" class="guru-view-section">
 
-            <!-- 1. TOP WELCOME CARD -->
-            <div class="guru-welcome-card">
-              <div class="guru-welcome-left">
-                <div class="guru-welcome-avatar">
-                  <!-- Male Teacher Cartoon Avatar in Khaki Uniform -->
-                  <svg viewBox="0 0 100 100" width="76" height="76" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="50" cy="50" r="46" fill="#DBEAFE"/>
-                    <!-- Khaki Safari / ASN PNS Uniform -->
-                    <path d="M18 96 C18 72 32 66 50 66 C68 66 82 72 82 96 Z" fill="#C28E58"/>
-                    <polygon points="43,66 50,78 57,66" fill="#FFFFFF"/>
-                    <line x1="50" y1="78" x2="50" y2="96" stroke="#A77440" stroke-width="2"/>
-                    <!-- Neck -->
-                    <rect x="44" y="56" width="12" height="12" fill="#F5CBA7"/>
-                    <!-- Face -->
-                    <circle cx="50" cy="45" r="16" fill="#F5CBA7"/>
-                    <circle cx="34" cy="45" r="4" fill="#F5CBA7"/>
-                    <circle cx="66" cy="45" r="4" fill="#F5CBA7"/>
-                    <!-- Hair -->
-                    <path d="M34 39 C33 28 40 22 50 22 C60 22 67 28 66 39 C64 34 59 28 50 28 C41 28 36 34 34 39 Z" fill="#1E293B"/>
-                    <!-- Eyes & Smile -->
-                    <ellipse cx="45" cy="43" rx="2.5" ry="3" fill="#1E293B"/>
-                    <ellipse cx="55" cy="43" rx="2.5" ry="3" fill="#1E293B"/>
-                    <circle cx="46" cy="42" r="0.8" fill="#FFFFFF"/>
-                    <circle cx="56" cy="42" r="0.8" fill="#FFFFFF"/>
-                    <path d="M45 52 Q50 56 55 52" stroke="#A04000" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <!-- 1. HEADER ATAS (SALUTASI DINAMIS & NAMA LENGKAP & NOTIFIKASI) -->
+            <header class="app-mobile-header">
+              <div class="header-greeting-wrap">
+                <h1 id="guru-greeting-title" class="greeting-salutation">Selamat Sore</h1>
+                <div id="guru-profile-nama" class="greeting-user-name">DITO JURINALDO, S.Kom</div>
+                <div id="guru-profile-jabatan" style="display:none;">Operator</div>
+                <div id="guru-profile-niy" style="display:none;">202401001</div>
+                <!-- Hidden compatibility elements -->
+                <span id="guru-live-date" style="display:none;">-- -- ----</span>
+                <span id="guru-live-clock" style="display:none;">--:--:--</span>
+                <span id="bar-gps-coords" style="display:none;">-0.9247, 100.3603</span>
+                <span id="bar-gps-badge" style="display:none;"></span>
+              </div>
+              <button type="button" class="btn-notification-bell" onclick="GuruModule.openNoticeModal()" title="Pemberitahuan & Pengumuman">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0F172A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+                <span class="bell-badge-dot"></span>
+              </button>
+            </header>
+
+            <!-- 2. HERO ANNOUNCEMENT BANNER (KARTU PUTIH DENGAN ILUSTRASI 3D GURU) -->
+            <div class="app-hero-banner" onclick="GuruModule.openNoticeModal()">
+              <div class="hero-banner-content">
+                <h3 class="hero-banner-title">Uji Coba<br>Aplikasi Pres...</h3>
+                <p class="hero-banner-sub">ketuk untuk membaca</p>
+                <div class="hero-banner-badge-icon">
+                  <!-- 3D Blue Envelope with Golden Bell -->
+                  <svg viewBox="0 0 64 64" width="46" height="46" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="6" y="16" width="52" height="36" rx="8" fill="url(#gradEnv)" />
+                    <path d="M8 18L32 36L56 18" stroke="#93C5FD" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="18" cy="18" r="11" fill="url(#gradBell)"/>
+                    <path d="M18 11V10M15.5 17H20.5M18 19A2 2 0 0 0 20 17H16A2 2 0 0 0 18 19Z" stroke="#78350F" stroke-width="2" stroke-linecap="round"/>
+                    <defs>
+                      <linearGradient id="gradEnv" x1="6" y1="16" x2="58" y2="52" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#3B82F6"/>
+                        <stop offset="1" stop-color="#1D4ED8"/>
+                      </linearGradient>
+                      <linearGradient id="gradBell" x1="7" y1="7" x2="29" y2="29" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FBBF24"/>
+                        <stop offset="1" stop-color="#D97706"/>
+                      </linearGradient>
+                    </defs>
                   </svg>
                 </div>
-                <div class="guru-welcome-bio">
-                  <div class="welcome-salutation">Selamat Datang,</div>
-                  <h2 id="guru-profile-nama" class="welcome-teacher-name">Dito Jurinaldo, S.Kom</h2>
-                  <div id="guru-profile-jabatan" class="welcome-teacher-role">Operator</div>
-                  <div id="guru-profile-niy" style="display:none;">202401001</div>
-                </div>
               </div>
 
-              <div class="guru-welcome-right">
-                <div class="guru-welcome-date-wrap">
-                  <span class="welcome-meta-icon">📅</span>
-                  <span id="guru-live-date" class="welcome-date-text">-- -- ----</span>
-                </div>
-                <div class="guru-welcome-clock-wrap">
-                  <span class="welcome-clock-icon">🕒</span>
-                  <span id="guru-live-clock" class="welcome-clock-text">--:--:--</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- 2. TWO-COLUMN DASHBOARD GRID -->
-            <div class="guru-dashboard-grid">
-
-              <!-- LEFT COLUMN: "ABSENSI HARI INI" -->
-              <div class="guru-col-left">
-                <div class="card-absensi-today">
-                  <!-- Royal Blue Card Header -->
-                  <div class="absensi-today-header">
-                    <span class="today-header-icon">📅</span>
-                    <h3>Absensi Hari Ini</h3>
-                  </div>
-
-                  <div class="absensi-today-body">
-                    <!-- Panels Row (Masuk & Pulang) -->
-                    <div class="absensi-panels-row">
-                      
-                      <!-- PANEL MASUK -->
-                      <div class="panel-box panel-masuk" id="panel-box-masuk">
-                        <div class="panel-box-title">
-                          <span class="sun-icon">☀️</span>
-                          <span>Absen Masuk</span>
-                        </div>
-                        <div class="panel-badge-circle circle-masuk" id="badge-icon-masuk">
-                          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                          </svg>
-                        </div>
-                        <div class="panel-time" id="panel-time-masuk">--:-- WIB</div>
-                        <div class="panel-date" id="panel-date-masuk">-- -- ----</div>
-                      </div>
-
-                      <!-- PANEL PULANG -->
-                      <div class="panel-box panel-pulang" id="panel-box-pulang">
-                        <div class="panel-box-title">
-                          <span class="moon-icon">🌙</span>
-                          <span>Absen Pulang</span>
-                        </div>
-                        <div class="panel-badge-circle circle-pulang" id="badge-icon-pulang">
-                          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                          </svg>
-                        </div>
-                        <div class="panel-time" id="panel-time-pulang">-</div>
-                        <div class="panel-desc" id="panel-desc-pulang">Menunggu absen pulang...</div>
-                      </div>
-
-                    </div>
-
-                    <!-- WIDE SOLID BLUE ACTION BUTTON -->
-                    <button type="button" id="btn-trigger-lakukan-absen" class="btn-do-absen" onclick="GuruModule.handleDoAbsenClick()">
-                      <span class="btn-do-pin-icon">📍</span>
-                      <div class="btn-do-labels">
-                        <span class="btn-do-primary-text" id="btn-do-primary-text">Lakukan Absen</span>
-                        <span class="btn-do-sub-text">Pastikan berada di lokasi sekolah</span>
-                      </div>
-                    </button>
-
-                    <!-- GPS STATUS STRIP -->
-                    <div class="gps-status-strip">
-                      <div class="gps-coords-wrap">
-                        <span class="gps-target-icon">🎯</span>
-                        <span>Lokasi Anda: <b id="bar-gps-coords">-0.9247, 100.3603</b></span>
-                      </div>
-                      <div class="gps-strip-divider">|</div>
-                      <div class="gps-badge-pill" id="bar-gps-badge">
-                        <span class="badge-check-icon">✔️</span>
-                        <span>GPS Aktif</span>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-
-              <!-- RIGHT COLUMN: STATUS KEHADIRAN & RIWAYAT MINI -->
-              <div class="guru-col-right">
-
-                <!-- CARD 1: STATUS KEHADIRAN -->
-                <div class="card-status-kehadiran">
-                  <div class="status-kehadiran-head">
-                    <div class="kehadiran-shield-icon">
-                      <svg viewBox="0 0 24 24" width="30" height="30" fill="#10B981">
-                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
-                      </svg>
-                    </div>
-                    <h4>Status Kehadiran</h4>
-                  </div>
-                  <p class="status-kehadiran-body" id="text-status-kehadiran">
-                    Silakan lakukan absen masuk hari ini.
-                  </p>
-                  <button type="button" class="btn-terima-kasih" id="btn-status-kehadiran-pill">
-                    <span>✔️</span>
-                    <span id="btn-status-kehadiran-text">Terima kasih!</span>
-                  </button>
-                </div>
-
-                <!-- CARD 2: RINGKASAN KEHADIRAN BULAN INI (MENGGANTIKAN DUPLIKAT SEBELUMNYA) -->
-                <div class="card-riwayat-mini">
-                  <div class="riwayat-mini-head" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-                    <div style="display:flex;align-items:center;gap:8px;">
-                      <span class="clock-mini-icon">📊</span>
-                      <h4>Kehadiran Bulan Ini</h4>
-                    </div>
-                    <span style="font-size:0.75rem;font-weight:700;color:#2563EB;background:#EFF6FF;padding:4px 10px;border-radius:12px;" id="dash-recap-month-label">Bulan Ini</span>
-                  </div>
+              <div class="hero-banner-illustration">
+                <!-- 3D Male Teacher in Batik Korpri Uniform with Glasses Pointing Left -->
+                <svg viewBox="0 0 140 180" width="130" height="155" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Drop shadow base -->
+                  <ellipse cx="70" cy="175" rx="35" ry="5" fill="#E2E8F0"/>
                   
-                  <!-- 3 Mini Statistik Kehadiran -->
-                  <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:8px;text-align:center;margin-bottom:14px;">
-                    <div style="background:#F0FDF4;border:1px solid #BBF7D0;padding:12px 6px;border-radius:14px;">
-                      <div id="dash-mini-hadir" style="font-size:1.35rem;font-weight:900;color:#16A34A;">0</div>
-                      <div style="font-size:0.65rem;font-weight:800;color:#15803D;letter-spacing:0.5px;">TOTAL HADIR</div>
-                    </div>
-                    <div style="background:#EFF6FF;border:1px solid #BFDBFE;padding:12px 6px;border-radius:14px;">
-                      <div id="dash-mini-tepat" style="font-size:1.35rem;font-weight:900;color:#2563EB;">0</div>
-                      <div style="font-size:0.65rem;font-weight:800;color:#1D4ED8;letter-spacing:0.5px;">TEPAT WAKTU</div>
-                    </div>
-                    <div style="background:#FFFBEB;border:1px solid #FDE68A;padding:12px 6px;border-radius:14px;">
-                      <div id="dash-mini-telat" style="font-size:1.35rem;font-weight:900;color:#D97706;">0</div>
-                      <div style="font-size:0.65rem;font-weight:800;color:#B45309;letter-spacing:0.5px;">TERLAMBAT</div>
-                    </div>
-                  </div>
+                  <!-- Body / Batik Korpri Blue Shirt with Gold Traditional Motif -->
+                  <path d="M40 100 C30 110, 20 150, 25 180 L115 180 C120 150, 110 110, 100 100 Z" fill="#1E40AF"/>
+                  <!-- Batik motifs (golden/cyan shapes) -->
+                  <path d="M50 115 Q60 110 70 120 Q80 110 90 115 Q70 135 50 115 Z" fill="#FBBF24" opacity="0.85"/>
+                  <circle cx="70" cy="145" r="8" fill="#FBBF24" opacity="0.85"/>
+                  <path d="M45 155 Q70 165 95 155 Q70 175 45 155 Z" fill="#60A5FA" opacity="0.7"/>
+                  
+                  <!-- Tie/Collar -->
+                  <polygon points="62,100 70,116 78,100" fill="#FFFFFF"/>
+                  <polygon points="66,116 70,140 74,116" fill="#1E3A8A"/>
+                  
+                  <!-- Left Arm pointing left to the announcement -->
+                  <path d="M40 105 C25 110, 10 112, 0 114 C-2 118, 5 124, 15 120 C25 118, 35 116, 42 122 Z" fill="#1E40AF"/>
+                  <ellipse cx="-2" cy="113" rx="5" ry="3.5" fill="#FBCFE8"/>
+                  <path d="M-2 113 L-14 112" stroke="#FBCFE8" stroke-width="4.5" stroke-linecap="round"/>
+                  
+                  <!-- Right Arm at side -->
+                  <path d="M100 105 C112 115, 118 135, 115 150 C110 152, 105 145, 102 135 Z" fill="#1E40AF"/>
+                  
+                  <!-- Neck -->
+                  <rect x="63" y="85" width="14" height="18" rx="4" fill="#FBCFE8"/>
+                  
+                  <!-- Head -->
+                  <ellipse cx="70" cy="68" rx="22" ry="24" fill="#FBCFE8"/>
+                  <!-- Ears -->
+                  <circle cx="48" cy="70" r="5" fill="#FBCFE8"/>
+                  <circle cx="92" cy="70" r="5" fill="#FBCFE8"/>
+                  
+                  <!-- Hair (modern stylish side part) -->
+                  <path d="M47 62 C45 42, 60 36, 75 36 C92 36, 95 48, 93 62 C88 52, 78 45, 68 46 C58 47, 50 55, 47 62 Z" fill="#1E293B"/>
+                  
+                  <!-- Glasses -->
+                  <rect x="53" y="60" width="14" height="11" rx="3.5" fill="none" stroke="#0F172A" stroke-width="2.5"/>
+                  <rect x="73" y="60" width="14" height="11" rx="3.5" fill="none" stroke="#0F172A" stroke-width="2.5"/>
+                  <line x1="67" y1="65" x2="73" y2="65" stroke="#0F172A" stroke-width="2.5"/>
+                  <line x1="49" y1="64" x2="53" y2="64" stroke="#0F172A" stroke-width="2"/>
+                  <line x1="87" y1="64" x2="91" y2="64" stroke="#0F172A" stroke-width="2"/>
+                  
+                  <!-- Eyes behind glasses -->
+                  <circle cx="60" cy="65" r="2.2" fill="#0F172A"/>
+                  <circle cx="80" cy="65" r="2.2" fill="#0F172A"/>
+                  <circle cx="61" cy="64" r="0.7" fill="#FFFFFF"/>
+                  <circle cx="81" cy="64" r="0.7" fill="#FFFFFF"/>
+                  
+                  <!-- Smile -->
+                  <path d="M64 78 Q70 84 76 78" stroke="#BE185D" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
 
-                  <!-- Info Bar -->
-                  <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:8px 12px;margin-bottom:14px;font-size:0.75rem;color:#475569;display:flex;align-items:center;gap:6px;">
-                    <span>🔒</span>
-                    <span>Presensi terverifikasi GPS & Sidik Jari</span>
+            <!-- 3. SECTION: LAYANAN (GRID 4 KARTU) -->
+            <div class="app-section-services">
+              <h2 class="section-services-title">Layanan</h2>
+              <div class="services-grid">
+                
+                <!-- Card 1: Riwayat Presensi (Solid Blue Card) -->
+                <div class="service-card service-card-blue" onclick="GuruModule.switchTab('riwayat')" title="Buka Riwayat Presensi">
+                  <div class="service-card-title">Riwayat<br>Presensi</div>
+                  <div class="service-card-icon">
+                    <!-- 3D Circular Clock Arrow -->
+                    <svg viewBox="0 0 64 64" width="56" height="56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="32" cy="32" r="24" stroke="url(#clockRing)" stroke-width="5" stroke-dasharray="110 30" stroke-linecap="round"/>
+                      <polygon points="46,18 52,28 40,28" fill="#FBBF24"/>
+                      <circle cx="32" cy="32" r="15" fill="url(#clockFace)"/>
+                      <polyline points="32 23 32 32 37 32" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <defs>
+                        <linearGradient id="clockRing" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+                          <stop stop-color="#FBBF24"/>
+                          <stop offset="1" stop-color="#F59E0B"/>
+                        </linearGradient>
+                        <linearGradient id="clockFace" x1="17" y1="17" x2="47" y2="47" gradientUnits="userSpaceOnUse">
+                          <stop stop-color="#F97316"/>
+                          <stop offset="1" stop-color="#EA580C"/>
+                        </linearGradient>
+                      </defs>
+                    </svg>
                   </div>
+                </div>
 
-                  <!-- Button Pintasan ke Riwayat Lengkap -->
-                  <button type="button" class="btn btn-outline btn-block" onclick="GuruModule.switchTab('riwayat')" style="width:100%;padding:10px;font-size:0.85rem;font-weight:700;border-radius:12px;display:flex;justify-content:center;align-items:center;gap:6px;background:#F8FAFC;border-color:#CBD5E1;color:#0B2545;">
-                    <span>Lihat Riwayat & Rekap Lengkap</span>
-                    <span>→</span>
-                  </button>
+                <!-- Card 2: Cuti (White Card) -->
+                <div class="service-card service-card-white" onclick="GuruModule.openCutiModal()" title="Pengajuan Cuti / Izin">
+                  <div class="service-card-title text-blue">Cuti</div>
+                  <div class="service-card-icon">
+                    <!-- 3D Desk Calendar with Alarm Clock -->
+                    <svg viewBox="0 0 64 64" width="56" height="56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="8" y="16" width="34" height="34" rx="7" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="2"/>
+                      <rect x="8" y="16" width="34" height="10" rx="7" fill="#FCA5A5"/>
+                      <circle cx="17" cy="14" r="2.5" fill="#EF4444"/>
+                      <circle cx="33" cy="14" r="2.5" fill="#EF4444"/>
+                      <circle cx="17" cy="34" r="2" fill="#F87171"/>
+                      <circle cx="25" cy="34" r="2" fill="#F87171"/>
+                      <circle cx="33" cy="34" r="2" fill="#F87171"/>
+                      <circle cx="17" cy="42" r="2" fill="#F87171"/>
+                      <circle cx="25" cy="42" r="2" fill="#F87171"/>
+                      <circle cx="44" cy="38" r="14" fill="url(#gradClockPurp)" stroke="#818CF8" stroke-width="2"/>
+                      <polyline points="44 30 44 38 49 38" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
+                      <defs>
+                        <linearGradient id="gradClockPurp" x1="30" y1="24" x2="58" y2="52" gradientUnits="userSpaceOnUse">
+                          <stop stop-color="#818CF8"/>
+                          <stop offset="1" stop-color="#6366F1"/>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Card 3: Dinas Luar (Solid Blue Card) -->
+                <div class="service-card service-card-blue" onclick="GuruModule.openDinasLuarModal()" title="Pengajuan Dinas Luar">
+                  <div class="service-card-title">Dinas Luar</div>
+                  <div class="service-card-icon">
+                    <!-- 3D Briefcase / Travel Pin -->
+                    <svg viewBox="0 0 64 64" width="56" height="56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="12" y="22" width="40" height="28" rx="6" fill="#3B82F6" stroke="#93C5FD" stroke-width="2"/>
+                      <path d="M24 22V16C24 14.5 25.5 13 27 13H37C38.5 13 40 14.5 40 16V22" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+                      <circle cx="32" cy="36" r="4" fill="#FBBF24"/>
+                      <path d="M20 22L32 32L44 22" stroke="#93C5FD" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Card 4: Profil Saya (White Card) -->
+                <div class="service-card service-card-white" onclick="GuruModule.switchTab('profil')" title="Lihat Profil & Biodata">
+                  <div class="service-card-title text-blue">Profil</div>
+                  <div class="service-card-icon">
+                    <!-- 3D User Identity Card -->
+                    <svg viewBox="0 0 64 64" width="56" height="56" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <rect x="10" y="14" width="44" height="36" rx="6" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2.5"/>
+                      <circle cx="24" cy="30" r="7" fill="#60A5FA"/>
+                      <path d="M14 44 C14 39, 18 37, 24 37 C30 37, 34 39, 34 44" fill="#3B82F6"/>
+                      <rect x="36" y="24" width="14" height="3" rx="1.5" fill="#94A3B8"/>
+                      <rect x="36" y="30" width="10" height="3" rx="1.5" fill="#CBD5E1"/>
+                      <rect x="36" y="36" width="12" height="3" rx="1.5" fill="#CBD5E1"/>
+                    </svg>
+                  </div>
                 </div>
 
               </div>
-
             </div>
 
-            <!-- 3. FOOTER MATCHING REFERENCE -->
-            <footer class="guru-page-footer">
-              <div class="footer-copy">
-                © 2026 Perguruan Islam NIBRAS - Kota Padang
+            <!-- 4. FLOATING ATTENDANCE TODAY CARD (PERSIS SEPERTI GAMBAR USER) -->
+            <div class="app-floating-attendance-card" id="floating-attendance-card">
+              <div class="attendance-card-header">
+                <div class="card-day-title" id="ref-card-day">Senin</div>
+                <div class="card-status-actions">
+                  <span class="card-status-badge badge-hadir" id="ref-card-status-badge">Hadir</span>
+                  <button type="button" class="card-close-btn" onclick="GuruModule.toggleAttendanceCard()" title="Tutup / Sembunyikan">✕</button>
+                </div>
               </div>
-              <div class="footer-meta">
-                <span class="footer-bar-icon">📊</span>
-                <span>Absensi Online | Transparan, Akurat, dan Real-Time</span>
+              <div class="card-date-sub" id="ref-card-date">23 Nov 2026</div>
+              <div class="attendance-card-times">
+                <div class="time-item">
+                  <span class="time-label">Masuk</span>
+                  <span class="time-value" id="panel-time-masuk">07:08</span>
+                </div>
+                <div class="time-item">
+                  <span class="time-label">Pulang</span>
+                  <span class="time-value" id="panel-time-pulang">16:54</span>
+                </div>
               </div>
-            </footer>
+
+              <!-- Compatibility elements hidden -->
+              <div style="display:none;">
+                <span id="panel-date-masuk">-- -- ----</span>
+                <span id="badge-icon-masuk"></span>
+                <span id="panel-desc-pulang">Menunggu absen pulang...</span>
+                <span id="badge-icon-pulang"></span>
+                <span id="btn-do-primary-text">Lakukan Absen</span>
+                <button id="btn-trigger-lakukan-absen" onclick="GuruModule.handleDoAbsenClick()"></button>
+                <span id="text-status-kehadiran">Status Kehadiran</span>
+                <button id="btn-status-kehadiran-pill"></button>
+                <span id="dash-mini-hadir">0</span>
+                <span id="dash-mini-tepat">0</span>
+                <span id="dash-mini-telat">0</span>
+                <span id="dash-recap-month-label">Bulan Ini</span>
+              </div>
+            </div>
 
           </div>
 
@@ -1209,6 +1201,41 @@
 
         </div>
 
+        <!-- ==================== 5. FLOATING DOCK BOTTOM NAVIGATION & FINGERPRINT FAB ==================== -->
+        <div class="app-floating-bottom-dock" id="nav-guru-bottom">
+          <div class="dock-pill-container">
+            <button type="button" class="dock-nav-btn active" id="dock-btn-beranda" onclick="GuruModule.switchTab('beranda')">
+              <div class="dock-icon-circle">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+              </div>
+              <span class="dock-label">Beranda</span>
+            </button>
+            <button type="button" class="dock-nav-btn" id="dock-btn-profil" onclick="GuruModule.switchTab('profil')">
+              <div class="dock-icon-circle">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+              <span class="dock-label">Profil</span>
+            </button>
+          </div>
+
+          <!-- FLOATING FINGERPRINT BUTTON -->
+          <button type="button" class="fab-fingerprint-btn" id="fab-fingerprint-btn" onclick="GuruModule.handleDoAbsenClick()" title="Lakukan Absen Sidik Jari">
+            <svg viewBox="0 0 24 24" width="38" height="38" fill="none" stroke="#2563EB" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12C2 6.5 6.5 2 12 2a10 10 0 0 1 8 4"/>
+              <path d="M5 19.5C5.5 18 6 15 6 12c0-.7.12-1.37.34-2"/>
+              <path d="M17.29 21.02c.12-.6.18-1.2.18-1.82 0-3.5-2-6-5-6-1.5 0-3 1-3.5 2.5"/>
+              <path d="M9.01 10.5A4 4 0 0 1 12 9c2.5 0 4.5 2 4.5 4.5 0 1.71-.5 3.16-1.33 4.29"/>
+              <path d="M12 17c.5 0 1-.2 1.41-.59"/>
+              <path d="M21.5 13.5c-.2 3.5-1.5 6.5-3.5 8"/>
+              <path d="M12 6a6 6 0 0 1 6 6c0 1.5-.5 3-1.5 4.5"/>
+            </svg>
+          </button>
+        </div>
+
       </div>
 
       <!-- ==================== MODAL LAKUKAN ABSEN (BERBASIS GPS) ==================== -->
@@ -1271,27 +1298,111 @@
         </div>
       </div>
 
-    </section>
+      <!-- ==================== MODAL PENGUMUMAN / UJI COBA ==================== -->
+      <div id="modal-announcement" class="modal-overlay" style="display:none;">
+        <div class="modal-content" style="max-width:400px;text-align:left;border-radius:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:1.5rem;">📢</span>
+              <h3 style="font-size:1.15rem;font-weight:800;color:#0F172A;margin:0;">Pengumuman Sistem</h3>
+            </div>
+            <button type="button" class="btn-modal-close" onclick="GuruModule.closeNoticeModal()">✕</button>
+          </div>
+          <div style="background:#EFF6FF;border:1.5px solid #BFDBFE;padding:14px;border-radius:16px;margin-bottom:14px;">
+            <h4 style="font-size:0.95rem;font-weight:800;color:#1E40AF;margin:0 0 6px;">Uji Coba Aplikasi Presensi NIBRAS</h4>
+            <p style="font-size:0.85rem;color:#1E3A8A;line-height:1.5;margin:0;">
+              Sistem presensi online Perguruan Islam NIBRAS saat ini dalam tahap uji coba aktif. Seluruh Guru & GTK dapat melakukan presensi kehadiran menggunakan verifikasi sensor sidik jari HP dan validasi lokasi GPS resmi sekolah.
+            </p>
+          </div>
+          <div style="font-size:0.82rem;color:#64748B;line-height:1.6;margin-bottom:16px;">
+            <b>Panduan Penggunaan:</b><br>
+            1. Tekan tombol bulat <b>Sidik Jari</b> di kanan bawah untuk absen.<br>
+            2. Pastikan GPS HP aktif.<br>
+            3. Sentuh sensor sidik jari HP Anda untuk verifikasi.<br>
+            4. Jika berada di luar radius sekolah karena dinas, sertakan alasan pada kolom yang disediakan.
+          </div>
+          <button type="button" class="btn btn-primary btn-block" style="border-radius:12px;padding:12px;" onclick="GuruModule.closeNoticeModal()">
+            Saya Mengerti
+          </button>
+        </div>
+      </div>
 
-    <!-- Bottom Nav Guru for Mobile Screens -->
-    <nav id="nav-guru-bottom" class="guru-bottom-nav" style="display:none;">
-      <button class="guru-tab-btn active" data-tab="beranda" onclick="GuruModule.switchTab('beranda')">
-        <span class="tab-icon">🏠</span>
-        <span>Beranda</span>
-      </button>
-      <button class="guru-tab-btn" data-tab="riwayat" onclick="GuruModule.switchTab('riwayat')">
-        <span class="tab-icon">📊</span>
-        <span>Riwayat</span>
-      </button>
-      <button class="guru-tab-btn" data-tab="profil" onclick="GuruModule.switchTab('profil')">
-        <span class="tab-icon">ℹ️</span>
-        <span>Profil</span>
-      </button>
-      <button class="guru-tab-btn" data-tab="pengaturan" onclick="GuruModule.switchTab('pengaturan')">
-        <span class="tab-icon">⚙️</span>
-        <span>Pengaturan</span>
-      </button>
-    </nav>
+      <!-- ==================== MODAL PENGAJUAN CUTI ==================== -->
+      <div id="modal-cuti" class="modal-overlay" style="display:none;">
+        <div class="modal-content" style="max-width:420px;text-align:left;border-radius:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:1.5rem;">📅</span>
+              <h3 style="font-size:1.15rem;font-weight:800;color:#0F172A;margin:0;">Pengajuan Cuti & Izin</h3>
+            </div>
+            <button type="button" class="btn-modal-close" onclick="GuruModule.closeCutiModal()">✕</button>
+          </div>
+          <form onsubmit="GuruModule.submitCuti(event)">
+            <div class="form-group">
+              <label class="form-label">Jenis Pengajuan</label>
+              <select id="cuti-jenis" class="form-input" required>
+                <option value="Cuti Tahunan">Cuti Tahunan</option>
+                <option value="Izin Sakit">Izin Sakit</option>
+                <option value="Izin Kepentingan Keluarga">Izin Kepentingan Keluarga</option>
+                <option value="Cuti Melahirkan">Cuti Melahirkan</option>
+              </select>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div class="form-group">
+                <label class="form-label">Mulai Tanggal</label>
+                <input type="date" id="cuti-mulai" class="form-input" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Sampai Tanggal</label>
+                <input type="date" id="cuti-selesai" class="form-input" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Alasan / Keterangan</label>
+              <textarea id="cuti-alasan" class="form-input" rows="3" placeholder="Jelaskan keperluan cuti/izin..." required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" style="border-radius:12px;padding:12px;margin-top:8px;">
+              Kirim Pengajuan Cuti
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ==================== MODAL PENGAJUAN DINAS LUAR ==================== -->
+      <div id="modal-dinas-luar" class="modal-overlay" style="display:none;">
+        <div class="modal-content" style="max-width:420px;text-align:left;border-radius:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span style="font-size:1.5rem;">💼</span>
+              <h3 style="font-size:1.15rem;font-weight:800;color:#0F172A;margin:0;">Pengajuan Dinas Luar</h3>
+            </div>
+            <button type="button" class="btn-modal-close" onclick="GuruModule.closeDinasLuarModal()">✕</button>
+          </div>
+          <form onsubmit="GuruModule.submitDinasLuar(event)">
+            <div class="form-group">
+              <label class="form-label">Nama Kegiatan / Tugas</label>
+              <input type="text" id="dinas-tugas" class="form-input" placeholder="Contoh: Pelatihan Kurikulum, Rapat Dinas..." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Lokasi / Instansi Tujuan</label>
+              <input type="text" id="dinas-lokasi" class="form-input" placeholder="Contoh: Kantor Dinas Pendidikan Kota Padang" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tanggal Pelaksanaan</label>
+              <input type="date" id="dinas-tanggal" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Keterangan Tambahan</label>
+              <textarea id="dinas-keterangan" class="form-input" rows="2" placeholder="Nomor surat tugas atau catatan lain..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block" style="border-radius:12px;padding:12px;margin-top:8px;">
+              Simpan Data Dinas Luar
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </section>
 
     <!-- ======================================================================
          VIEW 3: ADMINISTRATOR DASHBOARD & MANAGEMENT (MATCHING REFERENCE DESIGN)
@@ -2113,16 +2224,16 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
   <!-- Application Modules (with cache-buster) -->
-  <script src="js/config.js?v=2.2.9"></script>
-  <script src="js/state.js?v=2.2.9"></script>
-  <script src="js/api.js?v=2.2.9"></script>
-  <script src="js/gps.js?v=2.2.9"></script>
-  <script src="js/biometric.js?v=2.2.9"></script>
-  <script src="js/camera.js?v=2.2.9"></script>
-  <script src="js/auth.js?v=2.2.9"></script>
-  <script src="js/guru.js?v=2.2.9"></script>
-  <script src="js/admin.js?v=2.2.9"></script>
-  <script src="js/app.js?v=2.2.9"></script>
+  <script src="js/config.js?v=2.3.0"></script>
+  <script src="js/state.js?v=2.3.0"></script>
+  <script src="js/api.js?v=2.3.0"></script>
+  <script src="js/gps.js?v=2.3.0"></script>
+  <script src="js/biometric.js?v=2.3.0"></script>
+  <script src="js/camera.js?v=2.3.0"></script>
+  <script src="js/auth.js?v=2.3.0"></script>
+  <script src="js/guru.js?v=2.3.0"></script>
+  <script src="js/admin.js?v=2.3.0"></script>
+  <script src="js/app.js?v=2.3.0"></script>
 
 </body>
 </html>

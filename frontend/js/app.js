@@ -50,11 +50,15 @@ const App = {
 
       const elGuruDate = document.getElementById('guru-live-date');
       const elGuruClock = document.getElementById('guru-live-clock');
+      const elGuruGreeting = document.getElementById('guru-greeting-title');
       if (elGuruDate) {
         elGuruDate.textContent = `${hari}, ${tgl} ${bulan} ${thn}`;
       }
       if (elGuruClock) {
         elGuruClock.textContent = `${hh}:${mm}:${ss}`;
+      }
+      if (elGuruGreeting && window.GuruModule && typeof GuruModule.getDynamicGreeting === 'function') {
+        elGuruGreeting.textContent = GuruModule.getDynamicGreeting();
       }
     };
 

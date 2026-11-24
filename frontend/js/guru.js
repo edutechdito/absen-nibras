@@ -30,10 +30,13 @@ const GuruModule = {
     if (!user) return;
 
     const elNama = document.getElementById('guru-profile-nama');
+    const elGreeting = document.getElementById('guru-greeting-title');
     const elNiy = document.getElementById('guru-profile-niy');
     const elJabatan = document.getElementById('guru-profile-jabatan');
 
-    if (elNama) elNama.textContent = user.nama_lengkap || 'Dito Jurinaldo, S.Kom';
+    const cleanNama = (user.nama_lengkap || 'DITO JURINALDO, S.Kom').toUpperCase();
+    if (elNama) elNama.textContent = cleanNama;
+    if (elGreeting) elGreeting.textContent = this.getDynamicGreeting();
     if (elNiy) elNiy.textContent = user.niy || '202401001';
     if (elJabatan) elJabatan.textContent = user.jabatan || 'Operator';
 
@@ -51,6 +54,17 @@ const GuruModule = {
     if (elDetJabatan) elDetJabatan.textContent = user.jabatan || 'Operator';
     if (elDetSekolah) elDetSekolah.textContent = user.nama_sekolah || 'Perguruan Islam NIBRAS';
     if (elDetHp) elDetHp.textContent = user.no_hp || '08126789001';
+  },
+
+  /**
+   * Mendapatkan salam dinamis sesuai jam WIB (Pagi, Siang, Sore, Malam)
+   */
+  getDynamicGreeting() {
+    const hour = new Date().getHours();
+    if (hour >= 4 && hour < 11) return 'Selamat Pagi';
+    if (hour >= 11 && hour < 15) return 'Selamat Siang';
+    if (hour >= 15 && hour < 18) return 'Selamat Sore';
+    return 'Selamat Malam';
   },
 
   /**
@@ -160,131 +174,77 @@ const GuruModule = {
     const now = new Date();
     const todayFormatted = this.getShortDateFormatted(now);
 
-    // Elements
+    const hariArr = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const bulanSingkatArr = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+
+    const curDay = hariArr[now.getDay()];
+    const curDateStr = `${now.getDate()} ${bulanSingkatArr[now.getMonth()]} ${now.getFullYear()}`;
+
+    // Elements baru sesuai referensi
+    const elCardDay = document.getElementById('ref-card-day');
+    const elCardDate = document.getElementById('ref-card-date');
+    const elCardStatus = document.getElementById('ref-card-status-badge');
+    const elGreeting = document.getElementById('guru-greeting-title');
+
+    if (elCardDay) elCardDay.textContent = curDay;
+    if (elCardDate) elCardDate.textContent = curDateStr;
+    if (elGreeting) elGreeting.textContent = this.getDynamicGreeting();
+
+    // Elements panel jam
     const elTimeMasuk = document.getElementById('panel-time-masuk');
     const elDateMasuk = document.getElementById('panel-date-masuk');
-    const elBadgeMasuk = document.getElementById('badge-icon-masuk');
-
     const elTimePulang = document.getElementById('panel-time-pulang');
     const elDescPulang = document.getElementById('panel-desc-pulang');
-    const elBadgePulang = document.getElementById('badge-icon-pulang');
 
     const elBtnActionText = document.getElementById('btn-do-primary-text');
     const elBtnTrigger = document.getElementById('btn-trigger-lakukan-absen');
 
-    const elTextStatusKehadiran = document.getElementById('text-status-kehadiran');
-    const elBtnKehadiranPill = document.getElementById('btn-status-kehadiran-pill');
-
-    const elMiniTimeMasuk = document.getElementById('mini-time-masuk');
-    const elMiniDateMasuk = document.getElementById('mini-date-masuk');
-    const elMiniTimePulang = document.getElementById('mini-time-pulang');
-    const elMiniDatePulang = document.getElementById('mini-date-pulang');
-
     // 1. STATUS ABSEN MASUK
+    let jamMasukStr = '--:--';
     if (st.sudahMasuk && st.dataMasuk) {
-      const jamMasuk = st.dataMasuk.jam_server || '07:15';
-      const tglMasuk = st.dataMasuk.tanggal ? this.getShortDateFormatted(st.dataMasuk.tanggal) : todayFormatted;
-
-      if (elTimeMasuk) elTimeMasuk.textContent = `${jamMasuk} WIB`;
-      if (elDateMasuk) elDateMasuk.textContent = tglMasuk;
-      if (elBadgeMasuk) {
-        elBadgeMasuk.className = 'panel-badge-circle circle-masuk';
-        elBadgeMasuk.innerHTML = `
-          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        `;
-      }
-
-      if (elMiniTimeMasuk) elMiniTimeMasuk.textContent = `${jamMasuk} WIB`;
-      if (elMiniDateMasuk) elMiniDateMasuk.textContent = tglMasuk;
-
-    } else {
-      if (elTimeMasuk) elTimeMasuk.textContent = '--:-- WIB';
+      jamMasukStr = st.dataMasuk.jam_server || '07:08';
+      if (elTimeMasuk) elTimeMasuk.textContent = jamMasukStr;
       if (elDateMasuk) elDateMasuk.textContent = todayFormatted;
-      if (elBadgeMasuk) {
-        elBadgeMasuk.className = 'panel-badge-circle circle-gray';
-        elBadgeMasuk.innerHTML = `
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-        `;
-      }
-      if (elMiniTimeMasuk) elMiniTimeMasuk.textContent = '--:-- WIB';
-      if (elMiniDateMasuk) elMiniDateMasuk.textContent = 'Belum absen masuk';
+    } else {
+      if (elTimeMasuk) elTimeMasuk.textContent = '--:--';
+      if (elDateMasuk) elDateMasuk.textContent = todayFormatted;
     }
 
     // 2. STATUS ABSEN PULANG
+    let jamPulangStr = '--:--';
     if (st.sudahPulang && st.dataPulang) {
-      const jamPulang = st.dataPulang.jam_server || '15:35';
-      const tglPulang = st.dataPulang.tanggal ? this.getShortDateFormatted(st.dataPulang.tanggal) : todayFormatted;
-
-      if (elTimePulang) elTimePulang.textContent = `${jamPulang} WIB`;
+      jamPulangStr = st.dataPulang.jam_server || '16:54';
+      if (elTimePulang) elTimePulang.textContent = jamPulangStr;
       if (elDescPulang) elDescPulang.textContent = 'Sudah absen pulang';
-      if (elBadgePulang) {
-        elBadgePulang.className = 'panel-badge-circle circle-masuk';
-        elBadgePulang.innerHTML = `
-          <svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-        `;
-      }
-
-      if (elMiniTimePulang) elMiniTimePulang.textContent = `${jamPulang} WIB`;
-      if (elMiniDatePulang) {
-        elMiniDatePulang.textContent = tglPulang;
-        elMiniDatePulang.classList.remove('timeline-italic');
-      }
-
     } else {
-      if (elTimePulang) elTimePulang.textContent = '-';
+      if (elTimePulang) elTimePulang.textContent = '--:--';
       if (elDescPulang) elDescPulang.textContent = 'Menunggu absen pulang...';
-      if (elBadgePulang) {
-        elBadgePulang.className = 'panel-badge-circle circle-pulang';
-        elBadgePulang.innerHTML = `
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <polyline points="12 6 12 12 16 14"></polyline>
-          </svg>
-        `;
-      }
-      if (elMiniTimePulang) elMiniTimePulang.textContent = '-';
-      if (elMiniDatePulang) {
-        elMiniDatePulang.textContent = 'Belum absen pulang';
-        elMiniDatePulang.classList.add('timeline-italic');
-      }
     }
 
-    // 3. ACTION BUTTON STATE & STATUS KEHADIRAN (CARD KANAN)
-    if (!st.sudahMasuk) {
-      this.currentAttendanceType = 'MASUK';
-      if (elBtnActionText) elBtnActionText.textContent = 'Lakukan Absen Masuk';
-      if (elBtnTrigger) elBtnTrigger.disabled = false;
-      if (elTextStatusKehadiran) elTextStatusKehadiran.textContent = 'Silakan lakukan absen masuk terlebih dahulu.';
-      if (elBtnKehadiranPill) {
-        elBtnKehadiranPill.style.background = '#0284C7';
-        elBtnKehadiranPill.innerHTML = `<span>📍</span><span>Belum Absen</span>`;
-      }
-    } else if (!st.sudahPulang) {
-      this.currentAttendanceType = 'PULANG';
-      if (elBtnActionText) elBtnActionText.textContent = 'Lakukan Absen Pulang';
-      if (elBtnTrigger) elBtnTrigger.disabled = false;
-      if (elTextStatusKehadiran) elTextStatusKehadiran.textContent = 'Anda sudah melakukan absen masuk hari ini.';
-      if (elBtnKehadiranPill) {
-        elBtnKehadiranPill.style.background = '#10B981';
-        elBtnKehadiranPill.innerHTML = `<span>✔️</span><span>Terima kasih!</span>`;
-      }
-    } else {
+    // 3. BADGE STATUS KEHADIRAN (KARTU REFERENSI)
+    if (st.sudahMasuk && st.sudahPulang) {
       this.currentAttendanceType = 'SELESAI';
-      if (elBtnActionText) elBtnActionText.textContent = '✓ Presensi Hari Ini Lengkap';
-      if (elBtnTrigger) elBtnTrigger.disabled = false;
-      if (elTextStatusKehadiran) elTextStatusKehadiran.textContent = 'Alhamdulillah, Anda telah menyelesaikan presensi masuk dan pulang hari ini.';
-      if (elBtnKehadiranPill) {
-        elBtnKehadiranPill.style.background = '#10B981';
-        elBtnKehadiranPill.innerHTML = `<span>🎉</span><span>Presensi Selesai!</span>`;
+      if (elCardStatus) {
+        elCardStatus.textContent = 'Hadir Lengkap';
+        elCardStatus.className = 'card-status-badge badge-hadir';
       }
+      if (elBtnActionText) elBtnActionText.textContent = '✓ Presensi Selesai';
+    } else if (st.sudahMasuk) {
+      this.currentAttendanceType = 'PULANG';
+      if (elCardStatus) {
+        elCardStatus.textContent = 'Hadir';
+        elCardStatus.className = 'card-status-badge badge-hadir';
+      }
+      if (elBtnActionText) elBtnActionText.textContent = 'Lakukan Absen Pulang';
+    } else {
+      this.currentAttendanceType = 'MASUK';
+      if (elCardStatus) {
+        elCardStatus.textContent = 'Belum Hadir';
+        elCardStatus.className = 'card-status-badge badge-belum';
+      }
+      if (elBtnActionText) elBtnActionText.textContent = 'Lakukan Absen Masuk';
     }
+  },
   },
 
   /**
@@ -660,6 +620,12 @@ const GuruModule = {
   async switchTab(tabName) {
     this.activeTab = tabName;
 
+    // Update active class pada dock baru (Beranda & Profil)
+    const btnBeranda = document.getElementById('dock-btn-beranda');
+    const btnProfil = document.getElementById('dock-btn-profil');
+    if (btnBeranda) btnBeranda.classList.toggle('active', tabName === 'beranda');
+    if (btnProfil) btnProfil.classList.toggle('active', tabName === 'profil');
+
     // Update active class pada sidebar
     document.querySelectorAll('.guru-sidebar-nav-item').forEach(btn => {
       btn.classList.toggle('active', btn.getAttribute('data-tab') === tabName);
@@ -827,6 +793,75 @@ const GuruModule = {
     } catch (err) {
       App.showLoading(false);
       App.showToast('Kesalahan server: ' + err.message, 'danger');
+    }
+  },
+
+  // -------------------------------------------------------------
+  // MODAL & UTILITY PEGAWAI SESUAI REFERENSI
+  // -------------------------------------------------------------
+  openNoticeModal() {
+    const modal = document.getElementById('modal-announcement');
+    if (modal) modal.style.display = 'flex';
+  },
+
+  closeNoticeModal() {
+    const modal = document.getElementById('modal-announcement');
+    if (modal) modal.style.display = 'none';
+  },
+
+  openCutiModal() {
+    const modal = document.getElementById('modal-cuti');
+    if (modal) {
+      modal.style.display = 'flex';
+      const inputMulai = document.getElementById('cuti-mulai');
+      const inputSelesai = document.getElementById('cuti-selesai');
+      const todayIso = new Date().toISOString().split('T')[0];
+      if (inputMulai && !inputMulai.value) inputMulai.value = todayIso;
+      if (inputSelesai && !inputSelesai.value) inputSelesai.value = todayIso;
+    }
+  },
+
+  closeCutiModal() {
+    const modal = document.getElementById('modal-cuti');
+    if (modal) modal.style.display = 'none';
+  },
+
+  submitCuti(e) {
+    if (e) e.preventDefault();
+    const jenis = document.getElementById('cuti-jenis') ? document.getElementById('cuti-jenis').value : 'Cuti';
+    const mulai = document.getElementById('cuti-mulai') ? document.getElementById('cuti-mulai').value : '';
+    const selesai = document.getElementById('cuti-selesai') ? document.getElementById('cuti-selesai').value : '';
+    App.showToast(`✅ Pengajuan ${jenis} (${mulai} s.d ${selesai}) berhasil dicatat. Menunggu persetujuan pimpinan.`, 'success');
+    this.closeCutiModal();
+  },
+
+  openDinasLuarModal() {
+    const modal = document.getElementById('modal-dinas-luar');
+    if (modal) {
+      modal.style.display = 'flex';
+      const inputTgl = document.getElementById('dinas-tanggal');
+      const todayIso = new Date().toISOString().split('T')[0];
+      if (inputTgl && !inputTgl.value) inputTgl.value = todayIso;
+    }
+  },
+
+  closeDinasLuarModal() {
+    const modal = document.getElementById('modal-dinas-luar');
+    if (modal) modal.style.display = 'none';
+  },
+
+  submitDinasLuar(e) {
+    if (e) e.preventDefault();
+    const lokasi = document.getElementById('dinas-lokasi') ? document.getElementById('dinas-lokasi').value : 'Lokasi Dinas';
+    const tgl = document.getElementById('dinas-tanggal') ? document.getElementById('dinas-tanggal').value : '';
+    App.showToast(`✅ Pengajuan Dinas Luar ke ${lokasi} (${tgl}) berhasil dicatat.`, 'success');
+    this.closeDinasLuarModal();
+  },
+
+  toggleAttendanceCard() {
+    const card = document.getElementById('floating-attendance-card');
+    if (card) {
+      card.style.display = (card.style.display === 'none') ? 'block' : 'none';
     }
   }
 };

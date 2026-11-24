@@ -2545,60 +2545,398 @@ body {
   .sidebar-toggle-btn .toggle-label {
     display: none;
   }
-  #nav-guru-bottom,
-  .guru-bottom-nav {
-    display: none !important;
-  }
 }
 
 /* ==========================================================================
-   MOBILE BOTTOM NAVIGATION BAR (.guru-bottom-nav)
+   MOBILE-APP REFERENCE UI STYLES (SESUAI GAMBAR REFERENSI PEGAWAI)
    ========================================================================== */
-.guru-bottom-nav {
-  display: none;
+.guru-mobile-app-shell {
+  max-width: 440px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: #F8FAFC;
+  padding: 16px 18px 115px;
+  position: relative;
+  box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
-  .guru-bottom-nav {
-    display: flex !important;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(255, 255, 255, 0.98);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid #E2E8F0;
-    padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px));
-    justify-content: space-around;
-    align-items: center;
-    z-index: 1000;
-    box-shadow: 0 -4px 20px rgba(11, 37, 69, 0.08);
+@media (min-width: 769px) {
+  .guru-mobile-app-shell {
+    margin: 20px auto 40px;
+    border-radius: 36px;
+    box-shadow: 0 16px 45px rgba(15, 23, 42, 0.1);
+    border: 1px solid #E2E8F0;
+    overflow: hidden;
   }
-  .guru-tab-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: none;
-    color: #64748B;
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 6px 14px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    gap: 3px;
-  }
-  .guru-tab-btn .tab-icon {
-    font-size: 1.25rem;
-    line-height: 1;
-  }
-  .guru-tab-btn.active {
-    color: #0B2545;
-    background: #EFF6FF;
-  }
+}
+
+/* 1. Header Atas */
+.app-mobile-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 18px;
+  padding-top: 4px;
+}
+
+.header-greeting-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.greeting-salutation {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.15;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.greeting-user-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1E293B;
+  margin-top: 5px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.btn-notification-bell {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 1.5px solid #F1F5F9;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s;
+}
+
+.btn-notification-bell:active {
+  transform: scale(0.94);
+}
+
+.bell-badge-dot {
+  position: absolute;
+  top: 13px;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #EF4444;
+}
+
+/* 2. Hero Banner */
+.app-hero-banner {
+  background: #FFFFFF;
+  border-radius: 26px;
+  padding: 20px 18px 10px 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  border: 1px solid #F1F5F9;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.app-hero-banner:hover {
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.07);
+}
+
+.hero-banner-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 2;
+  padding-bottom: 8px;
+}
+
+.hero-banner-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0F172A;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.hero-banner-sub {
+  font-size: 0.85rem;
+  color: #64748B;
+  margin: 6px 0 16px;
+  font-weight: 500;
+}
+
+.hero-banner-badge-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.hero-banner-illustration {
+  position: relative;
+  right: -6px;
+  bottom: -4px;
+  z-index: 1;
+}
+
+/* 3. Section Layanan */
+.app-section-services {
+  margin-bottom: 22px;
+}
+
+.section-services-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #0F172A;
+  margin: 0 0 14px;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.service-card {
+  border-radius: 24px;
+  padding: 20px 14px 18px;
+  min-height: 145px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+
+.service-card:active {
+  transform: scale(0.96);
+}
+
+.service-card-blue {
+  background: linear-gradient(145deg, #1E54DB 0%, #1542B8 100%);
+  color: #FFFFFF;
+  box-shadow: 0 8px 24px rgba(30, 84, 219, 0.25);
+}
+
+.service-card-white {
+  background: #FFFFFF;
+  color: #1E54DB;
+  border: 1px solid #F1F5F9;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+}
+
+.service-card-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.service-card-title.text-blue {
+  color: #1E54DB;
+}
+
+.service-card-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+}
+
+/* 4. Floating Attendance Card */
+.app-floating-attendance-card {
+  background: #FFFFFF;
+  border-radius: 26px;
+  padding: 20px 22px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  border: 1.5px solid #E2E8F0;
+  margin-top: 14px;
+  margin-bottom: 24px;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.attendance-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-day-title {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: #1E54DB;
+  line-height: 1.1;
+}
+
+.card-status-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.card-status-badge {
+  font-weight: 700;
+  font-size: 0.85rem;
+  padding: 5px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.2px;
+}
+
+.card-status-badge.badge-hadir {
+  background: #22C55E;
+  color: #FFFFFF;
+}
+
+.card-status-badge.badge-belum {
+  background: #3B82F6;
+  color: #FFFFFF;
+}
+
+.card-status-badge.badge-terlambat {
+  background: #F59E0B;
+  color: #FFFFFF;
+}
+
+.card-close-btn {
+  background: none;
+  border: none;
+  color: #0F172A;
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-date-sub {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1E293B;
+  margin: 4px 0 16px;
+}
+
+.attendance-card-times {
+  display: flex;
+  gap: 36px;
+  align-items: center;
+}
+
+.time-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.time-label {
+  font-size: 0.95rem;
+  color: #475569;
+  font-weight: 500;
+}
+
+.time-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #0F172A;
+}
+
+/* 5. Floating Bottom Dock & Fingerprint Button */
+.app-floating-bottom-dock {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 420px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 99;
+  pointer-events: none;
+}
+
+.dock-pill-container {
+  pointer-events: auto;
+  background: #FFFFFF;
+  border-radius: 40px;
+  padding: 8px 22px;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
+  border: 1px solid #E2E8F0;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.dock-nav-btn {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  color: #64748B;
+  padding: 2px 8px;
+  transition: all 0.2s ease;
+}
+
+.dock-nav-btn .dock-icon-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.dock-nav-btn.active {
+  color: #1E54DB;
+  font-weight: 700;
+}
+
+.dock-nav-btn.active .dock-icon-circle {
+  background: #1E54DB;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(30, 84, 219, 0.3);
+}
+
+.dock-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.fab-fingerprint-btn {
+  pointer-events: auto;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  border: 2.5px solid #2563EB;
+  box-shadow: 0 10px 28px rgba(37, 99, 235, 0.32);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.fab-fingerprint-btn:active {
+  transform: scale(0.92);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
 }
 
 

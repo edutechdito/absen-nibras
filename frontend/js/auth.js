@@ -297,7 +297,7 @@ const AuthService = {
       document.getElementById('view-guru').style.display = 'block';
       const navGuru = document.getElementById('nav-guru-bottom');
       if (navGuru) {
-        navGuru.style.display = window.innerWidth <= 768 ? 'flex' : 'none';
+        navGuru.style.display = 'flex';
       }
       GuruModule.init();
     }
