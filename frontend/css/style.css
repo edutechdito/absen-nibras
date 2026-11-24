@@ -2584,6 +2584,14 @@ body {
   flex-direction: column;
 }
 
+.greeting-bismillah {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #0284C7;
+  letter-spacing: 0.3px;
+  margin-bottom: 2px;
+}
+
 .greeting-salutation {
   font-size: 1.85rem;
   font-weight: 800;
@@ -2594,12 +2602,19 @@ body {
 }
 
 .greeting-user-name {
-  font-size: 0.92rem;
-  font-weight: 700;
-  color: #1E293B;
-  margin-top: 5px;
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: #0B2545;
+  margin-top: 4px;
   text-transform: uppercase;
   letter-spacing: 0.3px;
+}
+
+.greeting-unit-badge {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #64748B;
+  margin-top: 3px;
 }
 
 .btn-notification-bell {
@@ -2615,6 +2630,7 @@ body {
   cursor: pointer;
   position: relative;
   transition: transform 0.2s;
+  flex-shrink: 0;
 }
 
 .btn-notification-bell:active {
@@ -2631,60 +2647,113 @@ body {
   background: #EF4444;
 }
 
-/* 2. Hero Banner */
-.app-hero-banner {
-  background: #FFFFFF;
+/* 2. Hero Banner - Authentic Perguruan Islam NIBRAS */
+.hero-banner-nibras {
+  background: linear-gradient(135deg, #0B2545 0%, #153E75 100%);
+  color: #FFFFFF;
   border-radius: 26px;
-  padding: 20px 18px 10px 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-  border: 1px solid #F1F5F9;
-  margin-bottom: 24px;
+  padding: 20px 20px 18px;
+  box-shadow: 0 10px 28px rgba(11, 37, 69, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 22px;
   position: relative;
   overflow: hidden;
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.app-hero-banner:hover {
-  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.07);
+.hero-banner-nibras:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 34px rgba(11, 37, 69, 0.28);
 }
 
-.hero-banner-content {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  z-index: 2;
-  padding-bottom: 8px;
+.hero-banner-tag {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #FBBF24;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
 }
 
 .hero-banner-title {
   font-size: 1.35rem;
   font-weight: 800;
-  color: #0F172A;
+  color: #FFFFFF;
   line-height: 1.25;
   margin: 0;
 }
 
-.hero-banner-sub {
-  font-size: 0.85rem;
-  color: #64748B;
-  margin: 6px 0 16px;
-  font-weight: 500;
+.hero-banner-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: #93C5FD;
+  margin: 8px 0 12px;
+  font-weight: 600;
 }
 
-.hero-banner-badge-icon {
+.location-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10B981;
+  box-shadow: 0 0 8px #10B981;
+  animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseGreen {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+  70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.hero-banner-action-pill {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.hero-banner-illustration {
+.hero-banner-brand-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
-  right: -6px;
-  bottom: -4px;
-  z-index: 1;
+  flex-shrink: 0;
+  margin-left: 14px;
+}
+
+.brand-logo-circle {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), 0 0 0 4px rgba(251, 191, 36, 0.45);
+}
+
+.brand-logo-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
 }
 
 /* 3. Section Layanan */
@@ -2853,6 +2922,24 @@ body {
   color: #0F172A;
 }
 
+.attendance-card-hint {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed #E2E8F0;
+  font-size: 0.78rem;
+  color: #2563EB;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.attendance-card-hint:hover {
+  color: #1D4ED8;
+}
+
 /* 5. Floating Bottom Dock & Fingerprint Button */
 .app-floating-bottom-dock {
   position: fixed;
@@ -2860,10 +2947,11 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 32px);
-  max-width: 420px;
+  max-width: 440px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
   z-index: 99;
   pointer-events: none;
 }
@@ -2872,12 +2960,14 @@ body {
   pointer-events: auto;
   background: #FFFFFF;
   border-radius: 40px;
-  padding: 8px 22px;
+  padding: 6px 14px;
   box-shadow: 0 8px 30px rgba(15, 23, 42, 0.12);
   border: 1px solid #E2E8F0;
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 10px;
+  flex: 1;
+  justify-content: space-around;
 }
 
 .dock-nav-btn {

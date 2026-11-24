@@ -34,11 +34,14 @@ const GuruModule = {
     const elNiy = document.getElementById('guru-profile-niy');
     const elJabatan = document.getElementById('guru-profile-jabatan');
 
-    const cleanNama = (user.nama_lengkap || 'DITO JURINALDO, S.Kom').toUpperCase();
+    const cleanNama = (user.nama_lengkap || 'Dito Jurinaldo, S.Kom').toUpperCase();
     if (elNama) elNama.textContent = cleanNama;
     if (elGreeting) elGreeting.textContent = this.getDynamicGreeting();
     if (elNiy) elNiy.textContent = user.niy || '202401001';
-    if (elJabatan) elJabatan.textContent = user.jabatan || 'Operator';
+    if (elJabatan) elJabatan.textContent = user.jabatan || 'Guru / GTK';
+
+    const elUnit = document.getElementById('guru-profile-unit');
+    if (elUnit) elUnit.textContent = `${user.jabatan || 'Guru / GTK'} • ${user.nama_sekolah || 'Perguruan Islam NIBRAS'}`;
 
     // Profil detail di Tab Profil
     const elDetNama = document.getElementById('profile-detail-nama');
@@ -202,7 +205,7 @@ const GuruModule = {
     // 1. STATUS ABSEN MASUK
     let jamMasukStr = '--:--';
     if (st.sudahMasuk && st.dataMasuk) {
-      jamMasukStr = st.dataMasuk.jam_server || '07:08';
+      jamMasukStr = st.dataMasuk.jam_server || '--:--';
       if (elTimeMasuk) elTimeMasuk.textContent = jamMasukStr;
       if (elDateMasuk) elDateMasuk.textContent = todayFormatted;
     } else {
@@ -213,7 +216,7 @@ const GuruModule = {
     // 2. STATUS ABSEN PULANG
     let jamPulangStr = '--:--';
     if (st.sudahPulang && st.dataPulang) {
-      jamPulangStr = st.dataPulang.jam_server || '16:54';
+      jamPulangStr = st.dataPulang.jam_server || '--:--';
       if (elTimePulang) elTimePulang.textContent = jamPulangStr;
       if (elDescPulang) elDescPulang.textContent = 'Sudah absen pulang';
     } else {
@@ -225,15 +228,16 @@ const GuruModule = {
     if (st.sudahMasuk && st.sudahPulang) {
       this.currentAttendanceType = 'SELESAI';
       if (elCardStatus) {
-        elCardStatus.textContent = 'Hadir Lengkap';
+        elCardStatus.textContent = 'Presensi Lengkap';
         elCardStatus.className = 'card-status-badge badge-hadir';
       }
       if (elBtnActionText) elBtnActionText.textContent = '✓ Presensi Selesai';
     } else if (st.sudahMasuk) {
       this.currentAttendanceType = 'PULANG';
       if (elCardStatus) {
-        elCardStatus.textContent = 'Hadir';
-        elCardStatus.className = 'card-status-badge badge-hadir';
+        const isLate = st.dataMasuk && (st.dataMasuk.status_kehadiran === 'TERLAMBAT' || st.dataMasuk.is_terlambat);
+        elCardStatus.textContent = isLate ? 'Terlambat' : 'Hadir';
+        elCardStatus.className = 'card-status-badge ' + (isLate ? 'badge-terlambat' : 'badge-hadir');
       }
       if (elBtnActionText) elBtnActionText.textContent = 'Lakukan Absen Pulang';
     } else {
@@ -244,7 +248,6 @@ const GuruModule = {
       }
       if (elBtnActionText) elBtnActionText.textContent = 'Lakukan Absen Masuk';
     }
-  },
   },
 
   /**
@@ -620,10 +623,12 @@ const GuruModule = {
   async switchTab(tabName) {
     this.activeTab = tabName;
 
-    // Update active class pada dock baru (Beranda & Profil)
+    // Update active class pada dock baru (Beranda, Riwayat, Profil)
     const btnBeranda = document.getElementById('dock-btn-beranda');
+    const btnRiwayat = document.getElementById('dock-btn-riwayat');
     const btnProfil = document.getElementById('dock-btn-profil');
     if (btnBeranda) btnBeranda.classList.toggle('active', tabName === 'beranda');
+    if (btnRiwayat) btnRiwayat.classList.toggle('active', tabName === 'riwayat');
     if (btnProfil) btnProfil.classList.toggle('active', tabName === 'profil');
 
     // Update active class pada sidebar
